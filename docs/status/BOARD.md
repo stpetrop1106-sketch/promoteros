@@ -36,10 +36,24 @@ Numbers are reserved before use. Never edit an applied migration.
 | 0004 | `0004_waitlist_signups.sql` | Codex | **NOT APPLIED** — verified against the live DB, see I2 |
 | 0005 | `0005_matching_fixes.sql` | P0 | Reserved |
 | 0006 | `0006_auth.sql` | P1 | Reserved |
-| 0007 | token hardening | P16 | Reserved |
-| 0008 | check-in | P9 | Reserved |
-| 0009 | billing | P17 | Reserved |
-| 0010 | admin + audit | P18 | Reserved |
+| 0007 | `0007_match_radius.sql` | P0c | Reserved — renumbered, P0 took 0005 and P1 took 0006 |
+| 0008 | token hardening | P16 | Reserved |
+| 0009 | check-in | P9 | Reserved |
+| 0010 | billing | P17 | Reserved |
+| 0011 | admin + audit | P18 | Reserved |
+
+0001–0006 are **applied and verified** against the live database (`waitlist_signups` now returns 200,
+`npm run smoke` still ranks correctly after `0005`).
+
+## Cross-lane requests raised by P1 — manager decisions
+
+| # | Request | Decision |
+|---|---|---|
+| R1 | `matchPromoters()` should take an optional client so `/shifts/[id]` can pass the RLS-scoped one | **Accept.** Defence in depth, not a live leak: the shift id is proved in-agency by RLS before the call and the SQL only considers `p.agency_id = sh.agency_id`. Queued as a small Lane A parcel |
+| R2 | Same for `createInvitation()` / `refreshShiftStatus()` | **Reject for now.** P1 compensated in `app/shifts/[id]/actions.ts` by re-reading shift and promoter through the RLS client, so a forged id fails before the service role is reached. Injecting a client would *remove* that compensation. `loadInvitation`/`respondToInvitation` must keep the admin client — they are the anonymous promoter paths with no session to scope by |
+| R3 | Migration numbering conflict with build-plan §8 | **Resolved.** The registry above is authoritative; §8's numbers were written before Codex took 0004 |
+| R4 | Sign-out lives in the `/shifts` header because Lane D owns `app/layout.tsx` | **Accept as temporary.** Moves to a shared nav when one lands |
+| R5 | Tenant-isolation tests belong in `tests/**`, which P1 does not own | **Accept.** Highest-priority addition to P15; the verification recipe is written out in `docs/status/P1.md` |
 
 ---
 

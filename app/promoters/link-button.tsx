@@ -8,9 +8,11 @@ type LinkButtonSize = "sm" | "md";
 
 /**
  * A navigation link styled to match `components/ui/Button`. `Button` renders a real `<button>`
- * on purpose (so it drops into a `<form action>`), which makes it the wrong element for
- * navigation — nesting a `<button>` inside an `<a>` is invalid HTML. This mirrors its token
- * classes exactly rather than introducing a new visual language.
+ * so it can sit inside a `<form action={...}>`, which makes it the wrong element for
+ * navigation — an `<a>` is interactive content and is invalid nested inside a `<button>`. This
+ * mirrors Button's token classes exactly rather than introducing a new visual language.
+ * Self-contained here (not imported from another lane) since `app/campaigns/**` is out of
+ * bounds for this parcel.
  */
 const BASE =
   "inline-flex items-center justify-center gap-2 rounded-lg font-semibold " +
@@ -18,8 +20,7 @@ const BASE =
   "focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent)]";
 
 const VARIANTS: Record<LinkButtonVariant, string> = {
-  primary:
-    "bg-[color:var(--color-accent)] text-white hover:bg-[color:var(--color-accent-hover)]",
+  primary: "bg-[color:var(--color-accent)] text-white hover:bg-[color:var(--color-accent-hover)]",
   secondary:
     "border border-[color:var(--color-line)] bg-[color:var(--color-surface)] text-[color:var(--color-ink)] hover:bg-[color:var(--color-canvas)]",
   ghost: "text-[color:var(--color-ink)] hover:bg-[color:var(--color-canvas)]",
@@ -31,27 +32,23 @@ const SIZES: Record<LinkButtonSize, string> = {
   md: "h-10 px-4 text-sm",
 };
 
-export interface LinkButtonProps<RouteType extends string = string>
-  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
-  // Generic over the route string, mirroring Next's typed-routes wrapper pattern — a plain
-  // `href: string` here would widen every caller's literal/template href and fail `next/link`'s
-  // `RouteImpl` check, even for hrefs that are valid routes.
-  href: Route<RouteType>;
+export interface LinkButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  href: string;
   variant?: LinkButtonVariant;
   size?: LinkButtonSize;
   children: ReactNode;
 }
 
-export function LinkButton<RouteType extends string>({
+export function LinkButton({
   href,
   variant = "primary",
   size = "md",
   className,
   children,
   ...rest
-}: LinkButtonProps<RouteType>) {
+}: LinkButtonProps) {
   return (
-    <Link href={href} className={cn(BASE, VARIANTS[variant], SIZES[size], className)} {...rest}>
+    <Link href={href as Route} className={cn(BASE, VARIANTS[variant], SIZES[size], className)} {...rest}>
       {children}
     </Link>
   );

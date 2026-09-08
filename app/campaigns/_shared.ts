@@ -1,3 +1,4 @@
+import type { ZodError } from "zod";
 import type { BadgeVariant } from "@/components/ui";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -107,4 +108,47 @@ export function expandSeriesDates(
     guard += 1;
   }
   return dates;
+}
+
+/**
+ * Shared `useActionState` shape for every form in this parcel. `TField` is the union of field
+ * names that can carry an inline, next-to-the-field error; `fieldErrors` values are translation
+ * keys, never raw strings, so every zod `.refine`/`.min`/`.max` call in an `actions.ts` file must
+ * pass an explicit `TranslationKey` string as its message — see `fieldErrorsFromZodError` below.
+ */
+export type FormState<TField extends string> = {
+  status: "idle" | "error";
+  fieldErrors?: Partial<Record<TField, TranslationKey>>;
+  formError?: TranslationKey;
+};
+
+/**
+ * Flattens a zod validation error into `{ field: translationKey }`, keeping only the first issue
+ * per field (one message next to a field at a time). Every message in this codebase's campaign
+ * schemas is authored as a `TranslationKey` string on purpose, so the cast is safe as long as
+ * every `.refine`/`.min`/`.max`/`.regex` call supplies one explicitly — a bare zod default
+ * message would otherwise flow through here untranslated.
+ */
+export function fieldErrorsFromZodError<TField extends string>(
+  error: ZodError,
+): Partial<Record<TField, TranslationKey>> {
+  const out: Partial<Record<TField, TranslationKey>> = {};
+  for (const issue of error.issues) {
+    const field = String(issue.path[0] ?? "") as TField;
+    if (!field || out[field]) continue;
+    out[field] = issue.message as TranslationKey;
+  }
+  return out;
+}
+
+/** FormData text value, trimmed, with blank treated as absent so optional zod fields behave. */
+export function optionalText(value: FormDataEntryValue | null): string | undefined {
+  if (value === null) return undefined;
+  const text = String(value).trim();
+  return text === "" ? undefined : text;
+}
+
+/** FormData text value, required-but-possibly-empty — validation of emptiness is zod's job. */
+export function requiredText(value: FormDataEntryValue | null): string {
+  return value === null ? "" : String(value);
 }
