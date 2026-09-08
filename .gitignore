@@ -1,0 +1,26 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+.env
+.env.*
+!.env.example
+
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+coverage/
+.supabase/
+
+# Never commit agency data. Synthetic seed only — see CLAUDE.md §1.
+*.csv
+*.xlsx
+/data/

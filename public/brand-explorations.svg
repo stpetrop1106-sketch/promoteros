@@ -1,0 +1,68 @@
+<svg width="1600" height="960" viewBox="0 0 1600 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="960" fill="#F7F8FC"/>
+  <text x="88" y="100" fill="#161A24" font-family="Arial, sans-serif" font-size="38" font-weight="700">PromoterOS — brand directions</text>
+  <text x="88" y="142" fill="#65708A" font-family="Arial, sans-serif" font-size="20">A practical operating system for promotion agencies</text>
+
+  <!-- Direction 1 -->
+  <rect x="80" y="205" width="454" height="650" rx="22" fill="#FFFFFF"/>
+  <rect x="80" y="205" width="454" height="10" rx="5" fill="#1646B8"/>
+  <rect x="122" y="262" width="92" height="92" rx="27" fill="#1646B8"/>
+  <path d="M149 327V289H169C183 289 190 295 190 307C190 319 183 327 169 327H149Z" fill="#FFFFFF"/>
+  <path d="M169 289V327" stroke="#2ED3C6" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="195" cy="327" r="7" fill="#2ED3C6"/>
+  <text x="122" y="411" fill="#1646B8" font-family="Arial, sans-serif" font-size="38" font-weight="700">Promoter</text>
+  <text x="306" y="411" fill="#161A24" font-family="Arial, sans-serif" font-size="38" font-weight="400">OS</text>
+  <text x="122" y="468" fill="#161A24" font-family="Arial, sans-serif" font-size="23" font-weight="700">01 / Signal loop</text>
+  <text x="122" y="505" fill="#65708A" font-family="Arial, sans-serif" font-size="18">Clear, capable and dependable.</text>
+  <rect x="122" y="565" width="92" height="68" rx="12" fill="#1646B8"/>
+  <rect x="227" y="565" width="92" height="68" rx="12" fill="#2ED3C6"/>
+  <rect x="332" y="565" width="92" height="68" rx="12" fill="#F7F8FC" stroke="#D6DAE5" stroke-width="2"/>
+  <text x="122" y="684" fill="#65708A" font-family="Arial, sans-serif" font-size="16">Primary</text>
+  <text x="122" y="711" fill="#161A24" font-family="Arial, sans-serif" font-size="16" font-weight="700">#1646B8</text>
+  <text x="227" y="684" fill="#65708A" font-family="Arial, sans-serif" font-size="16">Action</text>
+  <text x="227" y="711" fill="#161A24" font-family="Arial, sans-serif" font-size="16" font-weight="700">#2ED3C6</text>
+  <text x="122" y="786" fill="#65708A" font-family="Arial, sans-serif" font-size="17">Best for: trustworthy SaaS, matching and workflow.</text>
+
+  <!-- Direction 2 -->
+  <rect x="573" y="205" width="454" height="650" rx="22" fill="#FFFFFF"/>
+  <rect x="573" y="205" width="454" height="10" rx="5" fill="#F3AA2B"/>
+  <rect x="615" y="262" width="92" height="92" rx="24" fill="#202631"/>
+  <rect x="636" y="283" width="15" height="15" rx="4" fill="#F3AA2B"/>
+  <rect x="657" y="283" width="15" height="15" rx="4" fill="#FFFFFF" opacity="0.7"/>
+  <rect x="678" y="283" width="8" height="15" rx="4" fill="#FFFFFF" opacity="0.28"/>
+  <rect x="636" y="304" width="15" height="15" rx="4" fill="#FFFFFF" opacity="0.7"/>
+  <rect x="657" y="304" width="15" height="15" rx="4" fill="#FFFFFF" opacity="0.7"/>
+  <rect x="678" y="304" width="8" height="15" rx="4" fill="#FFFFFF" opacity="0.28"/>
+  <rect x="636" y="325" width="15" height="8" rx="4" fill="#FFFFFF" opacity="0.28"/>
+  <rect x="657" y="325" width="15" height="8" rx="4" fill="#FFFFFF" opacity="0.28"/>
+  <rect x="678" y="325" width="8" height="8" rx="4" fill="#FFFFFF" opacity="0.28"/>
+  <text x="615" y="411" fill="#202631" font-family="Arial, sans-serif" font-size="38" font-weight="700">PromoterOS</text>
+  <text x="615" y="468" fill="#202631" font-family="Arial, sans-serif" font-size="23" font-weight="700">02 / Shift grid</text>
+  <text x="615" y="505" fill="#65708A" font-family="Arial, sans-serif" font-size="18">Focused, premium and operational.</text>
+  <rect x="615" y="565" width="92" height="68" rx="12" fill="#202631"/>
+  <rect x="720" y="565" width="92" height="68" rx="12" fill="#F3AA2B"/>
+  <rect x="825" y="565" width="92" height="68" rx="12" fill="#FFF7E5"/>
+  <text x="615" y="684" fill="#65708A" font-family="Arial, sans-serif" font-size="16">Ink</text>
+  <text x="615" y="711" fill="#161A24" font-family="Arial, sans-serif" font-size="16" font-weight="700">#202631</text>
+  <text x="720" y="684" fill="#65708A" font-family="Arial, sans-serif" font-size="16">Alert</text>
+  <text x="720" y="711" fill="#161A24" font-family="Arial, sans-serif" font-size="16" font-weight="700">#F3AA2B</text>
+  <text x="615" y="786" fill="#65708A" font-family="Arial, sans-serif" font-size="17">Best for: a refined operations command centre.</text>
+
+  <!-- Direction 3 -->
+  <rect x="1066" y="205" width="454" height="650" rx="22" fill="#FFFFFF"/>
+  <rect x="1066" y="205" width="454" height="10" rx="5" fill="#1E5A4E"/>
+  <rect x="1108" y="262" width="92" height="92" rx="27" fill="#1E5A4E"/>
+  <path d="M1154 283C1140 283 1129 294 1129 308C1129 326 1154 341 1154 341C1154 341 1179 326 1179 308C1179 294 1168 283 1154 283Z" fill="#C8F169"/>
+  <path d="M1144 308L1151 315L1165 300" stroke="#1E5A4E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1108" y="411" fill="#1E5A4E" font-family="Arial, sans-serif" font-size="38" font-weight="700">PromoterOS</text>
+  <text x="1108" y="468" fill="#161A24" font-family="Arial, sans-serif" font-size="23" font-weight="700">03 / Field check</text>
+  <text x="1108" y="505" fill="#65708A" font-family="Arial, sans-serif" font-size="18">Human, grounded and field-ready.</text>
+  <rect x="1108" y="565" width="92" height="68" rx="12" fill="#1E5A4E"/>
+  <rect x="1213" y="565" width="92" height="68" rx="12" fill="#C8F169"/>
+  <rect x="1318" y="565" width="92" height="68" rx="12" fill="#F4F7F2"/>
+  <text x="1108" y="684" fill="#65708A" font-family="Arial, sans-serif" font-size="16">Primary</text>
+  <text x="1108" y="711" fill="#161A24" font-family="Arial, sans-serif" font-size="16" font-weight="700">#1E5A4E</text>
+  <text x="1213" y="684" fill="#65708A" font-family="Arial, sans-serif" font-size="16">Signal</text>
+  <text x="1213" y="711" fill="#161A24" font-family="Arial, sans-serif" font-size="16" font-weight="700">#C8F169</text>
+  <text x="1108" y="786" fill="#65708A" font-family="Arial, sans-serif" font-size="17">Best for: field verification and people-first work.</text>
+</svg>

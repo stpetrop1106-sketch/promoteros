@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  /* PromoterOS — Signal loop */
+  --color-ink: #161a24;
+  --color-muted: #65708a;
+  --color-line: #d6dae5;
+  --color-canvas: #f7f8fc;
+  --color-surface: #ffffff;
+  --color-accent: #1646b8;
+  --color-accent-subtle: #e9effc;
+  --color-accent-subtle: #e9effc;
+  --color-accent-hover: #103a99;
+  --color-action: #2ed3c6;
+  --color-action-hover: #12afa3;
+  --color-ok: #147d55;
+  --color-warn: #c97609;
+  --color-bad: #c93535;
+}
+
+html,
+body {
+  color: var(--color-ink);
+  background: var(--color-canvas);
+}
