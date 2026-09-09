@@ -1,0 +1,133 @@
+import {
+  Badge,
+  EmptyState,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+  type BadgeVariant,
+} from "@/components/ui";
+import type { TranslationKey } from "@/lib/i18n";
+import { formatAthens } from "./time";
+import type { BoardRow, BoardRowState } from "./board";
+import { CancelAssignmentButton } from "./cancel-assignment-button";
+import { MarkNoShowButton } from "./mark-no-show-button";
+
+type T = (key: TranslationKey, params?: Record<string, string | number>) => string;
+
+const STATE_KEY: Record<BoardRowState, TranslationKey> = {
+  awaiting_reply: "shifts.board.state.awaiting_reply",
+  expired: "shifts.board.state.expired",
+  declined: "shifts.board.state.declined",
+  confirmed: "shifts.board.state.confirmed",
+  checked_in: "shifts.board.state.checked_in",
+  checked_in_manual: "shifts.board.state.checked_in_manual",
+  no_show: "shifts.board.state.no_show",
+  cancelled: "shifts.board.state.cancelled",
+};
+
+/** Badge colour follows urgency (`tier`), not the raw state — an "awaiting reply" 10 minutes
+ *  before the shift is a different colour from one three days out, even though the state label
+ *  reads the same. This is the whole point of P10: exceptions carry a colour that means
+ *  something, not just a status word. */
+function badgeVariant(row: BoardRow): BadgeVariant {
+  if (row.tier === 0) return "bad";
+  if (row.tier === 1) return "warn";
+  if (row.tier === 3) return "neutral";
+  return row.state === "checked_in" || row.state === "confirmed" ? "ok" : "neutral";
+}
+
+function DetailLines({ row, t }: { row: BoardRow; t: T }) {
+  const lines: string[] = [];
+
+  if (row.sentAt) lines.push(t("shifts.board.sent_at", { when: formatAthens(row.sentAt) }));
+  if (row.state === "awaiting_reply" || row.state === "expired") {
+    if (row.expiresAt) lines.push(t("shifts.board.expires_at", { when: formatAthens(row.expiresAt) }));
+  }
+  if (row.respondedAt) lines.push(t("shifts.board.responded_at", { when: formatAthens(row.respondedAt) }));
+  if (row.declineReason) lines.push(t("shifts.board.reason_label", { reason: row.declineReason }));
+  if (row.confirmedAt && row.state !== "checked_in" && row.state !== "checked_in_manual") {
+    lines.push(t("shifts.board.confirmed_at", { when: formatAthens(row.confirmedAt) }));
+  }
+  if (row.checkedInAt) {
+    lines.push(t("shifts.board.checked_in_at", { when: formatAthens(row.checkedInAt) }));
+    if (row.distanceM !== null && row.distanceM !== undefined) {
+      lines.push(t("shifts.board.distance", { m: row.distanceM }));
+    }
+    if (row.withinGeofence !== null && row.withinGeofence !== undefined) {
+      lines.push(t(row.withinGeofence ? "shifts.board.within_geofence" : "shifts.board.outside_geofence"));
+    }
+  }
+  if (row.cancelledAt) lines.push(t("shifts.board.cancelled_at", { when: formatAthens(row.cancelledAt) }));
+  if (row.cancelReason) lines.push(t("shifts.board.reason_label", { reason: row.cancelReason }));
+  if (row.tier === 0 && row.state === "confirmed") lines.push(t("shifts.board.started_no_checkin"));
+
+  return (
+    <div className="flex flex-col gap-0.5 text-xs text-[color:var(--color-muted)]">
+      {lines.map((line, i) => (
+        <span key={i}>{line}</span>
+      ))}
+    </div>
+  );
+}
+
+export function StatusBoard({ shiftId, rows, t }: { shiftId: string; rows: BoardRow[]; t: T }) {
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        title={t("shifts.board.none_title")}
+        description={t("shifts.board.none_description")}
+      />
+    );
+  }
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>{t("shifts.board.column.promoter")}</TableHeaderCell>
+          <TableHeaderCell>{t("shifts.board.column.state")}</TableHeaderCell>
+          <TableHeaderCell>{t("shifts.board.column.detail")}</TableHeaderCell>
+          <TableHeaderCell>{t("shifts.board.column.actions")}</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {rows.map((row) => (
+          <TableRow key={row.assignmentId ?? row.promoterId}>
+            <TableCell className="font-medium">{row.fullName}</TableCell>
+            <TableCell>
+              <Badge variant={badgeVariant(row)}>{t(STATE_KEY[row.state])}</Badge>
+            </TableCell>
+            <TableCell>
+              <DetailLines row={row} t={t} />
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-col gap-2">
+                {row.markableNoShow && row.assignmentId ? (
+                  <MarkNoShowButton
+                    shiftId={shiftId}
+                    assignmentId={row.assignmentId}
+                    label={t("shifts.board.no_show_action")}
+                    confirmText={t("shifts.board.no_show_confirm", { name: row.fullName })}
+                  />
+                ) : null}
+                {row.cancellable && row.assignmentId ? (
+                  <CancelAssignmentButton
+                    shiftId={shiftId}
+                    assignmentId={row.assignmentId}
+                    label={t("shifts.board.cancel_action")}
+                    confirmText={t("shifts.board.cancel_confirm", { name: row.fullName })}
+                    reasonLabel={t("shifts.board.cancel_reason_label")}
+                    reasonPlaceholder={t("shifts.board.cancel_reason_placeholder")}
+                  />
+                ) : null}
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}

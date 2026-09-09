@@ -2,6 +2,8 @@
 
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { checkWaitlistRateLimit } from "@/lib/waitlist/rate-limit";
+import { getEmailAdapter } from "@/lib/waitlist/email";
 // A "use server" module may only export async functions. The state type and its initial
 // value live in ./waitlist-state so they survive the client boundary — see that file.
 import type { WaitlistState } from "./waitlist-state";
@@ -50,6 +52,13 @@ export async function joinWaitlist(
     return { status: "success", message: "waitlist.status.success" };
   }
 
+  // This is an unauthenticated write endpoint, so it needs its own gate before touching the
+  // table — see lib/waitlist/rate-limit.ts for why this has to be database-backed.
+  const rateLimit = await checkWaitlistRateLimit();
+  if (!rateLimit.allowed) {
+    return { status: "rate_limited", message: "waitlist.status.rate_limited" };
+  }
+
   const { data } = parsed;
 
   try {
@@ -79,6 +88,19 @@ export async function joinWaitlist(
       error: error instanceof Error ? error.name : "unknown",
     });
     return { status: "error", message: "waitlist.status.error" };
+  }
+
+  // The row is already saved at this point. A confirmation email is a nice-to-have on top of
+  // that, never a condition of it — see lib/waitlist/email.ts. Any failure here is logged and
+  // swallowed, not surfaced to the registrant as an error.
+  try {
+    await getEmailAdapter().sendWaitlistConfirmation({
+      to: { name: data.fullName, email: data.workEmail },
+    });
+  } catch (error) {
+    console.error("Waitlist confirmation email threw", {
+      error: error instanceof Error ? error.name : "unknown",
+    });
   }
 
   return { status: "success", message: "waitlist.status.success" };

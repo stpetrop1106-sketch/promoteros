@@ -458,4 +458,6 @@ export const en: Record<TranslationKey, string> = {
   "report.checkin_required_notice": "You need to check in at the store first.",
   "report.back_to_checkin": "Check in",
   "report.already_submitted": "This report has already been submitted. Thank you!",
+
+  "waitlist.status.rate_limited": "Too many signup attempts from this connection. Please try again shortly.",
 };

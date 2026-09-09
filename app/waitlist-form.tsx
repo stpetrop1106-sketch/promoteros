@@ -80,7 +80,7 @@ export function WaitlistForm({ attribution, locale }: WaitlistFormProps) {
       </button>
       <p className="mt-3 text-center text-xs leading-5 text-[color:var(--color-muted)]">{t("waitlist.privacy_note")}</p>
       {state.status !== "idle" && (
-        <p className={`mt-4 rounded-lg px-3 py-2 text-sm ${state.status === "error" ? "bg-red-50 text-[color:var(--color-bad)]" : "bg-emerald-50 text-[color:var(--color-ok)]"}`} aria-live="polite">
+        <p className={`mt-4 rounded-lg px-3 py-2 text-sm ${state.status === "error" || state.status === "rate_limited" ? "bg-red-50 text-[color:var(--color-bad)]" : "bg-emerald-50 text-[color:var(--color-ok)]"}`} aria-live="polite">
           {t(state.message as TranslationKey)}
         </p>
       )}

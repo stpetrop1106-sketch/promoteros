@@ -460,4 +460,6 @@ export const el = {
   "report.checkin_required_notice": "Χρειάζεται πρώτα να δηλώσεις άφιξη στο κατάστημα.",
   "report.back_to_checkin": "Δήλωση άφιξης",
   "report.already_submitted": "Η αναφορά έχει ήδη υποβληθεί. Ευχαριστούμε!",
+
+  "waitlist.status.rate_limited": "Έγιναν πολλές προσπάθειες εγγραφής από αυτή τη σύνδεση. Δοκίμασε ξανά σε λίγο.",
 } as const;

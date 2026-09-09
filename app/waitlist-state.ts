@@ -12,7 +12,7 @@ import type { TranslationKey } from "@/lib/i18n";
  * Keep plain values and types here; keep server actions there.
  */
 export type WaitlistState = {
-  status: "idle" | "success" | "already_joined" | "error";
+  status: "idle" | "success" | "already_joined" | "error" | "rate_limited";
   message: TranslationKey;
 };
 
