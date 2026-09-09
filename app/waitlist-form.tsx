@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, type ReactNode } from "react";
-import { initialWaitlistState, joinWaitlist } from "@/app/actions";
+import { joinWaitlist } from "@/app/actions";
+import { initialWaitlistState } from "@/app/waitlist-state";
 import type { Locale, TranslationKey } from "@/lib/i18n";
 import { translatorFor } from "@/lib/i18n";
 

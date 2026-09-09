@@ -1,0 +1,122 @@
+import Link from "next/link";
+import { loadCheckin } from "@/lib/checkins";
+import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { CheckinForm } from "./checkin-form";
+
+export const dynamic = "force-dynamic";
+
+/**
+ * The promoter's arrival page. No login: the signed link is the credential, same shape as
+ * `/i/[token]`. Mobile-first — this is opened standing in a supermarket, on one bar of signal.
+ *
+ * The "not yet time" gate is date-level only (not hour-level): the codebase has no timezone
+ * utility yet, and a wrong hour-level cutoff that blocks a legitimate early or late arrival is
+ * a worse failure than being slightly permissive. See docs/status/P9.md.
+ */
+export default async function CheckinPage({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  const { token } = await params;
+  const t = translatorFor(DEFAULT_LOCALE);
+  const result = await loadCheckin(token);
+
+  if (!result.ok) {
+    return (
+      <main className="mx-auto max-w-md px-6 py-16 text-center">
+        <p className="text-[color:var(--color-muted)]">{t("checkin.expired")}</p>
+      </main>
+    );
+  }
+
+  const v = result.view;
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const notYetTime = !v.checkedIn && v.onDate > todayIso;
+  const alreadyDone = v.checkedIn && v.hasReport;
+  const reportHref = `/c/${token}/report`;
+
+  const labels = {
+    confirm: t("checkin.confirm"),
+    locating: t("checkin.locating"),
+    submitting: t("checkin.submitting"),
+    success: t("checkin.success"),
+    tooFar: t("checkin.too_far"),
+    recordedFarNote: t("checkin.recorded_far_note"),
+    goToReport: t("checkin.go_to_report"),
+    useOverride: t("checkin.override"),
+    overridePrompt: t("checkin.override_prompt"),
+    overrideReasonLabel: t("checkin.override_reason_label"),
+    overrideReasonPlaceholder: t("checkin.override_reason_placeholder"),
+    overrideSubmit: t("checkin.override_submit"),
+    retryGeo: t("checkin.retry_geo"),
+    geoDenied: t("checkin.geo_denied"),
+    geoUnavailable: t("checkin.geo_unavailable"),
+    geoTimeout: t("checkin.geo_timeout"),
+    geoUnsupported: t("checkin.geo_unsupported"),
+    geoInsecure: t("checkin.geo_insecure"),
+    saveFailedByReason: {
+      already_checked_in: t("checkin.already_checked_in_error"),
+      default: t("checkin.save_failed"),
+    },
+  };
+
+  return (
+    <main className="mx-auto max-w-md px-6 py-12">
+      <h1 className="text-lg font-semibold">{t("checkin.title")}</h1>
+
+      <dl className="mt-6 space-y-3 rounded-lg border border-[color:var(--color-line)] bg-white p-5 text-sm">
+        <div>
+          <dt className="text-[color:var(--color-muted)]">{t("shifts.campaign")}</dt>
+          <dd className="font-medium">{v.campaignName}</dd>
+        </div>
+        <div>
+          <dt className="text-[color:var(--color-muted)]">{t("shifts.store")}</dt>
+          <dd className="font-medium">
+            {v.storeName}
+            {v.storeAddress ? ` · ${v.storeAddress}` : ""}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-[color:var(--color-muted)]">{t("shifts.date")}</dt>
+          <dd className="font-medium">
+            {v.onDate} · {v.startTime}–{v.endTime}
+          </dd>
+        </div>
+        {v.briefSummary && (
+          <div>
+            <dt className="text-[color:var(--color-muted)]">{t("checkin.brief_title")}</dt>
+            <dd>{v.briefSummary}</dd>
+          </div>
+        )}
+      </dl>
+
+      <p className="mt-4 text-xs text-[color:var(--color-muted)]">{t("checkin.privacy")}</p>
+
+      {alreadyDone ? (
+        <p className="mt-6 text-center text-sm">{t("checkin.already_done")}</p>
+      ) : v.checkedIn ? (
+        <div className="mt-6 space-y-3 text-center text-sm">
+          <p className="font-medium text-[color:var(--color-ok)]">{t("checkin.success")}</p>
+          {v.withinGeofence === false && (
+            <p className="text-[color:var(--color-muted)]">
+              {t("checkin.too_far")} {t("checkin.recorded_far_note")}
+            </p>
+          )}
+          <Link
+            href={reportHref}
+            className="inline-block rounded-lg bg-[color:var(--color-action)] px-4 py-3 font-medium text-white"
+          >
+            {t("checkin.go_to_report")}
+          </Link>
+        </div>
+      ) : notYetTime ? (
+        <p className="mt-6 text-center text-sm text-[color:var(--color-muted)]">
+          {t("checkin.not_yet_time")}
+        </p>
+      ) : (
+        <CheckinForm token={token} reportHref={reportHref} labels={labels} />
+      )}
+    </main>
+  );
+}

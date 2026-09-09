@@ -1,18 +1,10 @@
 "use server";
 
 import { z } from "zod";
-import type { TranslationKey } from "@/lib/i18n";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-export type WaitlistState = {
-  status: "idle" | "success" | "already_joined" | "error";
-  message: TranslationKey;
-};
-
-export const initialWaitlistState: WaitlistState = {
-  status: "idle",
-  message: "waitlist.status.idle",
-};
+// A "use server" module may only export async functions. The state type and its initial
+// value live in ./waitlist-state so they survive the client boundary — see that file.
+import type { WaitlistState } from "./waitlist-state";
 
 const waitlistSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
