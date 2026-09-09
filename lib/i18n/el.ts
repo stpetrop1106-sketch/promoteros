@@ -510,4 +510,235 @@ export const el = {
   "shifts.replacements.pending_count": "{count} προσκλήσεις σε αναμονή απάντησης",
   "shifts.replacements.score_label": "Βαθμολογία αντιστοίχισης για {name}",
   "shifts.replacements.reinvite": "Πρόσκληση",
+
+  // --- P19 — λογαριασμοί, ομάδα και πρώτα βήματα ---------------------------
+
+  "onboarding.signin.title": "Συνδέσου για να συνεχίσεις",
+  "onboarding.signin.body":
+    "Στείλε στον εαυτό σου έναν σύνδεσμο σύνδεσης και επέστρεψε εδώ για να δημιουργήσεις το πρακτορείο σου.",
+  "onboarding.signin.cta": "Σύνδεση",
+
+  "onboarding.create.title": "Δημιούργησε το πρακτορείο σου",
+  "onboarding.create.subtitle": "Τρία στοιχεία και είσαι μέσα. Γίνεσαι ιδιοκτήτης του λογαριασμού.",
+  "onboarding.create.name_label": "Όνομα πρακτορείου",
+  "onboarding.create.name_hint":
+    "Όπως το ξέρουν οι πελάτες σου. Θα το βλέπει η ομάδα σου στις προσκλήσεις.",
+  "onboarding.create.name_placeholder": "π.χ. Field Force Athens",
+  "onboarding.create.city_label": "Πόλη βάσης",
+  "onboarding.create.city_hint": "Προαιρετικό. Δείχνει πού δουλεύεις κυρίως.",
+  "onboarding.create.city_placeholder": "π.χ. Αθήνα",
+  "onboarding.create.timezone_label": "Ζώνη ώρας",
+  "onboarding.create.timezone_hint": "Όλες οι ώρες βαρδιών εμφανίζονται σε αυτή τη ζώνη.",
+  "onboarding.create.full_name_label": "Το όνομά σου",
+  "onboarding.create.full_name_hint": "Προαιρετικό. Έτσι θα σε βλέπει η ομάδα σου.",
+  "onboarding.create.submit": "Δημιουργία πρακτορείου",
+  "onboarding.create.submitting": "Δημιουργία…",
+  "onboarding.create.trial_note": "14 ημέρες δοκιμή. Δεν χρειάζεται κάρτα.",
+  "onboarding.create.invited_instead":
+    "Σε προσκάλεσε συνάδελφος; Άνοιξε τον σύνδεσμο που έλαβες με email αντί να δημιουργήσεις νέο πρακτορείο.",
+
+  "onboarding.errors.name_too_short": "Γράψε το όνομα του πρακτορείου (τουλάχιστον 2 χαρακτήρες).",
+  "onboarding.errors.name_too_long": "Το όνομα είναι πολύ μεγάλο (έως 120 χαρακτήρες).",
+  "onboarding.errors.city_too_long": "Η πόλη είναι πολύ μεγάλη (έως 80 χαρακτήρες).",
+  "onboarding.errors.timezone_invalid": "Διάλεξε μία από τις διαθέσιμες ζώνες ώρας.",
+  "onboarding.errors.already_in_agency":
+    "Ανήκεις ήδη σε πρακτορείο. Ένας λογαριασμός ανήκει σε ένα μόνο πρακτορείο.",
+  "onboarding.errors.not_authenticated": "Η σύνδεσή σου έληξε. Συνδέσου ξανά και δοκίμασε πάλι.",
+  "onboarding.errors.no_email":
+    "Ο λογαριασμός σου δεν έχει email. Συνδέσου ξανά με σύνδεσμο email.",
+  "onboarding.errors.unknown":
+    "Δεν ολοκληρώθηκε η δημιουργία. Φόρτωσε ξανά τη σελίδα και δοκίμασε πάλι.",
+
+  "onboarding.title": "Τα πρώτα σου βήματα",
+  "onboarding.subtitle": "{agency} — τρία βήματα μέχρι την πρώτη κατάταξη promoters.",
+  "onboarding.progress": "{done} από {total} βήματα ολοκληρωμένα",
+  "onboarding.trial_ends": "η δοκιμή λήγει {date}",
+  "onboarding.skip_all": "Θα το κάνω αργότερα",
+  "onboarding.settings_link": "Ρυθμίσεις και ομάδα",
+  "onboarding.step.done": "Έγινε",
+  "onboarding.step.optional": "Προαιρετικό",
+  "onboarding.step.count": "{count} από {target}",
+  "onboarding.step.promoters.title": "Πρόσθεσε τους πρώτους τρεις promoters",
+  "onboarding.step.promoters.why":
+    "Με λιγότερους από τρεις, η κατάταξη δεν έχει τι να συγκρίνει.",
+  "onboarding.step.promoters.cta": "Νέος promoter",
+  "onboarding.step.campaign.title": "Δημιούργησε την πρώτη καμπάνια",
+  "onboarding.step.campaign.why":
+    "Η καμπάνια κρατά τον πελάτη, το κατάστημα και την αμοιβή — τα χρειάζεται η βάρδια.",
+  "onboarding.step.campaign.cta": "Νέα καμπάνια",
+  "onboarding.step.shift.title": "Άνοιξε την πρώτη βάρδια",
+  "onboarding.step.shift.why":
+    "Η βάρδια είναι αυτό που προσφέρεις: ημερομηνία, ώρα, κατάστημα, πόσα άτομα.",
+  "onboarding.step.shift.cta": "Στις καμπάνιες",
+  "onboarding.step.team.title": "Κάλεσε την ομάδα σου",
+  "onboarding.step.team.why":
+    "Οι συντονιστές σου δουλεύουν στα ίδια δεδομένα, χωρίς κοινόχρηστο κωδικό.",
+  "onboarding.step.team.cta": "Πρόσκληση",
+  "onboarding.aha.title": "Δες την κατάταξη",
+  "onboarding.aha.body":
+    "Άνοιξε τη βάρδια και δες ποιοι promoters ταιριάζουν — και γιατί ο καθένας είναι εκεί που είναι.",
+  "onboarding.aha.locked":
+    "Χρειάζεσαι μια βάρδια για να δεις κατάταξη. Ιδανικά και {count} promoters, ώστε η σειρά να έχει νόημα.",
+  "onboarding.aha.cta": "Άνοιξε τη βάρδια",
+  "onboarding.aha.locked_cta": "Δημιούργησε βάρδια",
+
+  "onboarding.join.title": "Πρόσκληση στην ομάδα",
+  "onboarding.join.invited_to": "Προσκλήθηκες στο {agency}",
+  "onboarding.join.role_label": "Ρόλος",
+  "onboarding.join.sent_to": "Στάλθηκε στο {email}",
+  "onboarding.join.expires": "Λήγει {when}",
+  "onboarding.join.signin_title": "Συνδέσου για να αποδεχτείς",
+  "onboarding.join.signin_body":
+    "Η πρόσκληση ισχύει μόνο για το {email}. Θα σου στείλουμε σύνδεσμο σύνδεσης και θα επιστρέψεις εδώ.",
+  "onboarding.join.signin_cta": "Σύνδεση",
+  "onboarding.join.accept_body": "Με την αποδοχή αποκτάς πρόσβαση στα δεδομένα του {agency}.",
+  "onboarding.join.accept": "Αποδοχή πρόσκλησης",
+  "onboarding.join.accepting": "Γίνεται αποδοχή…",
+  "onboarding.join.wrong_email_title": "Είσαι συνδεδεμένος/η με άλλο email",
+  "onboarding.join.wrong_email_body":
+    "Η πρόσκληση στάλθηκε στο {invited}, αλλά είσαι συνδεδεμένος/η ως {current}. Αποσυνδέσου και συνδέσου με το σωστό email.",
+  "onboarding.join.sign_out_and_return": "Αποσύνδεση και επιστροφή εδώ",
+  "onboarding.join.already_in_agency_body":
+    "Ανήκεις ήδη σε πρακτορείο, οπότε αυτή η πρόσκληση δεν χρειάζεται. Ένας λογαριασμός ανήκει σε ένα μόνο πρακτορείο.",
+  "onboarding.join.go_to_app": "Στις βάρδιες",
+  "onboarding.join.invalid_title": "Ο σύνδεσμος δεν είναι έγκυρος",
+  "onboarding.join.invalid_body":
+    "Ζήτα από τον ιδιοκτήτη του λογαριασμού να σου στείλει νέα πρόσκληση.",
+  "onboarding.join.expired_title": "Η πρόσκληση έληξε",
+  "onboarding.join.expired_body":
+    "Οι προσκλήσεις ισχύουν για επτά ημέρες. Ζήτα νέα από τον ιδιοκτήτη του λογαριασμού.",
+  "onboarding.join.used_title": "Η πρόσκληση έχει ήδη χρησιμοποιηθεί",
+  "onboarding.join.used_body":
+    "Κάθε πρόσκληση ισχύει μία φορά. Αν είσαι ήδη μέλος, απλώς συνδέσου.",
+  "onboarding.join.error_way_out": "Πήγαινε στα πρώτα βήματα",
+
+  "team.title": "Ομάδα",
+  "team.subtitle": "Ποιος έχει πρόσβαση στα δεδομένα του {agency}.",
+  "team.back_to_settings": "Ρυθμίσεις",
+  "team.seats": "{used} από {limit} θέσεις σε χρήση",
+  "team.members_title": "Μέλη",
+  "team.you": "(εσύ)",
+  "team.readonly_notice":
+    "Μόνο ο ιδιοκτήτης του λογαριασμού μπορεί να προσκαλεί, να αλλάζει ρόλους και να αφαιρεί μέλη.",
+  "team.no_agency_title": "Δεν ανήκεις ακόμα σε πρακτορείο",
+  "team.no_agency_body":
+    "Δημιούργησε το πρακτορείο σου ή άνοιξε τον σύνδεσμο πρόσκλησης που έλαβες.",
+  "team.no_agency_cta": "Δημιουργία πρακτορείου",
+  "team.status.active": "Ενεργό",
+  "team.status.invited": "Εκκρεμεί",
+  "team.status.removed": "Αφαιρέθηκε",
+  "team.role.owner": "Ιδιοκτήτης",
+  "team.role.coordinator": "Συντονιστής",
+  "team.role.supervisor": "Επόπτης",
+  "team.role.admin": "Διαχειριστής",
+
+  "team.invite.title": "Πρόσκληση συναδέλφου",
+  "team.invite.subtitle":
+    "Στέλνεις έναν σύνδεσμο. Ο συνάδελφος συνδέεται με το δικό του email — χωρίς κοινόχρηστους κωδικούς.",
+  "team.invite.email_label": "Email συναδέλφου",
+  "team.invite.email_hint": "Η πρόσκληση ισχύει μόνο για αυτή τη διεύθυνση και για επτά ημέρες.",
+  "team.invite.email_placeholder": "onoma@etaireia.gr",
+  "team.invite.role_label": "Ρόλος",
+  "team.invite.role_hint":
+    "Ο συντονιστής βλέπει και διαχειρίζεται τη δουλειά. Μόνο ο ιδιοκτήτης διαχειρίζεται την ομάδα.",
+  "team.invite.submit": "Δημιουργία πρόσκλησης",
+  "team.invite.submitting": "Δημιουργία…",
+  "team.invite.sent_title": "Η πρόσκληση για {email} είναι έτοιμη",
+  "team.invite.sent_body":
+    "Στείλε τον σύνδεσμο στον συνάδελφό σου. Ισχύει μία φορά και λήγει σε επτά ημέρες.",
+  "team.invite.copy_link": "Αντιγραφή συνδέσμου",
+  "team.invite.copied": "Αντιγράφηκε",
+  "team.invite.no_seats_title": "Δεν υπάρχουν ελεύθερες θέσεις",
+  "team.invite.no_seats_body":
+    "Αφαίρεσε ένα μέλος ή ακύρωσε μια εκκρεμή πρόσκληση για να ελευθερώσεις θέση.",
+
+  "team.pending_title": "Εκκρεμείς προσκλήσεις",
+  "team.pending_none_title": "Καμία εκκρεμής πρόσκληση",
+  "team.pending_none_body": "Όταν προσκαλέσεις κάποιον, θα εμφανιστεί εδώ μέχρι να συνδεθεί.",
+  "team.pending.expires": "Λήγει {when}",
+  "team.pending.expired": "Έληξε {when}",
+  "team.pending.revoke": "Ακύρωση",
+
+  "team.removed_title": "Μέλη χωρίς πρόσβαση",
+  "team.removed_body": "Το ιστορικό τους παραμένει. Μπορείς να τους ξαναπροσκαλέσεις όποτε θες.",
+
+  "team.role_change.label": "Ρόλος",
+  "team.role_change.submit": "Αλλαγή ρόλου",
+  "team.role_change.done": "Ο ρόλος άλλαξε.",
+  "team.role_change.self_blocked": "Δεν μπορείς να αλλάξεις τον δικό σου ρόλο.",
+  "team.role_change.last_owner_blocked":
+    "Είναι ο τελευταίος ιδιοκτήτης. Όρισε πρώτα δεύτερο ιδιοκτήτη.",
+
+  "team.remove.action": "Αφαίρεση από την ομάδα",
+  "team.remove.confirm_title": "Να αφαιρεθεί ο/η {name};",
+  "team.remove.consequence_access":
+    "Χάνει αμέσως την πρόσβαση σε όλα τα δεδομένα του πρακτορείου.",
+  "team.remove.consequence_history": "Το όνομά του/της παραμένει σε ό,τι έχει καταχωρήσει.",
+  "team.remove.consequence_seat":
+    "Ελευθερώνεται μία θέση και μπορείς να τον/την ξαναπροσκαλέσεις.",
+  "team.remove.confirm": "Ναι, αφαίρεσέ τον/την",
+  "team.remove.cancel": "Άκυρο",
+  "team.remove.self_blocked": "Δεν μπορείς να αφαιρέσεις τον εαυτό σου.",
+  "team.remove.last_owner_blocked":
+    "Είναι ο τελευταίος ιδιοκτήτης και δεν μπορεί να αφαιρεθεί.",
+
+  "team.errors.not_authenticated": "Η σύνδεσή σου έληξε. Συνδέσου ξανά και δοκίμασε πάλι.",
+  "team.errors.not_owner": "Μόνο ο ιδιοκτήτης του λογαριασμού μπορεί να το κάνει αυτό.",
+  "team.errors.no_agency": "Ο λογαριασμός σου δεν συνδέεται με πρακτορείο.",
+  "team.errors.no_email": "Ο λογαριασμός σου δεν έχει email. Συνδέσου ξανά με σύνδεσμο email.",
+  "team.errors.email_invalid": "Γράψε μια έγκυρη διεύθυνση email.",
+  "team.errors.role_invalid": "Διάλεξε έναν από τους διαθέσιμους ρόλους.",
+  "team.errors.token_invalid": "Ο σύνδεσμος πρόσκλησης δεν δημιουργήθηκε σωστά. Δοκίμασε ξανά.",
+  "team.errors.already_member": "Αυτό το email ανήκει ήδη σε μέλος της ομάδας σου.",
+  "team.errors.belongs_to_other_agency":
+    "Αυτό το email ανήκει ήδη σε άλλο πρακτορείο. Ένας λογαριασμός ανήκει σε ένα μόνο πρακτορείο.",
+  "team.errors.seat_limit_reached":
+    "Έφτασες το όριο θέσεων του πακέτου σου. Ελευθέρωσε μία θέση ή αναβάθμισε.",
+  "team.errors.seat_limit_reached_accept":
+    "Το πρακτορείο δεν έχει ελεύθερη θέση αυτή τη στιγμή. Ζήτα από τον ιδιοκτήτη να ελευθερώσει μία.",
+  "team.errors.invitation_not_found": "Δεν βρέθηκε αυτή η πρόσκληση. Ζήτα νέα.",
+  "team.errors.invitation_used": "Η πρόσκληση έχει ήδη χρησιμοποιηθεί.",
+  "team.errors.invitation_expired": "Η πρόσκληση έληξε. Ζήτα νέα.",
+  "team.errors.invitation_email_mismatch": "Η πρόσκληση στάλθηκε σε άλλη διεύθυνση email.",
+  "team.errors.already_in_agency": "Ανήκεις ήδη σε πρακτορείο.",
+  "team.errors.member_not_found": "Δεν βρέθηκε αυτό το μέλος στην ομάδα σου.",
+  "team.errors.member_inactive": "Αυτό το μέλος δεν έχει ήδη πρόσβαση.",
+  "team.errors.cannot_change_own_role": "Δεν μπορείς να αλλάξεις τον δικό σου ρόλο.",
+  "team.errors.cannot_remove_self": "Δεν μπορείς να αφαιρέσεις τον εαυτό σου.",
+  "team.errors.last_owner": "Το πρακτορείο πρέπει να έχει τουλάχιστον έναν ιδιοκτήτη.",
+  "team.errors.signing_secret_missing":
+    "Λείπει η ρύθμιση TOKEN_SIGNING_SECRET, οπότε δεν μπορεί να δημιουργηθεί σύνδεσμος πρόσκλησης.",
+  "team.errors.unknown": "Η ενέργεια δεν ολοκληρώθηκε. Φόρτωσε ξανά τη σελίδα και δοκίμασε πάλι.",
+
+  "settings.title": "Ρυθμίσεις",
+  "settings.subtitle": "Ο λογαριασμός του πρακτορείου και η ομάδα σου.",
+  "settings.agency.title": "Πρακτορείο",
+  "settings.agency.name": "Όνομα",
+  "settings.agency.city": "Πόλη",
+  "settings.agency.timezone": "Ζώνη ώρας",
+  "settings.agency.plan": "Πακέτο",
+  "settings.agency.status": "Κατάσταση συνδρομής",
+  "settings.agency.trial_ends": "Λήξη δοκιμής",
+  "settings.agency.seats": "Θέσεις",
+  "settings.agency.promoter_limit": "Promoters",
+  "settings.agency.promoter_usage": "{used} από {limit}",
+  "settings.agency.change_note":
+    "Η αλλαγή ονόματος και πακέτου έρχεται μαζί με τη χρέωση, σε επόμενη έκδοση.",
+  "settings.plan.starter": "Starter",
+  "settings.plan.agency": "Agency",
+  "settings.plan.multi_brand": "Multi-brand",
+  "settings.subscription.trialing": "Σε δοκιμή",
+  "settings.subscription.active": "Ενεργή",
+  "settings.subscription.past_due": "Εκκρεμεί πληρωμή",
+  "settings.subscription.canceled": "Ακυρωμένη",
+  "settings.subscription.paused": "Σε παύση",
+  "settings.card.team_title": "Ομάδα",
+  "settings.card.team_body_owner":
+    "Προσκάλεσε συναδέλφους, άλλαξε ρόλους και αφαίρεσε πρόσβαση.",
+  "settings.card.team_body_staff": "Δες ποιος έχει πρόσβαση στα δεδομένα του πρακτορείου.",
+  "settings.card.team_cta": "Διαχείριση ομάδας",
+  "settings.card.onboarding_title": "Τα πρώτα σου βήματα",
+  "settings.card.onboarding_body":
+    "Δεν έφτασες ακόμα στην πρώτη κατάταξη promoters. Συνέχισε από εκεί που έμεινες.",
+  "settings.card.onboarding_cta": "Συνέχεια",
 } as const;
