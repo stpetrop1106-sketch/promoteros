@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import type { Route } from "next";
 import { checkinWithGeo, checkinWithOverride, type CheckinActionState } from "./actions";
 
 export type CheckinFormLabels = {
@@ -36,13 +37,17 @@ type Phase = "idle" | "locating" | "submitting" | "success" | "override";
  * context, unsupported browser, or a server error) lands on the manual override form below,
  * never on a dead end.
  */
-export function CheckinForm({
+export function CheckinForm<RouteType extends string>({
   token,
   reportHref,
   labels,
 }: {
   token: string;
-  reportHref: string;
+  // Generic over the route string, mirroring Next's typed-routes wrapper pattern used
+  // elsewhere in this codebase (e.g. app/campaigns/link-button.tsx) — a plain `href: string`
+  // prop would widen the caller's literal/template href and fail `next/link`'s `RouteImpl`
+  // check even for a href that is a valid route.
+  reportHref: Route<RouteType>;
   labels: CheckinFormLabels;
 }) {
   const [phase, setPhase] = useState<Phase>("idle");

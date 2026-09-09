@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { submitCheckin } from "@/lib/checkins";
 
 export type CheckinActionState =
-  | { status: "idle" }
   | { status: "success"; withinGeofence: boolean | null }
   | { status: "error"; reason: string };
 

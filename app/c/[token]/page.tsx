@@ -34,7 +34,6 @@ export default async function CheckinPage({
   const todayIso = new Date().toISOString().slice(0, 10);
   const notYetTime = !v.checkedIn && v.onDate > todayIso;
   const alreadyDone = v.checkedIn && v.hasReport;
-  const reportHref = `/c/${token}/report`;
 
   const labels = {
     confirm: t("checkin.confirm"),
@@ -104,7 +103,7 @@ export default async function CheckinPage({
             </p>
           )}
           <Link
-            href={reportHref}
+            href={`/c/${token}/report`}
             className="inline-block rounded-lg bg-[color:var(--color-action)] px-4 py-3 font-medium text-white"
           >
             {t("checkin.go_to_report")}
@@ -115,7 +114,7 @@ export default async function CheckinPage({
           {t("checkin.not_yet_time")}
         </p>
       ) : (
-        <CheckinForm token={token} reportHref={reportHref} labels={labels} />
+        <CheckinForm token={token} reportHref={`/c/${token}/report`} labels={labels} />
       )}
     </main>
   );
