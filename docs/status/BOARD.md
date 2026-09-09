@@ -73,15 +73,37 @@ context. Two at a time is slower per wall-clock hour and strictly faster to a fi
 
 ---
 
-## Wave 1 — in flight
+## Parcel ledger
 
-| Parcel | Title | Model | Status | Blocks |
+| Parcel | Title | Model | Status | Manager verification |
 |---|---|---|---|---|
-| P0 | Prove the matching engine | Opus | in_progress | P7, P8, P13 |
-| P1 | Auth + RLS end to end | Opus | in_progress | P4, P5, P17, P18 |
-| P2 | Application UI kit | Sonnet | **accepted** | — |
-| P15 | Test harness | Sonnet | **accepted** | — |
-| P3a | Geocoding adapter | Sonnet | in_progress | P3b |
+| P0 | Prove the matching engine | Opus | **accepted** | `npm run smoke` run by the manager; 0 dominance violations |
+| P0c | Distance ceiling + seed realism | Sonnet | **accepted** | Score spread sd 0.11 → 0.21; smoke reports **0 problems** after 0007 |
+| P1 | Auth + RLS end to end | Opus | **accepted** | `/login` 200, protected routes 307 |
+| P2 | Application UI kit | Sonnet | **accepted** | typecheck clean, scope respected |
+| P3a | Geocoding adapter | Sonnet | **accepted** | 22 tests, all failure paths return null |
+| P3b | Promoter management | Sonnet | **accepted** | typecheck clean; concurrent i18n append survived |
+| P4 | Campaigns, briefs, shift series | Sonnet | **accepted** | typecheck clean repo-wide |
+| P9 | Check-in + field report | Sonnet | **accepted** | typecheck clean; **not yet exercised on a device** |
+| P15 | Test harness | Sonnet | **accepted** | `npm test` → 54 passing |
+| P21 | Waitlist hardening | Sonnet | **accepted** | verify passes; rate limiter increments 1→2 atomically |
+| P8+P10 | Replacement panel + status board | Sonnet | in_progress | — |
+
+**Applied migrations: 0001–0010.** All verified against the live database.
+
+### Deliberately not built yet
+
+P19 accounts/onboarding, P17 billing, P18 admin console, P20 idiot-proofing pass — all Wave 5 in
+build-plan §8. They come after the core loop is proven, because billing for a product that does not
+work yet is the wrong order.
+
+### Outstanding manager actions
+
+| # | Action | Blocked on |
+|---|---|---|
+| M6 | Move the project out of OneDrive to `C:\dev\promoteros` | P8+P10 finishing — it is writing to the folder now |
+| M7 | Full 8-step acceptance test | M6 |
+| M8 | Real legal entity for `/privacy`; Vercel account | Stella |
 
 ### P2 — manager verification, accepted
 

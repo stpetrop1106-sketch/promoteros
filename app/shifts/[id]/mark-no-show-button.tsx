@@ -3,7 +3,19 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui";
+import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { markNoShow, type MarkNoShowState } from "./actions";
+
+const t = translatorFor(DEFAULT_LOCALE);
+
+const KNOWN_ERROR_REASONS = new Set(["missing_ids", "not_found", "not_confirmed", "save_failed"]);
+
+/** See the identical helper in `cancel-assignment-button.tsx` — kept duplicated rather than
+ *  shared because this parcel does not own a place outside `app/shifts/[id]/` to put it. */
+function errorMessage(reason: string | undefined): string {
+  const safe = reason && KNOWN_ERROR_REASONS.has(reason) ? reason : "save_failed";
+  return t(`shifts.board.error.${safe}` as TranslationKey);
+}
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -50,7 +62,9 @@ export function MarkNoShowButton({
       <input type="hidden" name="assignmentId" value={assignmentId} />
       <Submit label={label} />
       {state.status === "error" ? (
-        <span className="text-xs text-[color:var(--color-bad)]">{state.reason}</span>
+        <span role="alert" className="text-xs text-[color:var(--color-bad)]">
+          {errorMessage(state.reason)}
+        </span>
       ) : null}
     </form>
   );

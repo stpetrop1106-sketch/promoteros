@@ -1,13 +1,16 @@
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
-import { matchPromoters, topReasons, type MatchFactor } from "@/lib/matching";
-import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { InviteButton } from "./invite-button";
+import { matchPromoters } from "@/lib/matching";
+import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { Badge, PageHeader } from "@/components/ui";
+import { buildBoard, summariseCoverage, type RawAssignment, type RawCheckIn, type RawInvitation } from "./board";
+import { StatusBoard } from "./status-board";
+import { ReplacementPanel } from "./replacement-panel";
 
 export const dynamic = "force-dynamic";
 
-const factorKey = (f: MatchFactor) => `match.factor.${f}` as TranslationKey;
+type PromoterRef = { full_name: string } | null;
 
 export default async function ShiftDetailPage({
   params,
@@ -33,76 +36,99 @@ export default async function ShiftDetailPage({
 
   const store = shift.stores as unknown as { name: string; address: string } | null;
   const campaign = shift.campaigns as unknown as { name: string } | null;
+  const startTime = String(shift.start_time).slice(0, 5);
+  const endTime = String(shift.end_time).slice(0, 5);
+
+  // Everyone who has ever been invited or assigned to this shift, plus their check-in if any.
+  // All three queries go through the same RLS-scoped client as the shift above — no service
+  // role is reachable from this page at all.
+  const [{ data: assignmentsData }, { data: invitationsData }] = await Promise.all([
+    db
+      .from("assignments")
+      .select("id, promoter_id, status, confirmed_at, cancelled_at, cancel_reason, promoters(full_name)")
+      .eq("shift_id", id),
+    db
+      .from("invitations")
+      .select("id, promoter_id, status, sent_at, expires_at, responded_at, decline_reason, promoters(full_name)")
+      .eq("shift_id", id)
+      .order("sent_at", { ascending: false }),
+  ]);
+
+  const assignmentRows = assignmentsData ?? [];
+  const assignmentIds = assignmentRows.map((a) => a.id);
+
+  const { data: checkInsData } =
+    assignmentIds.length > 0
+      ? await db
+          .from("check_ins")
+          .select("assignment_id, checked_in_at, distance_from_store_m, within_geofence, method")
+          .in("assignment_id", assignmentIds)
+      : { data: [] };
+
+  const assignments: RawAssignment[] = assignmentRows.map((a) => ({
+    id: a.id,
+    promoterId: a.promoter_id,
+    fullName: (a.promoters as unknown as PromoterRef)?.full_name ?? "—",
+    status: a.status,
+    confirmedAt: a.confirmed_at,
+    cancelledAt: a.cancelled_at,
+    cancelReason: a.cancel_reason,
+  }));
+
+  const invitations: RawInvitation[] = (invitationsData ?? []).map((i) => ({
+    id: i.id,
+    promoterId: i.promoter_id,
+    fullName: (i.promoters as unknown as PromoterRef)?.full_name ?? "—",
+    status: i.status,
+    sentAt: i.sent_at,
+    expiresAt: i.expires_at,
+    respondedAt: i.responded_at,
+    declineReason: i.decline_reason,
+  }));
+
+  const checkIns: RawCheckIn[] = (checkInsData ?? []).map((c) => ({
+    assignmentId: c.assignment_id,
+    checkedInAt: c.checked_in_at,
+    distanceFromStoreM: c.distance_from_store_m,
+    withinGeofence: c.within_geofence,
+    method: c.method,
+  }));
+
+  const coverage = summariseCoverage(shift.promoters_required, assignments, invitations);
+  const boardRows = buildBoard(shift.on_date, startTime, assignments, invitations, checkIns);
 
   // The shift id above was proved to belong to this agency by RLS, and `match_promoters` only
   // ever considers promoters with the shift's own `agency_id`, so this cannot cross a tenant
   // boundary. It is still the last call on a coordinator path reaching the service role —
   // `lib/matching` is another lane's file. See "Requests to other lanes" in docs/status/P1.md.
-  const candidates = await matchPromoters(id);
+  const replacementCandidates = coverage.coverageMet ? [] : await matchPromoters(id, 3);
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
-      <header className="border-b border-[color:var(--color-line)] pb-6">
-        <h1 className="text-xl font-semibold tracking-tight">{campaign?.name ?? "—"}</h1>
-        <p className="mt-1 text-sm text-[color:var(--color-muted)]">
-          {store?.name} · {shift.on_date} · {String(shift.start_time).slice(0, 5)}–
-          {String(shift.end_time).slice(0, 5)} · {shift.promoters_required}{" "}
-          {t("shifts.needed").toLowerCase()}
-        </p>
-      </header>
+      <PageHeader
+        title={campaign?.name ?? "—"}
+        subtitle={`${store?.name ?? ""} · ${shift.on_date} · ${startTime}–${endTime}`}
+        actions={
+          <Badge variant={coverage.coverageMet ? "ok" : "warn"}>
+            {t("shifts.coverage.filled", {
+              filled: coverage.confirmedCount,
+              required: coverage.requiredCount,
+            })}
+          </Badge>
+        }
+      />
 
-      <h2 className="mt-8 text-base font-medium">{t("match.title")}</h2>
+      <section className="mt-8">
+        <h2 className="text-base font-medium">{t("shifts.board.title")}</h2>
+        <div className="mt-3">
+          <StatusBoard shiftId={id} rows={boardRows} t={t} />
+        </div>
+      </section>
 
-      {candidates.length === 0 ? (
-        <p className="mt-4 text-sm text-[color:var(--color-muted)]">{t("match.none")}</p>
+      {!coverage.coverageMet ? (
+        <ReplacementPanel shiftId={id} coverage={coverage} candidates={replacementCandidates} t={t} />
       ) : (
-        <ul className="mt-4 divide-y divide-[color:var(--color-line)]">
-          {candidates.map((c, i) => (
-            <li key={c.promoterId} className="flex items-start gap-4 py-4">
-              <span className="w-6 pt-1 text-sm text-[color:var(--color-muted)]">
-                {i + 1}
-              </span>
-
-              <div className="flex-1">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-medium">{c.fullName}</span>
-                  <span className="text-sm text-[color:var(--color-muted)]">
-                    {t("common.km_away", { km: (c.distanceM / 1000).toFixed(1) })}
-                  </span>
-                  {c.hasCar && (
-                    <span className="text-xs text-[color:var(--color-muted)]">
-                      {t("match.has_car")}
-                    </span>
-                  )}
-                </div>
-
-                {/* The reasons, not just the number — a coordinator overrides on reasons. */}
-                <p className="mt-1 text-sm text-[color:var(--color-muted)]">
-                  {topReasons(c)
-                    .map((f) => t(factorKey(f)))
-                    .join(" · ")}
-                </p>
-
-                <div className="mt-2 h-1 w-48 rounded bg-[color:var(--color-line)]">
-                  <div
-                    className="h-1 rounded bg-[color:var(--color-accent)]"
-                    style={{ width: `${Math.round(c.score * 100)}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="text-right">
-                <div className="text-sm font-medium">{Math.round(c.score * 100)}%</div>
-                <InviteButton
-                  shiftId={id}
-                  promoterId={c.promoterId}
-                  label={t("match.invite")}
-                  copyLabel={t("common.copy")}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+        <p className="mt-6 text-sm text-[color:var(--color-muted)]">{t("shifts.coverage.full")}</p>
       )}
     </main>
   );

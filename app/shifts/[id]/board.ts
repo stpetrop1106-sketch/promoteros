@@ -108,10 +108,13 @@ export function buildBoard(
   const seenPromoterIds = new Set<string>();
 
   for (const a of assignments) {
-    seenPromoterIds.add(a.promoterId);
     const checkIn = checkInByAssignment.get(a.id);
 
     if (a.status === "cancelled") {
+      // Deliberately NOT added to `seenPromoterIds`: `match_promoters` only excludes a
+      // *confirmed* assignment, so this exact promoter can be, and often is, re-invited for the
+      // same shift straight after being cancelled. If that happens their new invitation must
+      // still get its own row below rather than being hidden behind this historical one.
       rows.push({
         promoterId: a.promoterId,
         fullName: a.fullName,
@@ -126,6 +129,8 @@ export function buildBoard(
       });
       continue;
     }
+
+    seenPromoterIds.add(a.promoterId);
 
     if (a.status === "no_show") {
       rows.push({

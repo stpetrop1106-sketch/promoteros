@@ -47,9 +47,14 @@ export function nowAsAthensMs(): number {
  *  same "Athens wall-clock as if UTC" representation as `nowAsAthensMs()`, so the two are safe
  *  to subtract. */
 export function athensWallClockMs(onDate: string, timeOfDay: string): number {
-  const [y, mo, d] = onDate.split("-").map(Number);
-  const [h, mi] = timeOfDay.split(":").map(Number);
-  return Date.UTC(y, (mo ?? 1) - 1, d ?? 1, h ?? 0, mi ?? 0, 0);
+  const [yPart, moPart, dPart] = onDate.split("-");
+  const [hPart, miPart] = timeOfDay.split(":");
+  const y = Number(yPart ?? 0);
+  const mo = Number(moPart ?? 1);
+  const d = Number(dPart ?? 1);
+  const h = Number(hPart ?? 0);
+  const mi = Number(miPart ?? 0);
+  return Date.UTC(y, mo - 1, d, h, mi, 0);
 }
 
 /** Minutes from now until the given Athens wall-clock instant. Negative once it is in the past. */
