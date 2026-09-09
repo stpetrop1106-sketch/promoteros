@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { signOut } from "./actions";
@@ -36,6 +37,16 @@ export default async function LoginPage({
         <p className="mt-3 text-sm text-[color:var(--color-muted)]">
           {t("auth.no_agency_body")}
         </p>
+
+        {/* Signing in without an agency used to be a dead end. Since 0011 a user can
+            provision their own tenant, so offer that rather than leaving them stuck. */}
+        <Link
+          href="/onboarding"
+          className="mt-6 inline-flex items-center justify-center rounded-lg bg-[color:var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
+        >
+          {t("auth.create_agency_cta")}
+        </Link>
+
         <p className="mt-6 text-sm text-[color:var(--color-muted)]">
           {t("auth.signed_in_as", { email: user.email ?? "" })}
         </p>

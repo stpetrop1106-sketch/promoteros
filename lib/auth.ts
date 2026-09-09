@@ -2,7 +2,10 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-export type UserRole = "coordinator" | "supervisor" | "admin";
+// Mirrors the `user_role` enum. `owner` was appended by 0011_accounts.sql, so the enum
+// sorts coordinator < supervisor < admin < owner — do not rely on that ordering for
+// permission checks; check the value.
+export type UserRole = "coordinator" | "supervisor" | "admin" | "owner";
 
 export type CurrentUser = {
   userId: string;
