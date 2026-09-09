@@ -742,4 +742,259 @@ export const el = {
   "settings.card.onboarding_body":
     "Δεν έφτασες ακόμα στην πρώτη κατάταξη promoters. Συνέχισε από εκεί που έμεινες.",
   "settings.card.onboarding_cta": "Συνέχεια",
+
+  // --- P17 billing -----------------------------------------------------------------------
+  "billing.title": "Χρέωση",
+  "billing.subtitle": "Συνδρομή και τιμολόγια για {agency}.",
+  "billing.back_to_settings": "Πίσω στις ρυθμίσεις",
+
+  "billing.owner_only_title": "Μόνο ο ιδιοκτήτης βλέπει τη χρέωση",
+  "billing.owner_only_body":
+    "Η συνδρομή και τα τιμολόγια είναι ορατά μόνο στον ιδιοκτήτη του πρακτορείου. Ζήτησέ του να ανοίξει αυτή τη σελίδα ή να σου δώσει ρόλο ιδιοκτήτη.",
+
+  "billing.no_agency_title": "Δεν βρέθηκε πρακτορείο",
+  "billing.no_agency_body":
+    "Ο λογαριασμός σου δεν είναι συνδεδεμένος με πρακτορείο, οπότε δεν υπάρχει συνδρομή να δείξουμε.",
+  "billing.no_agency_cta": "Δημιουργία πρακτορείου",
+
+  "billing.not_configured_title": "Η χρέωση δεν είναι ακόμα ενεργοποιημένη",
+  "billing.not_configured_body":
+    "Δεν έχει ρυθμιστεί κλειδί Stripe σε αυτή την εγκατάσταση, οπότε δεν μπορεί να ξεκινήσει συνδρομή. Όλα τα υπόλοιπα λειτουργούν κανονικά και η κατάσταση παρακάτω είναι πραγματική.",
+  "billing.test_mode":
+    "Δοκιμαστική λειτουργία Stripe: καμία πραγματική χρέωση δεν γίνεται σε αυτή την εγκατάσταση.",
+
+  "billing.status.trialing": "Σε δοκιμή",
+  "billing.status.active": "Ενεργή",
+  "billing.status.past_due": "Εκκρεμεί πληρωμή",
+  "billing.status.canceled": "Ακυρωμένη",
+  "billing.status.paused": "Σε παύση",
+
+  "billing.access.full": "Πλήρης πρόσβαση",
+  "billing.access.grace": "Πλήρης πρόσβαση, με προειδοποίηση",
+  "billing.access.read_only": "Μόνο ανάγνωση και εξαγωγή",
+
+  "billing.notice.trial_ending.title": "Η δοκιμή τελειώνει σύντομα",
+  "billing.notice.trial_ending.body":
+    "Απομένουν {days} ημέρες δοκιμής. Διάλεξε πακέτο για να συνεχίσεις χωρίς διακοπή.",
+  "billing.notice.trial_expired.title": "Η δοκιμή έληξε",
+  "billing.notice.trial_expired.body":
+    "Κρατάς πλήρη πρόσβαση για άλλες {days} ημέρες. Μετά ο λογαριασμός γίνεται μόνο για ανάγνωση και εξαγωγή — τίποτα δεν διαγράφεται.",
+  "billing.notice.past_due.title": "Η πληρωμή δεν πέρασε",
+  "billing.notice.past_due.body":
+    "Η κάρτα απορρίφθηκε. Κρατάς πλήρη πρόσβαση για {days} ημέρες — καμία βάρδια δεν σταματά. Ενημέρωσε την κάρτα από τη διαχείριση χρέωσης.",
+  "billing.notice.grace_ending.title": "Απομένουν λίγες ημέρες",
+  "billing.notice.grace_ending.body":
+    "Σε {days} ημέρες ο λογαριασμός γίνεται μόνο για ανάγνωση αν δεν ολοκληρωθεί η πληρωμή. Τα δεδομένα σου παραμένουν στη θέση τους.",
+  "billing.notice.read_only_unpaid.title": "Ο λογαριασμός είναι σε ανάγνωση μόνο",
+  "billing.notice.read_only_unpaid.body":
+    "Μπορείς να δεις και να εξάγεις τα πάντα, αλλά όχι να κάνεις αλλαγές. Μια πληρωμή τον ξεκλειδώνει αμέσως. Δεν διαγράφουμε ποτέ τα δεδομένα σου για απλήρωτο λογαριασμό.",
+  "billing.notice.paused.title": "Η συνδρομή είναι σε παύση",
+  "billing.notice.paused.body":
+    "Βλέπεις και εξάγεις τα πάντα. Για να συνεχίσεις τη δουλειά, ενεργοποίησε ξανά τη συνδρομή από τη διαχείριση χρέωσης.",
+  "billing.notice.canceled.title": "Η συνδρομή ακυρώθηκε",
+  "billing.notice.canceled.body":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση και εξαγωγή. Τα δεδομένα σου μένουν στη θέση τους και επιστρέφουν αμέσως με νέα συνδρομή.",
+
+  "billing.current.title": "Τρέχουσα συνδρομή",
+  "billing.current.plan": "Πακέτο",
+  "billing.current.status": "Κατάσταση",
+  "billing.current.trial_ends": "Λήξη δοκιμής",
+  "billing.current.trial_days": "{date} — {days} ημέρες ακόμα",
+  "billing.current.renews": "Επόμενη ανανέωση",
+  "billing.current.access": "Πρόσβαση",
+  "billing.current.no_subscription":
+    "Δεν υπάρχει ακόμα ενεργή συνδρομή. Το πρακτορείο τρέχει με τα όρια του πακέτου Starter.",
+
+  "billing.usage.title": "Χρήση",
+  "billing.usage.seats": "Λογαριασμοί ομάδας",
+  "billing.usage.promoters": "Promoters",
+  "billing.usage.of_limit": "{used} από {limit}",
+  "billing.usage.at_limit": "Στο όριο",
+  "billing.usage.note":
+    "Το όριο μπλοκάρει μόνο την προσθήκη νέων. Ό,τι υπάρχει ήδη συνεχίζει να δουλεύει κανονικά.",
+
+  "billing.plans.title": "Πακέτα",
+  "billing.plans.subtitle":
+    "Σταθερή τιμή ανά πρακτορείο, όχι ανά promoter: ίδιος λογαριασμός τον Δεκέμβριο και τον Αύγουστο.",
+  "billing.plan.starter": "Starter",
+  "billing.plan.agency": "Agency",
+  "billing.plan.multi_brand": "Multi-brand",
+  "billing.plan.seats": "{count} λογαριασμοί ομάδας",
+  "billing.plan.seats_unlimited": "Απεριόριστοι λογαριασμοί ομάδας",
+  "billing.plan.promoters": "Έως {count} promoters",
+  "billing.plan.price_missing":
+    "Η τιμή αυτού του πακέτου δεν έχει δημιουργηθεί ακόμα στο Stripe.",
+
+  "billing.interval.per_month": "/ μήνα",
+  "billing.interval.per_year": "/ έτος",
+  "billing.interval.annual_effective": "{price} τον μήνα, δύο μήνες δώρο",
+  "billing.interval.switch_to_annual": "Ετήσια χρέωση — δύο μήνες δώρο",
+  "billing.interval.switch_to_monthly": "Μηνιαία χρέωση",
+
+  "billing.cta.subscribe": "Έναρξη συνδρομής",
+  "billing.cta.change_plan": "Αλλαγή πακέτου",
+  "billing.cta.current_plan": "Τρέχον πακέτο",
+  "billing.cta.working": "Άνοιγμα Stripe…",
+
+  "billing.portal.title": "Κάρτα, τιμολόγια και ακύρωση",
+  "billing.portal.body":
+    "Η αλλαγή κάρτας, τα τιμολόγια, το ΑΦΜ και η ακύρωση γίνονται στη σελίδα του Stripe. Τα στοιχεία της κάρτας δεν περνούν ποτέ από τους δικούς μας διακομιστές.",
+  "billing.portal.cta": "Διαχείριση χρέωσης",
+  "billing.portal.unavailable":
+    "Θα ενεργοποιηθεί μόλις ξεκινήσει η πρώτη συνδρομή.",
+
+  "billing.checkout.success_title": "Η πληρωμή καταχωρήθηκε",
+  "billing.checkout.success_body":
+    "Το Stripe μας ενημερώνει σε λίγα δευτερόλεπτα. Αν η κατάσταση παρακάτω δεν έχει αλλάξει, ανανέωσε τη σελίδα.",
+  "billing.checkout.cancelled_title": "Δεν ολοκληρώθηκε η συνδρομή",
+  "billing.checkout.cancelled_body":
+    "Δεν χρεώθηκε τίποτα. Μπορείς να ξαναδοκιμάσεις όποτε θέλεις.",
+
+  "billing.data_note":
+    "Δεν διαγράφουμε ποτέ τα δεδομένα σου επειδή ένας λογαριασμός έμεινε απλήρωτος. Μπορείς να τα εξάγεις οποιαδήποτε στιγμή.",
+  "billing.contact_note": "Συνδεδεμένος ως {email}.",
+
+  "billing.errors.not_owner":
+    "Μόνο ο ιδιοκτήτης του πρακτορείου μπορεί να αλλάξει τη συνδρομή.",
+  "billing.errors.no_agency":
+    "Ο λογαριασμός σου δεν είναι συνδεδεμένος με πρακτορείο. Ολοκλήρωσε πρώτα τη δημιουργία πρακτορείου.",
+  "billing.errors.not_configured":
+    "Η χρέωση δεν είναι ενεργοποιημένη σε αυτή την εγκατάσταση. Δεν λείπει κάτι από εσένα.",
+  "billing.errors.price_missing":
+    "Αυτό το πακέτο δεν έχει τιμή στο Stripe ακόμα. Διάλεξε άλλο πακέτο ή δοκίμασε αργότερα.",
+  "billing.errors.plan_invalid": "Άγνωστο πακέτο. Διάλεξε ένα από τα τρία παραπάνω.",
+  "billing.errors.no_customer":
+    "Δεν υπάρχει ακόμα λογαριασμός πελάτη στο Stripe. Ξεκίνα μια συνδρομή πρώτα.",
+  "billing.errors.stripe_unavailable":
+    "Το Stripe δεν απάντησε. Δοκίμασε ξανά σε λίγο — δεν χρεώθηκε τίποτα.",
+  "billing.errors.unknown":
+    "Η ενέργεια δεν ολοκληρώθηκε. Δοκίμασε ξανά· αν επιμένει, στείλε μας το μήνυμα που βλέπεις.",
+
+  // P18 — admin console. Internal tool for PromoterOS staff, not agency users, so English
+  // labels are used in both dictionaries (CLAUDE.md's bilingual rule is about the customer-
+  // facing product). Every string still goes through t() and both files stay complete.
+  "admin.nav.agencies": "Agencies",
+  "admin.nav.audit": "Audit log",
+  "admin.nav.waitlist": "Waitlist",
+  "admin.title": "Platform admin",
+  "admin.subtitle": "Signed in as {name}",
+
+  "admin.agencies.title": "Agencies",
+  "admin.agencies.subtitle":
+    "Every tenant on the platform. Counts are aggregates — open an agency for detail.",
+  "admin.agencies.search_placeholder": "Search by name…",
+  "admin.agencies.col.name": "Agency",
+  "admin.agencies.col.plan": "Plan",
+  "admin.agencies.col.status": "Status",
+  "admin.agencies.col.trial_ends": "Trial ends",
+  "admin.agencies.col.users": "Users",
+  "admin.agencies.col.promoters": "Promoters",
+  "admin.agencies.col.campaigns": "Campaigns",
+  "admin.agencies.col.shifts": "Shifts",
+  "admin.agencies.col.created": "Created",
+  "admin.agencies.suspended_badge": "Suspended",
+  "admin.agencies.deletion_badge": "Deletion requested",
+  "admin.agencies.empty_title": "No agencies yet",
+  "admin.agencies.empty_body": "Agencies appear here once someone signs up.",
+  "admin.agencies.view": "View",
+
+  "admin.agency.back": "Back to agencies",
+  "admin.agency.aggregates_title": "At a glance — an aggregate view, always visible",
+  "admin.agency.city_label": "City",
+  "admin.agency.timezone_label": "Timezone",
+  "admin.agency.reason_gate_title": "View operational detail",
+  "admin.agency.reason_gate_body":
+    "Recent campaigns and shifts are this agency's operational data. Opening them is logged with your reason, before anything is shown. The aggregates above needed no reason.",
+  "admin.agency.reason_label": "Reason",
+  "admin.agency.reason_hint":
+    "Required, at least 10 characters — this is written to the audit log.",
+  "admin.agency.reason_placeholder": "e.g. investigating support ticket #123",
+  "admin.agency.reason_submit": "View detail",
+  "admin.agency.reason_submitting": "Logging and loading…",
+  "admin.agency.recent_campaigns": "Recent campaigns",
+  "admin.agency.recent_shifts": "Recent shifts",
+  "admin.agency.no_recent_campaigns": "No campaigns yet.",
+  "admin.agency.no_recent_shifts": "No shifts yet.",
+  "admin.agency.actions_toggle_on": "Enable actions for this agency",
+  "admin.agency.actions_toggle_off": "Exit action mode",
+  "admin.agency.actions_mode_banner":
+    "Action mode is on. Every action below is logged with your reason.",
+  "admin.agency.action_done": "Done. This was written to the audit log.",
+  "admin.agency.extend_trial.title": "Extend trial",
+  "admin.agency.extend_trial.days_label": "Days to add",
+  "admin.agency.extend_trial.submit": "Extend trial",
+  "admin.agency.extend_trial.done": "Trial extended to {when}.",
+  "admin.agency.change_plan.title": "Change plan",
+  "admin.agency.change_plan.plan_label": "New plan",
+  "admin.agency.change_plan.submit": "Change plan",
+  "admin.agency.change_plan.done": "Plan changed to {plan}.",
+  "admin.agency.suspend.title": "Suspend agency",
+  "admin.agency.suspend.body":
+    "Reversible, never destructive — nothing is deleted. Not yet enforced at login; see the note below.",
+  "admin.agency.suspend.confirm_title":
+    "This suspends {name}, {users} users and {promoters} promoters",
+  "admin.agency.suspend.submit": "Suspend",
+  "admin.agency.suspend.cancel": "Cancel",
+  "admin.agency.unsuspend.title": "Unsuspend agency",
+  "admin.agency.unsuspend.submit": "Unsuspend",
+  "admin.agency.deletion.title": "Data-deletion request",
+  "admin.agency.deletion.body":
+    "This only marks the request. Deletion itself is Gate 1 work — a two-step, export-first erasure flow (build-plan.md §11, item G3) — and is deliberately not built here.",
+  "admin.agency.deletion.mark_submit": "Mark deletion requested",
+  "admin.agency.deletion.clear_submit": "Clear deletion request",
+  "admin.agency.deletion.marked_badge": "Deletion requested {when}",
+  "admin.agency.enforcement_note":
+    "Suspension is a visible, audited flag only — the login and session layer does not check it yet. See docs/status/P18.md for the request to Lane A.",
+
+  "admin.errors.reason_required": "Type a reason of at least 10 characters before continuing.",
+  "admin.errors.agency_not_found": "That agency could not be found.",
+  "admin.errors.invalid_days": "Enter a number of days between 1 and 365.",
+  "admin.errors.invalid_plan": "Choose a valid plan.",
+  "admin.errors.already_suspended": "This agency is already suspended.",
+  "admin.errors.not_suspended": "This agency is not suspended.",
+  "admin.errors.unknown": "That did not go through. Reload the page and try again.",
+
+  "admin.plan.starter": "Starter",
+  "admin.plan.agency": "Agency",
+  "admin.plan.multi_brand": "Multi-brand",
+  "admin.status.trialing": "Trialing",
+  "admin.status.active": "Active",
+  "admin.status.past_due": "Payment due",
+  "admin.status.canceled": "Cancelled",
+  "admin.status.paused": "Paused",
+
+  "admin.audit.title": "Audit log",
+  "admin.audit.subtitle":
+    "Every admin action against customer data. Append-only — nothing here can be edited or deleted.",
+  "admin.audit.filter.admin_label": "Admin",
+  "admin.audit.filter.admin_all": "All admins",
+  "admin.audit.filter.agency_label": "Agency",
+  "admin.audit.filter.agency_all": "All agencies",
+  "admin.audit.filter.from_label": "From",
+  "admin.audit.filter.to_label": "To",
+  "admin.audit.filter.apply": "Filter",
+  "admin.audit.filter.clear": "Clear filters",
+  "admin.audit.col.when": "When",
+  "admin.audit.col.admin": "Admin",
+  "admin.audit.col.action": "Action",
+  "admin.audit.col.agency": "Agency",
+  "admin.audit.col.target": "Target",
+  "admin.audit.col.reason": "Reason",
+  "admin.audit.empty_title": "No matching audit entries",
+  "admin.audit.empty_body": "Try widening the filters.",
+
+  "admin.waitlist.title": "Waitlist",
+  "admin.waitlist.subtitle": "Product leads from the public landing page. Read-only.",
+  "admin.waitlist.total": "{count} total signups",
+  "admin.waitlist.by_size_title": "By promoter count",
+  "admin.waitlist.by_source_title": "By UTM source",
+  "admin.waitlist.recent_title": "Recent signups",
+  "admin.waitlist.col.name": "Name",
+  "admin.waitlist.col.email": "Email",
+  "admin.waitlist.col.company": "Company",
+  "admin.waitlist.col.size": "Promoters",
+  "admin.waitlist.col.source": "Source",
+  "admin.waitlist.col.when": "When",
+  "admin.waitlist.empty_title": "No signups yet",
+  "admin.waitlist.unknown_source": "Direct / unknown",
 } as const;

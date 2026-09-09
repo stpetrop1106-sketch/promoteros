@@ -730,4 +730,254 @@ export const en: Record<TranslationKey, string> = {
   "settings.card.onboarding_body":
     "You have not reached your first ranked shift yet. Pick up where you left off.",
   "settings.card.onboarding_cta": "Continue",
+
+  // --- P17 billing -----------------------------------------------------------------------
+  "billing.title": "Billing",
+  "billing.subtitle": "Subscription and invoices for {agency}.",
+  "billing.back_to_settings": "Back to settings",
+
+  "billing.owner_only_title": "Billing is visible to the owner only",
+  "billing.owner_only_body":
+    "The subscription and invoices are visible only to the agency owner. Ask them to open this page, or to give you the owner role.",
+
+  "billing.no_agency_title": "No agency found",
+  "billing.no_agency_body":
+    "Your account is not attached to an agency, so there is no subscription to show.",
+  "billing.no_agency_cta": "Create an agency",
+
+  "billing.not_configured_title": "Billing is not switched on yet",
+  "billing.not_configured_body":
+    "No Stripe key is configured on this installation, so a subscription cannot be started. Everything else works normally and the state below is real.",
+  "billing.test_mode": "Stripe test mode: nothing on this installation charges real money.",
+
+  "billing.status.trialing": "Trialing",
+  "billing.status.active": "Active",
+  "billing.status.past_due": "Payment due",
+  "billing.status.canceled": "Cancelled",
+  "billing.status.paused": "Paused",
+
+  "billing.access.full": "Full access",
+  "billing.access.grace": "Full access, with a warning",
+  "billing.access.read_only": "Read and export only",
+
+  "billing.notice.trial_ending.title": "Your trial ends soon",
+  "billing.notice.trial_ending.body":
+    "{days} days of trial left. Pick a plan to carry on without interruption.",
+  "billing.notice.trial_expired.title": "Your trial has ended",
+  "billing.notice.trial_expired.body":
+    "You keep full access for another {days} days. After that the account becomes read and export only — nothing is deleted.",
+  "billing.notice.past_due.title": "A payment failed",
+  "billing.notice.past_due.body":
+    "The card was declined. You keep full access for {days} days — no shift stops. Update the card from billing management.",
+  "billing.notice.grace_ending.title": "Only a few days left",
+  "billing.notice.grace_ending.body":
+    "In {days} days the account becomes read-only unless the payment goes through. Your data stays exactly where it is.",
+  "billing.notice.read_only_unpaid.title": "The account is read-only",
+  "billing.notice.read_only_unpaid.body":
+    "You can see and export everything, but not make changes. One payment unlocks it immediately. We never delete your data over an unpaid invoice.",
+  "billing.notice.paused.title": "The subscription is paused",
+  "billing.notice.paused.body":
+    "You can see and export everything. To start working again, resume the subscription from billing management.",
+  "billing.notice.canceled.title": "The subscription was cancelled",
+  "billing.notice.canceled.body":
+    "The account is read and export only. Your data stays where it is and comes back the moment you subscribe again.",
+
+  "billing.current.title": "Current subscription",
+  "billing.current.plan": "Plan",
+  "billing.current.status": "Status",
+  "billing.current.trial_ends": "Trial ends",
+  "billing.current.trial_days": "{date} — {days} days left",
+  "billing.current.renews": "Next renewal",
+  "billing.current.access": "Access",
+  "billing.current.no_subscription":
+    "No active subscription yet. The agency runs on the Starter plan's limits.",
+
+  "billing.usage.title": "Usage",
+  "billing.usage.seats": "Team logins",
+  "billing.usage.promoters": "Promoters",
+  "billing.usage.of_limit": "{used} of {limit}",
+  "billing.usage.at_limit": "At the limit",
+  "billing.usage.note":
+    "A limit only blocks adding more. Everything that already exists keeps working.",
+
+  "billing.plans.title": "Plans",
+  "billing.plans.subtitle":
+    "A flat price per agency, not per promoter: the same bill in December and in August.",
+  "billing.plan.starter": "Starter",
+  "billing.plan.agency": "Agency",
+  "billing.plan.multi_brand": "Multi-brand",
+  "billing.plan.seats": "{count} team logins",
+  "billing.plan.seats_unlimited": "Unlimited team logins",
+  "billing.plan.promoters": "Up to {count} promoters",
+  "billing.plan.price_missing": "This plan's price has not been created in Stripe yet.",
+
+  "billing.interval.per_month": "/ month",
+  "billing.interval.per_year": "/ year",
+  "billing.interval.annual_effective": "{price} a month, two months free",
+  "billing.interval.switch_to_annual": "Annual billing — two months free",
+  "billing.interval.switch_to_monthly": "Monthly billing",
+
+  "billing.cta.subscribe": "Start subscription",
+  "billing.cta.change_plan": "Change plan",
+  "billing.cta.current_plan": "Current plan",
+  "billing.cta.working": "Opening Stripe…",
+
+  "billing.portal.title": "Card, invoices and cancellation",
+  "billing.portal.body":
+    "Changing the card, invoices, VAT id and cancellation all happen on Stripe's own page. Card details never pass through our servers.",
+  "billing.portal.cta": "Manage billing",
+  "billing.portal.unavailable": "Available once the first subscription has started.",
+
+  "billing.checkout.success_title": "Payment received",
+  "billing.checkout.success_body":
+    "Stripe tells us within a few seconds. If the state below has not changed, refresh the page.",
+  "billing.checkout.cancelled_title": "Subscription not completed",
+  "billing.checkout.cancelled_body": "Nothing was charged. You can try again whenever you like.",
+
+  "billing.data_note":
+    "We never delete your data because an invoice went unpaid. You can export all of it at any time.",
+  "billing.contact_note": "Signed in as {email}.",
+
+  "billing.errors.not_owner": "Only the agency owner can change the subscription.",
+  "billing.errors.no_agency":
+    "Your account is not attached to an agency. Finish creating an agency first.",
+  "billing.errors.not_configured":
+    "Billing is not switched on for this installation. Nothing is missing on your side.",
+  "billing.errors.price_missing":
+    "That plan has no price in Stripe yet. Pick another plan or try again later.",
+  "billing.errors.plan_invalid": "Unknown plan. Pick one of the three above.",
+  "billing.errors.no_customer":
+    "There is no Stripe customer yet. Start a subscription first.",
+  "billing.errors.stripe_unavailable":
+    "Stripe did not answer. Try again shortly — nothing was charged.",
+  "billing.errors.unknown":
+    "That did not go through. Try again; if it keeps happening, send us the message you see.",
+
+  // P18 — admin console. Internal tool for PromoterOS staff, not agency users, so English
+  // labels are used in both dictionaries (CLAUDE.md's bilingual rule is about the customer-
+  // facing product). Every string still goes through t() and both files stay complete.
+  "admin.nav.agencies": "Agencies",
+  "admin.nav.audit": "Audit log",
+  "admin.nav.waitlist": "Waitlist",
+  "admin.title": "Platform admin",
+  "admin.subtitle": "Signed in as {name}",
+
+  "admin.agencies.title": "Agencies",
+  "admin.agencies.subtitle":
+    "Every tenant on the platform. Counts are aggregates — open an agency for detail.",
+  "admin.agencies.search_placeholder": "Search by name…",
+  "admin.agencies.col.name": "Agency",
+  "admin.agencies.col.plan": "Plan",
+  "admin.agencies.col.status": "Status",
+  "admin.agencies.col.trial_ends": "Trial ends",
+  "admin.agencies.col.users": "Users",
+  "admin.agencies.col.promoters": "Promoters",
+  "admin.agencies.col.campaigns": "Campaigns",
+  "admin.agencies.col.shifts": "Shifts",
+  "admin.agencies.col.created": "Created",
+  "admin.agencies.suspended_badge": "Suspended",
+  "admin.agencies.deletion_badge": "Deletion requested",
+  "admin.agencies.empty_title": "No agencies yet",
+  "admin.agencies.empty_body": "Agencies appear here once someone signs up.",
+  "admin.agencies.view": "View",
+
+  "admin.agency.back": "Back to agencies",
+  "admin.agency.aggregates_title": "At a glance — an aggregate view, always visible",
+  "admin.agency.city_label": "City",
+  "admin.agency.timezone_label": "Timezone",
+  "admin.agency.reason_gate_title": "View operational detail",
+  "admin.agency.reason_gate_body":
+    "Recent campaigns and shifts are this agency's operational data. Opening them is logged with your reason, before anything is shown. The aggregates above needed no reason.",
+  "admin.agency.reason_label": "Reason",
+  "admin.agency.reason_hint":
+    "Required, at least 10 characters — this is written to the audit log.",
+  "admin.agency.reason_placeholder": "e.g. investigating support ticket #123",
+  "admin.agency.reason_submit": "View detail",
+  "admin.agency.reason_submitting": "Logging and loading…",
+  "admin.agency.recent_campaigns": "Recent campaigns",
+  "admin.agency.recent_shifts": "Recent shifts",
+  "admin.agency.no_recent_campaigns": "No campaigns yet.",
+  "admin.agency.no_recent_shifts": "No shifts yet.",
+  "admin.agency.actions_toggle_on": "Enable actions for this agency",
+  "admin.agency.actions_toggle_off": "Exit action mode",
+  "admin.agency.actions_mode_banner":
+    "Action mode is on. Every action below is logged with your reason.",
+  "admin.agency.action_done": "Done. This was written to the audit log.",
+  "admin.agency.extend_trial.title": "Extend trial",
+  "admin.agency.extend_trial.days_label": "Days to add",
+  "admin.agency.extend_trial.submit": "Extend trial",
+  "admin.agency.extend_trial.done": "Trial extended to {when}.",
+  "admin.agency.change_plan.title": "Change plan",
+  "admin.agency.change_plan.plan_label": "New plan",
+  "admin.agency.change_plan.submit": "Change plan",
+  "admin.agency.change_plan.done": "Plan changed to {plan}.",
+  "admin.agency.suspend.title": "Suspend agency",
+  "admin.agency.suspend.body":
+    "Reversible, never destructive — nothing is deleted. Not yet enforced at login; see the note below.",
+  "admin.agency.suspend.confirm_title":
+    "This suspends {name}, {users} users and {promoters} promoters",
+  "admin.agency.suspend.submit": "Suspend",
+  "admin.agency.suspend.cancel": "Cancel",
+  "admin.agency.unsuspend.title": "Unsuspend agency",
+  "admin.agency.unsuspend.submit": "Unsuspend",
+  "admin.agency.deletion.title": "Data-deletion request",
+  "admin.agency.deletion.body":
+    "This only marks the request. Deletion itself is Gate 1 work — a two-step, export-first erasure flow (build-plan.md §11, item G3) — and is deliberately not built here.",
+  "admin.agency.deletion.mark_submit": "Mark deletion requested",
+  "admin.agency.deletion.clear_submit": "Clear deletion request",
+  "admin.agency.deletion.marked_badge": "Deletion requested {when}",
+  "admin.agency.enforcement_note":
+    "Suspension is a visible, audited flag only — the login and session layer does not check it yet. See docs/status/P18.md for the request to Lane A.",
+
+  "admin.errors.reason_required": "Type a reason of at least 10 characters before continuing.",
+  "admin.errors.agency_not_found": "That agency could not be found.",
+  "admin.errors.invalid_days": "Enter a number of days between 1 and 365.",
+  "admin.errors.invalid_plan": "Choose a valid plan.",
+  "admin.errors.already_suspended": "This agency is already suspended.",
+  "admin.errors.not_suspended": "This agency is not suspended.",
+  "admin.errors.unknown": "That did not go through. Reload the page and try again.",
+
+  "admin.plan.starter": "Starter",
+  "admin.plan.agency": "Agency",
+  "admin.plan.multi_brand": "Multi-brand",
+  "admin.status.trialing": "Trialing",
+  "admin.status.active": "Active",
+  "admin.status.past_due": "Payment due",
+  "admin.status.canceled": "Cancelled",
+  "admin.status.paused": "Paused",
+
+  "admin.audit.title": "Audit log",
+  "admin.audit.subtitle":
+    "Every admin action against customer data. Append-only — nothing here can be edited or deleted.",
+  "admin.audit.filter.admin_label": "Admin",
+  "admin.audit.filter.admin_all": "All admins",
+  "admin.audit.filter.agency_label": "Agency",
+  "admin.audit.filter.agency_all": "All agencies",
+  "admin.audit.filter.from_label": "From",
+  "admin.audit.filter.to_label": "To",
+  "admin.audit.filter.apply": "Filter",
+  "admin.audit.filter.clear": "Clear filters",
+  "admin.audit.col.when": "When",
+  "admin.audit.col.admin": "Admin",
+  "admin.audit.col.action": "Action",
+  "admin.audit.col.agency": "Agency",
+  "admin.audit.col.target": "Target",
+  "admin.audit.col.reason": "Reason",
+  "admin.audit.empty_title": "No matching audit entries",
+  "admin.audit.empty_body": "Try widening the filters.",
+
+  "admin.waitlist.title": "Waitlist",
+  "admin.waitlist.subtitle": "Product leads from the public landing page. Read-only.",
+  "admin.waitlist.total": "{count} total signups",
+  "admin.waitlist.by_size_title": "By promoter count",
+  "admin.waitlist.by_source_title": "By UTM source",
+  "admin.waitlist.recent_title": "Recent signups",
+  "admin.waitlist.col.name": "Name",
+  "admin.waitlist.col.email": "Email",
+  "admin.waitlist.col.company": "Company",
+  "admin.waitlist.col.size": "Promoters",
+  "admin.waitlist.col.source": "Source",
+  "admin.waitlist.col.when": "When",
+  "admin.waitlist.empty_title": "No signups yet",
+  "admin.waitlist.unknown_source": "Direct / unknown",
 };
