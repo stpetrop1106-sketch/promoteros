@@ -33,3 +33,6 @@ export type { EmptyStateProps } from "./EmptyState";
 
 export { ScoreBar } from "./ScoreBar";
 export type { ScoreBarProps, ScoreBarSize } from "./ScoreBar";
+
+export { Markdown } from "./Markdown";
+export type { MarkdownProps } from "./Markdown";

@@ -6,7 +6,9 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { getGeocoder, type GeocodeResult } from "@/lib/geocoding";
-import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
+import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
+import type { PlanId } from "@/lib/billing/plans";
 
 // Every user-facing string still goes through t() — see CLAUDE.md's i18n rule — even though
 // this file is server-only. Validation messages are shown in the reference locale: the app has
@@ -16,6 +18,14 @@ const t = translatorFor(DEFAULT_LOCALE);
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const CURRENT_YEAR = new Date().getFullYear();
+
+// Reuses P17's plan-name keys (`billing.plan.*`) rather than adding new ones for the same three
+// names — see lib/i18n's append-only rule in CLAUDE.md.
+const PLAN_LABEL_KEY: Record<PlanId, TranslationKey> = {
+  starter: "billing.plan.starter",
+  agency: "billing.plan.agency",
+  multi_brand: "billing.plan.multi_brand",
+};
 
 export type FieldErrors = Partial<
   Record<
@@ -210,11 +220,49 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult | n
   return getGeocoder().geocode(address, { country: "gr" });
 }
 
+/**
+ * P22 — the one enforcement point for `docs/commercial-architecture.md` §3's promoter-limit and
+ * read-only rules, on the one write path this parcel owns. `checkBilling()` (`lib/billing/
+ * subscription.ts`) already encodes both: a read-only agency is blocked from every write
+ * regardless of how many promoters it has, and an agency under its limit is never blocked at
+ * all — only *adding* the next promoter past the limit is. Editing and archiving an existing
+ * promoter never call this, on purpose: the limit blocks growth, never what already exists.
+ *
+ * Checked before the form is even parsed: there is no reason to validate fields the request is
+ * going to be refused anyway, and it gives the coordinator the real reason immediately.
+ */
+async function checkPromoterCreationAllowed(agencyId: string): Promise<string | null> {
+  const entitlement = await getEntitlement(agencyId);
+  // No entitlement row is the same "agency not found" shape `requireUser()` already guards
+  // against — fail open here rather than inventing a block for a state that should not reach
+  // this line at all.
+  if (!entitlement) return null;
+
+  const gate = checkBilling(entitlement, "add_promoter");
+  if (gate.allowed) return null;
+
+  if (gate.block === "promoter_limit_reached") {
+    return t("enforcement.promoters.blocked_limit", {
+      plan: t(PLAN_LABEL_KEY[entitlement.planId]),
+      limit: entitlement.promoterLimit,
+    });
+  }
+
+  // "subscription_read_only" — the account is read-only, unrelated to how many promoters it has.
+  return t("enforcement.promoters.blocked_read_only");
+}
+
 export async function createPromoter(
   _prev: PromoterFormState,
   formData: FormData,
 ): Promise<PromoterFormState> {
   const user = await requireUser();
+
+  const blockedMessage = await checkPromoterCreationAllowed(user.agencyId);
+  if (blockedMessage) {
+    return { status: "error", errors: { general: blockedMessage } };
+  }
+
   const db = await createServerSupabase();
 
   const { scalars, phoneNormalized, fieldErrors } = parseForm(formData);

@@ -980,4 +980,26 @@ export const en: Record<TranslationKey, string> = {
   "admin.waitlist.col.when": "When",
   "admin.waitlist.empty_title": "No signups yet",
   "admin.waitlist.unknown_source": "Direct / unknown",
+
+  // --- P22 — wiring the enforcement (suspension, billing read-only, promoter limit) ----------
+  "enforcement.suspended.title": "This agency has been suspended",
+  "enforcement.suspended.body":
+    "Access to this account has been paused by PromoterOS. Nothing in the agency's data has been deleted. Contact your agency owner or our support team for details.",
+  "enforcement.suspended.signout": "Sign out",
+
+  "enforcement.banner.billing_cta": "Billing",
+  "enforcement.banner.dismiss": "Dismiss",
+
+  "enforcement.settings.agency_note": "Changing plan happens from Billing, below.",
+  "enforcement.settings.billing_title": "Billing",
+  "enforcement.settings.billing_body_owner":
+    "See the plan, usage and invoices, or change the subscription.",
+  "enforcement.settings.billing_body_staff":
+    "Billing is only visible to the agency owner.",
+  "enforcement.settings.billing_cta": "Open billing",
+
+  "enforcement.promoters.blocked_read_only":
+    "This account is read-only right now, so you can't add a new promoter. Go to Billing in Settings to continue.",
+  "enforcement.promoters.blocked_limit":
+    "You've reached the {plan} plan limit ({limit} promoters). Upgrade from Billing in Settings to add another.",
 };

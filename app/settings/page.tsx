@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { loadTeamSnapshot } from "@/lib/team";
 import { loadOnboardingProgress } from "@/lib/onboarding";
+import { getEntitlement } from "@/lib/billing/subscription";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { PageHeader, Card, Badge, Button, EmptyState } from "@/components/ui";
+import { BillingBanner } from "@/components/billing-banner";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +64,10 @@ export default async function SettingsPage() {
   }
 
   const { agency, viewer, seatsUsed } = snapshot;
-  const progress = await loadOnboardingProgress();
+  const [progress, entitlement] = await Promise.all([
+    loadOnboardingProgress(),
+    getEntitlement(agency.id),
+  ]);
 
   const planKey = PLAN_LABEL[agency.plan] ?? "settings.plan.starter";
   const statusKey = STATUS_LABEL[agency.subscriptionStatus] ?? "settings.subscription.trialing";
@@ -70,6 +75,17 @@ export default async function SettingsPage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
       <PageHeader title={t("settings.title")} subtitle={t("settings.subtitle")} />
+
+      {entitlement ? (
+        <div className="mt-6">
+          <BillingBanner
+            notice={entitlement.notice}
+            access={entitlement.access}
+            graceDaysRemaining={entitlement.graceDaysRemaining}
+            trialDaysRemaining={entitlement.trialDaysRemaining}
+          />
+        </div>
+      ) : null}
 
       <Card
         className="mt-6"
@@ -103,8 +119,28 @@ export default async function SettingsPage() {
           </Row>
         </dl>
         <p className="mt-3 text-xs text-[color:var(--color-muted)]">
-          {t("settings.agency.change_note")}
+          {t("enforcement.settings.agency_note")}
         </p>
+      </Card>
+
+      <Card
+        className="mt-6"
+        header={
+          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
+            {t("enforcement.settings.billing_title")}
+          </h2>
+        }
+      >
+        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+          {viewer.isOwner
+            ? t("enforcement.settings.billing_body_owner")
+            : t("enforcement.settings.billing_body_staff")}
+        </p>
+        <div className="mt-4">
+          <Link href="/settings/billing">
+            <Button variant="secondary">{t("enforcement.settings.billing_cta")}</Button>
+          </Link>
+        </div>
       </Card>
 
       <Card

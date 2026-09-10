@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { loadCheckin } from "@/lib/checkins";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { Markdown } from "@/components/ui";
 import { CheckinForm } from "./checkin-form";
 
 export const dynamic = "force-dynamic";
@@ -85,7 +86,9 @@ export default async function CheckinPage({
         {v.briefSummary && (
           <div>
             <dt className="text-[color:var(--color-muted)]">{t("checkin.brief_title")}</dt>
-            <dd>{v.briefSummary}</dd>
+            <dd>
+              <Markdown source={v.briefSummary} className="text-[color:var(--color-ink)]" />
+            </dd>
           </div>
         )}
       </dl>

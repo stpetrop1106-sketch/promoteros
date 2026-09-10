@@ -997,4 +997,26 @@ export const el = {
   "admin.waitlist.col.when": "When",
   "admin.waitlist.empty_title": "No signups yet",
   "admin.waitlist.unknown_source": "Direct / unknown",
+
+  // --- P22 — wiring the enforcement (suspension, billing read-only, promoter limit) ----------
+  "enforcement.suspended.title": "Το πρακτορείο έχει ανασταλεί",
+  "enforcement.suspended.body":
+    "Η πρόσβαση στον λογαριασμό διακόπηκε από την PromoterOS. Τα δεδομένα του πρακτορείου δεν διαγράφηκαν. Επικοινώνησε με τον ιδιοκτήτη του πρακτορείου ή με την υποστήριξή μας για περισσότερες πληροφορίες.",
+  "enforcement.suspended.signout": "Αποσύνδεση",
+
+  "enforcement.banner.billing_cta": "Χρέωση",
+  "enforcement.banner.dismiss": "Απόκρυψη",
+
+  "enforcement.settings.agency_note": "Η αλλαγή πακέτου γίνεται από τη Χρέωση, παρακάτω.",
+  "enforcement.settings.billing_title": "Χρέωση",
+  "enforcement.settings.billing_body_owner":
+    "Δες το πακέτο, τη χρήση και τα τιμολόγια, ή άλλαξε συνδρομή.",
+  "enforcement.settings.billing_body_staff":
+    "Η χρέωση είναι ορατή μόνο στον ιδιοκτήτη του πρακτορείου.",
+  "enforcement.settings.billing_cta": "Άνοιγμα χρέωσης",
+
+  "enforcement.promoters.blocked_read_only":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να προσθέσεις νέο promoter. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
+  "enforcement.promoters.blocked_limit":
+    "Έφτασες το όριο του πακέτου {plan} ({limit} promoters). Αναβάθμισε από τη Χρέωση στις Ρυθμίσεις για να προσθέσεις άλλον.",
 } as const;
