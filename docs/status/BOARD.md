@@ -93,3 +93,17 @@ proved strictly faster to a finished parcel.
 
 **I4 — an applied migration was corrupted in the working copy** (`revoke_agenc+y_invitation`).
 Caught by an agent reading it, restored from git. Nothing had been re-run against the database.
+
+**I5 — the manager broke his own rule.** Committing P22 with `git add -A` while P23 was still
+writing swept five of P23's in-flight files into commit `5995444`. Nothing was lost — the agent
+verified with `git diff HEAD` that the committed content was byte-identical to its final work — but
+the history now attributes part of P23 to P22's commit, and had the timing been slightly different
+it would have committed a half-written file.
+
+The rule I gave every agent was *stay inside your own file set*, and the broad `git add` is the same
+mistake at the repository level. **Process change: while any agent is running, commits use an
+explicit path list, never `-A`.** Applied from P23's commit onward.
+
+Worth recording rather than quietly fixing: the agent caught the manager, reported it instead of
+performing git surgery to hide it, and that is exactly the behaviour the status protocol exists to
+produce.
