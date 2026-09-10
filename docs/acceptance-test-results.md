@@ -95,7 +95,7 @@ no residue. The rate limiter increments atomically (1 → 2) and its probe row w
 
 | Severity | Finding |
 |---|---|
-| **Minor** | The campaign brief renders as **raw markdown** on the promoter's check-in page — a promoter sees `## Στόχος` and `- Παρουσίαση`. Stored as `body_md` but never rendered. Fix before a real promoter sees it |
+| ~~Minor~~ **Fixed** | The campaign brief rendered as **raw markdown** on the promoter's check-in page. Fixed 2026-09-10 by `components/ui/Markdown.tsx` — a dependency-free renderer built from `createElement` on parsed tokens, never `dangerouslySetInnerHTML`, with tests asserting that a `<script>` payload renders as text |
 | Note | `/shifts` returned one 307 immediately after the auth callback, then 200 on every subsequent request — a session-warming race, not a fault, but worth watching |
 
 ---
@@ -108,9 +108,7 @@ Stated plainly, because an acceptance test that overstates itself is worse than 
   phone over HTTPS is untested, and it is the one path that cannot be tested any other way.
 - **No real email.** The magic link was generated through the Admin API. Deliverability into a Greek
   inbox is untested and needs the Resend key in `docs/keys-needed.md` §1.
-- **No second tenant.** Tenant isolation is enforced by RLS and proven by policy, but nobody has
-  created a second agency and confirmed it sees nothing. That is G7 in build-plan §11 and it must
-  happen before a second customer exists.
+- ~~**No second tenant.**~~ **Closed 2026-09-10 — see below.**
 - **Billing and the admin console** were still being built when this ran.
 
 ## Test data left behind
@@ -118,3 +116,34 @@ Stated plainly, because an acceptance test that overstates itself is worse than 
 The shift `Aurora Bloom / Hyper Vega Γλυφάδα` was moved to today so the check-in window could be
 exercised, and carries a confirmed assignment and a manual check-in. `npm run seed` restores the
 seeded dates.
+
+---
+
+## G7 — tenant isolation, proven 2026-09-10
+
+Run by the manager: `npx tsx --env-file=.env scripts/verify-isolation.ts`
+
+**30 of 30 assertions passed against the live database.**
+
+Two synthetic agencies are created through the *real* self-serve signup path — `create_agency_for_user`
+called from a genuine RLS-scoped session, obtained the same way `app/login/callback/route.ts` obtains
+one. Each gets a fixture row in `promoters`, `campaigns`, `shifts`, `invitations`, `assignments`,
+`check_ins` and `field_reports`. Then, using each owner's own authenticated session, every table is
+asserted in both directions.
+
+**Every "cannot see the other's row" is paired with a "can see its own row".** That pairing is the
+point: without it, a broken query, an empty table or a revoked grant would produce a green run that
+proves nothing. An assertion that cannot fail is not a test.
+
+Both privilege escalations that `0011_accounts.sql` was written to stop were attempted and rejected
+by Postgres, not by application code:
+
+```
+ordinary member self-promoting to owner   → permission denied for table app_users
+cross-tenant insert into another agency's → new row violates row-level security policy
+  promoters, straight through PostgREST      for table "promoters"
+```
+
+The script cleans up after itself and is safe to re-run. **Re-run it after any change to RLS, to
+`current_agency_id()`, or to the grants in `0011` / `0013`** — those are the three places where this
+guarantee can be silently lost.
