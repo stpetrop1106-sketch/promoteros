@@ -70,6 +70,27 @@ In Vercel → Settings → Environment Variables. Copy the values from your loca
 | `NEXT_PUBLIC_PRIVACY_EMAIL` | `st.petrop1106@gmail.com` |
 | `MESSAGING_ADAPTER` | `clipboard` |
 
+> ### Never mark anything "Sensitive" in this project
+>
+> Vercel offers a **Sensitive** environment-variable type that cannot be read back after saving.
+> It sounds like the safe choice. On this project it silently breaks the product, and it cost an
+> afternoon to diagnose because each symptom looked like a different bug:
+>
+> - **Not available at build.** `NEXT_PUBLIC_*` values are inlined into the browser bundle while
+>   building, so they became `undefined`. `/privacy` threw its own guard and `/login` could not
+>   construct a Supabase client — both 500, while the landing page looked perfectly fine.
+> - **Not available at runtime either**, on this account. `SUPABASE_SERVICE_ROLE_KEY` was missing
+>   inside server actions, so the waitlist form crashed and `/i/[token]` returned 500 — for a token
+>   that rendered correctly against the same database from a local production build.
+>
+> Use **Encrypted**, which is Vercel's normal storage for secrets: encrypted at rest, readable only
+> by project members, available to build and runtime. It does **not** leak to the browser — Next
+> inlines only `NEXT_PUBLIC_*`, and the two real secrets do not carry that prefix.
+>
+> A diagnosis note worth keeping: `/i/<invalid-token>` is **not** a test of the service-role key.
+> `verifyToken` rejects a malformed token and returns before the database client is ever built, so
+> that page renders "expired" whether the key works or not. Mint a real token.
+
 > ### `NEXT_PUBLIC_APP_URL` is the one that will bite
 >
 > `linkFor()` in `lib/tokens.ts` builds every promoter link from it — the invitation at `/i/[token]`
