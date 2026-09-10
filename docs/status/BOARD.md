@@ -29,6 +29,23 @@ the thing — not accepted on the agent's word. No agent ever set its own status
 | **P21** | Waitlist hardening | Insert, duplicate conflict, anonymous read blocked, rate limiter atomic |
 | **P22, P23** | *in flight* | see below |
 
+## The road to a finished application
+
+The waitlist is live and verified at `promoteros.vercel.app`. What follows is the product itself.
+Ordered by what makes it usable, not by what is easiest.
+
+| # | Parcel | Why it matters | State |
+|---|---|---|---|
+| **P27** | Team write guards | A cancelled agency can still invite staff | **in flight** |
+| **P28** | Exception dashboard | `product-spec.md` §8 — the coordinator's home. Today `/shifts` is a flat list, so a shift starting in 30 minutes with nobody confirmed sits below one three weeks away. **This is the screen that makes it a product rather than a database with a calendar** | **in flight** |
+| **P29** | Client reporting | §11 — the campaign rollup an agency shows its client. The deliverable they are actually paid for | queued |
+| **P30** | Promoter self-service availability | §2 — promoters declare their own. Today only a coordinator can, which reintroduces exactly the manual work we sell against | queued |
+| **P31** | Brief acknowledgement | §9 — who has read the brief. Feeds `brief_completed`, already a scoring factor | queued |
+| **P32** | Gate 1 — GDPR | build-plan §11.2. Privacy notice on promoter pages, retention job, erasure path, audit trail. **Must be done before the first real promoter link goes out**, which is 2–4 weeks away | queued |
+
+Not planned, and deliberately: route optimisation, learned weights, the conversational coordinator,
+Viber, payroll export. All L6 in `roadmap.md`. Saying no is what has kept this shippable.
+
 ## In flight
 
 | Parcel | Title | Model | Owns |

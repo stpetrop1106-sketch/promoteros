@@ -149,6 +149,11 @@ export async function middleware(request: NextRequest) {
  */
 export const config = {
   matcher: [
+    // The coordinator's home (P28). Safe without this — `requireUser()` redirects and RLS scopes
+    // every row — but it is where a coordinator lands and lingers, so it needs the session-cookie
+    // refresh every other authenticated route gets. Without it, the one screen someone leaves
+    // open all morning is the one whose session quietly expires.
+    "/dashboard/:path*",
     "/shifts/:path*",
     "/promoters/:path*",
     "/campaigns/:path*",

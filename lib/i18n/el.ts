@@ -1033,4 +1033,86 @@ export const el = {
     "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να προσκαλέσεις ή να αλλάξεις ρόλο σε συνάδελφο. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
   "enforcement.team.blocked_seat_limit":
     "Έφτασες το όριο θέσεων του πακέτου {plan} ({limit} χρήστες). Αναβάθμισε από τη Χρέωση στις Ρυθμίσεις για να προσκαλέσεις άλλον.",
+
+  // --- P28 — the exception dashboard ---------------------------------------------------------
+  // Names appear without the article ("Μαρία δεν έχει κάνει check-in", not "Η Μαρία…") on
+  // purpose: the article is gendered in Greek and `promoters.gender` is optional, so an
+  // article would mislabel someone. Clipped, but never wrong.
+  "dashboard.title": "Σήμερα",
+  "dashboard.subtitle": "{date} · Τι χρειάζεται την προσοχή σου τώρα.",
+  "dashboard.all_shifts": "Όλες οι βάρδιες",
+
+  "dashboard.exceptions.title": "Χρειάζονται προσοχή",
+  "dashboard.severity.critical": "Επείγοντα",
+  "dashboard.severity.warning": "Χρειάζονται έλεγχο",
+  "dashboard.severity.info": "Για ενημέρωση",
+  "dashboard.standing_for": "Ισχύει εδώ και {duration}",
+
+  "dashboard.empty.title": "Όλα υπό έλεγχο",
+  "dashboard.empty.body":
+    "Καμία βάρδια δεν χρειάζεται την παρέμβασή σου αυτή τη στιγμή. Οι εκκρεμείς προσκλήσεις έχουν ακόμη χρόνο, όσες βάρδιες ξεκίνησαν έχουν check-in και δεν λείπει καμία αναφορά πεδίου.",
+  "dashboard.empty.hint": "Ο έλεγχος καλύπτει τις βάρδιες από {from} έως {to}.",
+  "dashboard.empty.no_shifts.title": "Δεν υπάρχουν βάρδιες ακόμη",
+  "dashboard.empty.no_shifts.body":
+    "Μόλις δημιουργήσεις μια καμπάνια με βάρδιες, εδώ θα βλέπεις μόνο ό,τι χρειάζεται την προσοχή σου — τίποτα άλλο.",
+  "dashboard.empty.no_shifts.cta": "Δημιουργία καμπάνιας",
+
+  "dashboard.today.title": "Η σημερινή μέρα",
+  "dashboard.today.shifts": "Βάρδιες σήμερα",
+  "dashboard.today.coverage": "Κάλυψη",
+  "dashboard.today.checked_in": "Έχουν κάνει check-in",
+  "dashboard.today.of": "{done} από {total}",
+  "dashboard.today.none": "Δεν υπάρχουν βάρδιες σήμερα.",
+
+  "dashboard.when.now": "τώρα",
+  "dashboard.when.in_minute": "σε 1 λεπτό",
+  "dashboard.when.in_minutes": "σε {n} λεπτά",
+  "dashboard.when.in_hour": "σε 1 ώρα",
+  "dashboard.when.in_hours": "σε {n} ώρες",
+  "dashboard.when.in_day": "σε 1 ημέρα",
+  "dashboard.when.in_days": "σε {n} ημέρες",
+  "dashboard.when.ago_minute": "πριν από 1 λεπτό",
+  "dashboard.when.ago_minutes": "πριν από {n} λεπτά",
+  "dashboard.when.ago_hour": "πριν από 1 ώρα",
+  "dashboard.when.ago_hours": "πριν από {n} ώρες",
+  "dashboard.when.ago_day": "πριν από 1 ημέρα",
+  "dashboard.when.ago_days": "πριν από {n} ημέρες",
+
+  "dashboard.duration.minute": "1 λεπτό",
+  "dashboard.duration.minutes": "{n} λεπτά",
+  "dashboard.duration.hour": "1 ώρα",
+  "dashboard.duration.hours": "{n} ώρες",
+  "dashboard.duration.day": "1 ημέρα",
+  "dashboard.duration.days": "{n} ημέρες",
+
+  "dashboard.ex.under_covered_one": "Η βάρδια στο {store} ξεκινά {when} και λείπει ένα άτομο.",
+  "dashboard.ex.under_covered_many": "Η βάρδια στο {store} ξεκινά {when} και λείπουν {missing} άτομα.",
+  "dashboard.ex.under_covered_started_one":
+    "Η βάρδια στο {store} ξεκίνησε {when} και λείπει ένα άτομο.",
+  "dashboard.ex.under_covered_started_many":
+    "Η βάρδια στο {store} ξεκίνησε {when} και λείπουν {missing} άτομα.",
+  "dashboard.ex.invitation_expiring":
+    "{promoter} δεν έχει απαντήσει ακόμη για τη βάρδια στο {store} και η πρόσκληση λήγει {when}.",
+  "dashboard.ex.invitation_expired":
+    "Η πρόσκληση για {promoter} στη βάρδια στο {store} έληξε {when} χωρίς απάντηση.",
+  "dashboard.ex.declined":
+    "{promoter} αρνήθηκε τη βάρδια στο {store} {when} και η βάρδια είναι ακόμη ακάλυπτη.",
+  "dashboard.ex.cancelled":
+    "{promoter} ακύρωσε τη βάρδια στο {store} {when} και χρειάζεται αντικατάσταση.",
+  "dashboard.ex.no_check_in":
+    "Η βάρδια στο {store} ξεκίνησε {when} και {promoter} δεν έχει κάνει check-in.",
+  "dashboard.ex.outside_geofence":
+    "{promoter} έκανε check-in {distance} μέτρα μακριά από το κατάστημα {store}.",
+  "dashboard.ex.outside_geofence_unknown":
+    "{promoter} έκανε check-in εκτός της περιοχής του καταστήματος {store}.",
+  "dashboard.ex.manual_override":
+    "{promoter} επιβεβαίωσε άφιξη χειροκίνητα στο {store} — δεν είναι πρόβλημα, απλώς δεν επιβεβαιώθηκε από την τοποθεσία.",
+  "dashboard.ex.missing_report":
+    "Η βάρδια στο {store} τελείωσε {when} και {promoter} δεν έχει στείλει αναφορά πεδίου.",
+
+  "dashboard.action.open_shift": "Άνοιγμα βάρδιας",
+  "dashboard.action.find_replacement": "Εύρεση αντικατάστασης",
+  "dashboard.action.chase_reply": "Έλεγχος πρόσκλησης",
+  "dashboard.action.review_check_in": "Έλεγχος check-in",
+  "dashboard.action.request_report": "Έλεγχος αναφοράς",
 } as const;

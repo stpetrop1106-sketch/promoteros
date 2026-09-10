@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Login" };
 
 function safeNext(value: string | undefined): string {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/shifts";
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/dashboard";
   return value;
 }
 

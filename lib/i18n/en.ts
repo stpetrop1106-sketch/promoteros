@@ -1016,4 +1016,83 @@ export const en: Record<TranslationKey, string> = {
     "This account is read-only right now, so you can't invite or change a colleague's role. Go to Billing in Settings to continue.",
   "enforcement.team.blocked_seat_limit":
     "You've reached the {plan} plan's seat limit ({limit} users). Upgrade from Billing in Settings to invite another.",
+
+  // --- P28 — the exception dashboard ---------------------------------------------------------
+  "dashboard.title": "Today",
+  "dashboard.subtitle": "{date} · What needs you right now.",
+  "dashboard.all_shifts": "All shifts",
+
+  "dashboard.exceptions.title": "Needs attention",
+  "dashboard.severity.critical": "Urgent",
+  "dashboard.severity.warning": "Worth a look",
+  "dashboard.severity.info": "For information",
+  "dashboard.standing_for": "True for {duration}",
+
+  "dashboard.empty.title": "Nothing needs you",
+  "dashboard.empty.body":
+    "No shift needs your attention right now. Pending invitations still have time, every shift that has started has a check-in, and no field report is missing.",
+  "dashboard.empty.hint": "This check covers shifts from {from} to {to}.",
+  "dashboard.empty.no_shifts.title": "No shifts yet",
+  "dashboard.empty.no_shifts.body":
+    "Once you create a campaign with shifts, this screen shows only what needs your attention — nothing else.",
+  "dashboard.empty.no_shifts.cta": "Create a campaign",
+
+  "dashboard.today.title": "Today at a glance",
+  "dashboard.today.shifts": "Shifts today",
+  "dashboard.today.coverage": "Coverage",
+  "dashboard.today.checked_in": "Checked in",
+  "dashboard.today.of": "{done} of {total}",
+  "dashboard.today.none": "No shifts today.",
+
+  "dashboard.when.now": "now",
+  "dashboard.when.in_minute": "in 1 minute",
+  "dashboard.when.in_minutes": "in {n} minutes",
+  "dashboard.when.in_hour": "in 1 hour",
+  "dashboard.when.in_hours": "in {n} hours",
+  "dashboard.when.in_day": "in 1 day",
+  "dashboard.when.in_days": "in {n} days",
+  "dashboard.when.ago_minute": "1 minute ago",
+  "dashboard.when.ago_minutes": "{n} minutes ago",
+  "dashboard.when.ago_hour": "1 hour ago",
+  "dashboard.when.ago_hours": "{n} hours ago",
+  "dashboard.when.ago_day": "1 day ago",
+  "dashboard.when.ago_days": "{n} days ago",
+
+  "dashboard.duration.minute": "1 minute",
+  "dashboard.duration.minutes": "{n} minutes",
+  "dashboard.duration.hour": "1 hour",
+  "dashboard.duration.hours": "{n} hours",
+  "dashboard.duration.day": "1 day",
+  "dashboard.duration.days": "{n} days",
+
+  "dashboard.ex.under_covered_one": "The shift at {store} starts {when} and is one person short.",
+  "dashboard.ex.under_covered_many": "The shift at {store} starts {when} and is {missing} people short.",
+  "dashboard.ex.under_covered_started_one":
+    "The shift at {store} started {when} and is one person short.",
+  "dashboard.ex.under_covered_started_many":
+    "The shift at {store} started {when} and is {missing} people short.",
+  "dashboard.ex.invitation_expiring":
+    "{promoter} has not replied about the shift at {store} and the invitation expires {when}.",
+  "dashboard.ex.invitation_expired":
+    "{promoter}'s invitation for the shift at {store} expired {when} with no reply.",
+  "dashboard.ex.declined":
+    "{promoter} declined the shift at {store} {when} and the shift is still short.",
+  "dashboard.ex.cancelled":
+    "{promoter} cancelled the shift at {store} {when} and needs replacing.",
+  "dashboard.ex.no_check_in":
+    "The shift at {store} started {when} and {promoter} has not checked in.",
+  "dashboard.ex.outside_geofence":
+    "{promoter} checked in {distance} metres away from the store at {store}.",
+  "dashboard.ex.outside_geofence_unknown":
+    "{promoter} checked in outside the store area at {store}.",
+  "dashboard.ex.manual_override":
+    "{promoter} confirmed arrival manually at {store} — not a problem, just not confirmed by location.",
+  "dashboard.ex.missing_report":
+    "The shift at {store} finished {when} and {promoter} has not sent a field report.",
+
+  "dashboard.action.open_shift": "Open shift",
+  "dashboard.action.find_replacement": "Find a replacement",
+  "dashboard.action.chase_reply": "Check the invitation",
+  "dashboard.action.review_check_in": "Review check-in",
+  "dashboard.action.request_report": "Check the report",
 };
