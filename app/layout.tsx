@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { authState } from "@/lib/auth";
 import { getEntitlement } from "@/lib/billing/subscription";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
@@ -14,6 +14,10 @@ export const metadata: Metadata = {
   icons: {
     icon: "/promoteros-mark.svg",
   },
+};
+
+// Next 15 moved themeColor out of `metadata`; leaving it there logs a warning on every build.
+export const viewport: Viewport = {
   themeColor: "#1646B8",
 };
 
@@ -45,11 +49,35 @@ export const metadata: Metadata = {
  * on `/settings`, which already renders its own copy — lives inside `<GlobalBillingBanner>`
  * instead (see that file's comment).
  */
+/**
+ * Never let the banner break the site.
+ *
+ * The reasoning above was right about *sessions* but wrong about *contexts*. `authState()` does
+ * not throw for "no user" — but it does throw when the Supabase client cannot be constructed at
+ * all, which is exactly what happens while Next prerenders `/_not-found` at build time: no
+ * request, no cookies, and on a fresh CI machine no environment either. That took down the whole
+ * production build with `Error occurred prerendering page "/_not-found"`, days after the code
+ * looked correct in dev.
+ *
+ * So this is fail-safe by construction. Anything goes wrong — missing env, no request context, a
+ * database that is down — and the layout renders no banner and the page below it still works. A
+ * missing billing warning is a small loss; a marketing page or a promoter's shift link that 500s
+ * because a billing lookup failed is an incident.
+ */
+async function loadBillingNotice() {
+  try {
+    const state = await authState();
+    if (!state.ok) return null;
+    return await getEntitlement(state.user.agencyId);
+  } catch {
+    return null;
+  }
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const state = await authState();
-  const entitlement = state.ok ? await getEntitlement(state.user.agencyId) : null;
+  const entitlement = await loadBillingNotice();
 
   return (
     <html lang={DEFAULT_LOCALE}>

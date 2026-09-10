@@ -6,6 +6,11 @@ import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 
 export const metadata: Metadata = { title: "PromoterOS admin" };
 
+// This layout queries `platform_admins`, so nothing under /admin can be prerendered. Without
+// this, `next build` tried to statically generate /admin, ran the guard with no request and no
+// database, and failed the whole production build.
+export const dynamic = "force-dynamic";
+
 const t = translatorFor(DEFAULT_LOCALE);
 
 /**
