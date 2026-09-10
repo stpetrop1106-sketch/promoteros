@@ -34,24 +34,10 @@ import {
  * `authenticated` no longer has INSERT/UPDATE/DELETE on `app_users` at all.
  */
 
-export type InviteState = {
-  status: "idle" | "sent" | "error";
-  /** The link to send. Shown because staff invitations have no mail transport yet — see P19 notes. */
-  url?: string;
-  email?: string;
-  code?: TeamErrorCode;
-};
-
-export const INVITE_IDLE: InviteState = { status: "idle" };
-
-export type MutationState = {
-  status: "idle" | "done" | "error";
-  code?: TeamErrorCode;
-  /** Which row the message belongs to, so the list can render it in place. */
-  targetId?: string;
-};
-
-export const MUTATION_IDLE: MutationState = { status: "idle" };
+// State types and their initial values live in `./state` — a "use server" module may only export
+// async functions, and anything else reaches the client as `undefined`. Import them from there,
+// and do NOT re-export them from here: a re-export is still an export.
+import type { InviteState, MutationState } from "./state";
 
 export async function inviteTeamMember(
   _prev: InviteState,

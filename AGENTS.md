@@ -46,6 +46,29 @@ These are not style preferences. Violating them breaks the product legally or co
 
 Rationale is in `docs/decisions.md`. Do not swap any of this without adding a decision entry.
 
+## The server/client boundary — read this before writing an action
+
+Five separate parcels shipped the same bug, so it is a rule rather than a tip.
+
+**A `"use server"` module may export ONLY async functions.** A `const`, a sync function, a class, a
+re-export block — each is either rejected at build time or, worse, silently replaced by `undefined`
+on the client. That second failure took down the public landing page: `initialWaitlistState` was
+exported from `app/actions.ts`, `useActionState` received `undefined`, and every render threw.
+
+**A `server-only` module must never be imported by a client component for a *value*.** A type-only
+import is erased and safe; importing a constant drags the whole server module into the client bundle
+and fails the production build.
+
+So:
+
+- State types and their `*_IDLE` constants live in a sibling `state.ts`, never in `actions.ts`.
+  See `app/waitlist-state.ts`, `app/settings/team/state.ts`.
+- Values shared with the browser live outside the `server-only` module.
+  See `lib/team-shared.ts`, `lib/admin/plans.ts`.
+- **Re-exporting does not help.** A re-export is still an export.
+
+**`npm run dev` does not catch any of this. Run `npm run build` before claiming a parcel is done.**
+
 ## Conventions
 
 - `snake_case` in the database, `camelCase` in TypeScript, mapping at the data-access boundary

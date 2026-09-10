@@ -5,34 +5,11 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { teamErrorCode, type TeamErrorCode } from "@/lib/team";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
+import { TIMEZONES, type CreateAgencyErrors, type CreateAgencyState } from "./state";
 
 // Same convention as app/promoters/actions.ts: server-only, but every user-facing string still
 // goes through t() in the reference locale. There is no coordinator locale switcher yet (P12).
 const t = translatorFor(DEFAULT_LOCALE);
-
-/**
- * Timezones offered at signup. A short, honest list beats a 400-entry dropdown: the market is
- * Greek agencies, and anyone outside it can be moved by support rather than by scrolling.
- */
-export const TIMEZONES = [
-  "Europe/Athens",
-  "Europe/Nicosia",
-  "Europe/Bucharest",
-  "Europe/Berlin",
-  "Europe/London",
-  "UTC",
-] as const;
-
-export type Timezone = (typeof TIMEZONES)[number];
-
-export type CreateAgencyErrors = Partial<Record<"name" | "city" | "timezone" | "general", string>>;
-
-export type CreateAgencyState = {
-  status: "idle" | "error";
-  errors?: CreateAgencyErrors;
-};
-
-export const CREATE_AGENCY_IDLE: CreateAgencyState = { status: "idle" };
 
 const ERROR_KEYS: Partial<Record<TeamErrorCode, TranslationKey>> = {
   already_in_agency: "onboarding.errors.already_in_agency",

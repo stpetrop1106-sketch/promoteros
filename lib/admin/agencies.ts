@@ -270,9 +270,10 @@ export async function clearDeletionRequest(
   return { ok: true, data: Boolean(data) };
 }
 
-export const ASSIGNABLE_PLANS = ["starter", "agency", "multi_brand"] as const;
-export type AssignablePlan = (typeof ASSIGNABLE_PLANS)[number];
-
-export function isAssignablePlan(value: string): value is AssignablePlan {
-  return (ASSIGNABLE_PLANS as readonly string[]).includes(value);
-}
+// Plan values live in `lib/admin/plans.ts` because client components need them and this module
+// is `server-only`. Re-exported so existing server-side imports keep working.
+export {
+  ASSIGNABLE_PLANS,
+  isAssignablePlan,
+  type AssignablePlan,
+} from "@/lib/admin/plans";

@@ -5,13 +5,8 @@ import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import type { BillingInterval, PlanId } from "@/lib/billing/plans";
-import {
-  startCheckout,
-  openBillingPortal,
-  BILLING_IDLE,
-  type BillingActionState,
-  type BillingErrorCode,
-} from "./actions";
+import { startCheckout, openBillingPortal } from "./actions";
+import { BILLING_IDLE, type BillingActionState, type BillingErrorCode } from "./state";
 
 const t = translatorFor(DEFAULT_LOCALE);
 

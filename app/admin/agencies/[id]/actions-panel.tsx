@@ -6,7 +6,7 @@ import { Button, Card, TextField, SelectField, TextArea } from "@/components/ui"
 import type { ButtonVariant } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { REASON_MIN_LENGTH, type AdminErrorCode } from "@/lib/admin/errors";
-import { ASSIGNABLE_PLANS, type AssignablePlan } from "@/lib/admin/agencies";
+import { ASSIGNABLE_PLANS, type AssignablePlan } from "@/lib/admin/plans";
 import { PLAN_LABEL, formatAdminDate } from "@/lib/admin/labels";
 import {
   runExtendTrial,
@@ -15,9 +15,8 @@ import {
   runUnsuspend,
   runMarkDeletion,
   runClearDeletion,
-  MUTATION_IDLE,
-  type MutationState,
 } from "./actions";
+import { MUTATION_IDLE, type MutationState } from "./state";
 
 const t = translatorFor(DEFAULT_LOCALE);
 

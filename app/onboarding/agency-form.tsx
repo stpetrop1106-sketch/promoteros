@@ -4,7 +4,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { TextField, SelectField, Button } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { createAgency, CREATE_AGENCY_IDLE, TIMEZONES, type CreateAgencyState } from "./actions";
+import { createAgency } from "./actions";
+import { CREATE_AGENCY_IDLE, TIMEZONES, type CreateAgencyState } from "./state";
 
 const t = translatorFor(DEFAULT_LOCALE);
 

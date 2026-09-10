@@ -5,7 +5,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { acceptInvitation, ACCEPT_IDLE, type AcceptState } from "./actions";
+import { acceptInvitation } from "./actions";
+import { ACCEPT_IDLE, type AcceptState } from "./state";
 import type { TeamErrorCode } from "@/lib/team";
 
 const t = translatorFor(DEFAULT_LOCALE);

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { IDLE_STATE, type ReportActionState } from "./actions";
+import { IDLE_STATE, type ReportActionState } from "./state";
 
 export type ReportFormLabels = {
   unitsPromoted: string;

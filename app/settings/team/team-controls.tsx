@@ -4,17 +4,15 @@ import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button, SelectField, TextField } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { ASSIGNABLE_ROLES, type TeamErrorCode, type TeamRole } from "@/lib/team";
+import { ASSIGNABLE_ROLES, type TeamRole } from "@/lib/team-shared";
+import type { TeamErrorCode } from "@/lib/team";
 import {
   inviteTeamMember,
   changeMemberRole,
   removeMember,
   revokeInvitation,
-  INVITE_IDLE,
-  MUTATION_IDLE,
-  type InviteState,
-  type MutationState,
 } from "./actions";
+import { INVITE_IDLE, MUTATION_IDLE, type InviteState, type MutationState } from "./state";
 
 const t = translatorFor(DEFAULT_LOCALE);
 

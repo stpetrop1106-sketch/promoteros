@@ -26,12 +26,10 @@ import { adminErrorCode, type AdminErrorCode, REASON_MIN_LENGTH } from "@/lib/ad
  * instead of a raised exception, exactly like `lib/team.ts`'s comment about the same split.
  */
 
-export type ActivityState =
-  | { status: "idle" }
-  | { status: "loaded"; activity: AgencyActivity }
-  | { status: "error"; code: AdminErrorCode };
-
-export const ACTIVITY_IDLE: ActivityState = { status: "idle" };
+// State types and their initial values live in `./state` — a "use server" module may only export
+// async functions, and anything else reaches the client as `undefined`. Import them from there,
+// and do NOT re-export them from here: a re-export is still an export.
+import type { ActivityState, MutationState } from "./state";
 
 /**
  * Bind with the agency id: `loadAgencyActivity.bind(null, agencyId)`. Logs an audit row (inside
@@ -53,13 +51,6 @@ export async function loadAgencyActivity(
   return { status: "loaded", activity: result.data };
 }
 
-export type MutationState = {
-  status: "idle" | "done" | "error";
-  code?: AdminErrorCode;
-  value?: string;
-};
-
-export const MUTATION_IDLE: MutationState = { status: "idle" };
 
 function readReason(formData: FormData): string | null {
   const reason = String(formData.get("reason") ?? "").trim();
@@ -181,7 +172,7 @@ export async function runClearDeletion(
   return { status: "done" };
 }
 
-/** Re-exported so client components in this folder never need to know the code list. */
-export function mapAdminError(message: string | null | undefined): AdminErrorCode {
-  return adminErrorCode(message);
-}
+// `mapAdminError` used to live here as a sync re-export of `adminErrorCode`. A "use server"
+// module may only export ASYNC functions, so it failed the production build — and it had no
+// callers: `lib/admin/errors.ts` is not server-only, so client components import
+// `adminErrorCode` from there directly.

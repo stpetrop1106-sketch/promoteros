@@ -4,14 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { hashToken, verifyToken } from "@/lib/tokens";
-import { teamErrorCode, type TeamErrorCode } from "@/lib/team";
-
-export type AcceptState = {
-  status: "idle" | "error";
-  code?: TeamErrorCode;
-};
-
-export const ACCEPT_IDLE: AcceptState = { status: "idle" };
+import { teamErrorCode } from "@/lib/team";
+import type { AcceptState } from "./state";
 
 /**
  * Join the agency named on the invitation this token belongs to.

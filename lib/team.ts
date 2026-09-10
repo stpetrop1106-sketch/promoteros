@@ -18,15 +18,17 @@ import type { PlanId } from "@/lib/billing/plans";
  * refuse a coordinator's attempt to promote themselves.
  */
 
-export type TeamRole = "owner" | "coordinator" | "supervisor" | "admin";
+// Role values live in `lib/team-shared.ts` because client components need them and this module
+// is `server-only`. Imported for use below, and re-exported so existing server-side imports keep
+// working — `export … from` alone would not bring the names into this file's scope.
+import type { TeamRole, AssignableRole } from "@/lib/team-shared";
 
-/** What an owner may hand out. `admin` is the legacy 0001 value and is deliberately not offered. */
-export const ASSIGNABLE_ROLES = ["owner", "coordinator", "supervisor"] as const;
-export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number];
-
-export function isAssignableRole(value: string): value is AssignableRole {
-  return (ASSIGNABLE_ROLES as readonly string[]).includes(value);
-}
+export {
+  ASSIGNABLE_ROLES,
+  isAssignableRole,
+  type TeamRole,
+  type AssignableRole,
+} from "@/lib/team-shared";
 
 export type TeamMember = {
   id: string;

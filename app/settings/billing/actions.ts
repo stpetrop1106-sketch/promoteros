@@ -13,6 +13,7 @@ import {
   createCustomer,
   isConfigured,
 } from "@/lib/billing/stripe";
+import type { BillingErrorCode, BillingActionState } from "./state";
 
 /**
  * The two buttons on the billing screen: "subscribe / change plan" and "manage billing".
@@ -31,23 +32,6 @@ import {
  * Paying is how a customer leaves read-only, so blocking the payment path when access is
  * restricted would be a trap with no way out.
  */
-
-export type BillingErrorCode =
-  | "not_owner"
-  | "no_agency"
-  | "not_configured"
-  | "price_missing"
-  | "plan_invalid"
-  | "no_customer"
-  | "stripe_unavailable"
-  | "unknown";
-
-export type BillingActionState = {
-  status: "idle" | "error";
-  code?: BillingErrorCode;
-};
-
-export const BILLING_IDLE: BillingActionState = { status: "idle" };
 
 function fail(code: BillingErrorCode): BillingActionState {
   return { status: "error", code };

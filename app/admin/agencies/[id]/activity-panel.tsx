@@ -6,7 +6,8 @@ import { Button, Card, TextArea } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { REASON_MIN_LENGTH, type AdminErrorCode } from "@/lib/admin/errors";
 import { formatAdminDate } from "@/lib/admin/labels";
-import { loadAgencyActivity, ACTIVITY_IDLE, type ActivityState } from "./actions";
+import { loadAgencyActivity } from "./actions";
+import { ACTIVITY_IDLE, type ActivityState } from "./state";
 
 const t = translatorFor(DEFAULT_LOCALE);
 

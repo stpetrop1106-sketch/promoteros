@@ -9,6 +9,7 @@ import { getGeocoder, type GeocodeResult } from "@/lib/geocoding";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import type { PlanId } from "@/lib/billing/plans";
+import type { FieldErrors, PromoterFormState } from "./state";
 
 // Every user-facing string still goes through t() — see CLAUDE.md's i18n rule — even though
 // this file is server-only. Validation messages are shown in the reference locale: the app has
@@ -26,21 +27,6 @@ const PLAN_LABEL_KEY: Record<PlanId, TranslationKey> = {
   agency: "billing.plan.agency",
   multi_brand: "billing.plan.multi_brand",
 };
-
-export type FieldErrors = Partial<
-  Record<
-    "fullName" | "phone" | "email" | "birthYear" | "lat" | "lng" | "areas" | "skills" | "general",
-    string
-  >
->;
-
-export type PromoterFormState = {
-  status: "idle" | "error" | "duplicate" | "success";
-  errors?: FieldErrors;
-  duplicate?: { id: string; fullName: string };
-};
-
-export const IDLE_STATE: PromoterFormState = { status: "idle" };
 
 /**
  * Normalises a promoter's phone number to a consistent shape before it ever reaches the

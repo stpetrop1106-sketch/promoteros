@@ -5,7 +5,8 @@ import { useActionState, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { TextField, SelectField, TextArea, Button, Badge } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { geocodeAddress, IDLE_STATE, type PromoterFormState } from "./actions";
+import { geocodeAddress } from "./actions";
+import { IDLE_STATE, type PromoterFormState } from "./state";
 import type { GeocodeResult } from "@/lib/geocoding";
 
 const t = translatorFor(DEFAULT_LOCALE);

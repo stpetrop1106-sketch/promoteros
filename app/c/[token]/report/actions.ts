@@ -3,30 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { submitFieldReport, attachReportPhoto, type FieldReportInput } from "@/lib/checkins";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import type { ReportActionState, ReportFieldErrors } from "./state";
 
 // Same shape as app/promoters/actions.ts's field-error pattern: server-rendered validation
 // messages in the reference locale, since promoter-facing pages have no locale switcher yet.
 const t = translatorFor(DEFAULT_LOCALE);
-
-export type ReportFieldErrors = Partial<
-  Record<
-    | "unitsPromoted"
-    | "salesCount"
-    | "interactionsCount"
-    | "stockIssues"
-    | "storeManagerName"
-    | "notes"
-    | "general",
-    string
-  >
->;
-
-export type ReportActionState =
-  | { status: "idle" }
-  | { status: "error"; errors: ReportFieldErrors }
-  | { status: "success"; photosSaved: number; photosFailed: number };
-
-export const IDLE_STATE: ReportActionState = { status: "idle" };
 
 /** `value` is always present so a caller never needs to cast after checking `ok` on a sibling
  *  field — it is simply ignored (left `null`) when parsing failed. */
