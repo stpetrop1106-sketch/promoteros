@@ -136,6 +136,30 @@ Step 6 is the reason to deploy at all before you have a domain.
 
 ---
 
+## 5a. Branches — why production does not move on its own
+
+`promoteros.vercel.app` is being emailed to companies while the product is still being built. The
+landing page has already gone down twice as collateral damage from product code, so the two need
+different release cadences even though they share a codebase.
+
+| Branch | Role |
+|---|---|
+| `main` | **What production serves.** Vercel deploys it automatically, so nothing lands here by accident |
+| `develop` | Where the work happens. Pushing it creates a **preview** deployment on its own HTTPS URL — which is what makes phone GPS testing possible |
+| `waitlist` | A marker of the commit that was verified live, kept so we can always see what companies were actually shown |
+
+Vercel's API refuses to change the production branch (`should NOT have additional property
+productionBranch`), so the freeze is enforced by git discipline instead: **work goes to `develop`,
+and production only moves when someone deliberately merges `develop` into `main`.** That is a
+stronger guarantee than a dashboard setting, because it cannot be undone by a stray push.
+
+Promoting a verified change:
+
+```bash
+git checkout main && git merge --ff-only develop && git push
+git branch -f waitlist main && git push -f origin waitlist
+```
+
 ## 6. A custom domain, later
 
 Nothing here needs redoing. Vercel → Settings → Domains → add it, follow the DNS records, then
