@@ -83,6 +83,25 @@ location. Rate limiting, database-level single-use enforcement and expiry cleanu
 v1 rather than hardening debt, because this is the failure mode that would end the product and it is
 cheap now and expensive later.
 
+### D15 — An expired trial gets the same 14-day grace as a failed card · 2026-09-10
+Approved by Stella. The alternative was immediate lockout at trial end. Rejected because the failure
+mode is identical to a failed card and so is the damage: a coordinator locked out mid-campaign with
+promoters standing in stores turns our billing event into their client's incident. Someone whose
+trial lapsed on a Friday is also the person most likely to buy on the Monday, and locking them out is
+the worst possible moment to ask for a card.
+
+### D16 — `past_due_since` is a real column, not a derived value · 2026-09-10
+Approved by Stella. The 14-day grace window needs a start that does not move. Deriving it from the
+latest `invoice.payment_failed` would restart the clock on every dunning retry, so an agency in
+permanent dunning would keep full access forever. The column is written once when the subscription
+first enters `past_due` and cleared when it leaves.
+
+### D17 — The first platform admin is seeded by hand · 2026-09-10
+There is no code path that inserts into `platform_admins`, because any such path would be a path to
+every customer's data. Seeding is a single manual `insert` in the SQL editor, documented in the tail
+of `0013_admin.sql`. Until it runs, `/admin` returns 404 to everyone — the correct default for a
+console with nobody in it.
+
 ---
 
 ## Open questions
