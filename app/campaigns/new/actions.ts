@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import {
   fieldErrorsFromZodError,
   optionalText,
@@ -62,6 +63,18 @@ export async function createCampaign(
   formData: FormData,
 ): Promise<CampaignFormState> {
   const user = await requireUser();
+
+  // P24 — creating a campaign is new operational commitment, the canonical "write" checkBilling
+  // exists to stop once an agency is read-only (docs/commercial-architecture.md §3). Checked
+  // before the form is even parsed, same as app/promoters/actions.ts's
+  // checkPromoterCreationAllowed(): no reason to validate fields the request will be refused
+  // anyway. "write" only ever returns the "subscription_read_only" block (limits are
+  // add_promoter/add_staff only), so there is exactly one message to give.
+  const entitlement = await getEntitlement(user.agencyId);
+  if (entitlement && !checkBilling(entitlement, "write").allowed) {
+    return { status: "error", formError: "enforcement.campaigns.blocked_read_only_create" };
+  }
+
   const db = await createServerSupabase();
 
   const parsed = schema.safeParse({

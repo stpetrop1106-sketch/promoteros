@@ -116,6 +116,36 @@ export default async function JoinPage({ params }: { params: Promise<{ token: st
     </div>
   );
 
+  // A real signed-in user, but their *current* agency was suspended by us (the admin console —
+  // commercial-architecture.md §5). Letting this fall through to the acceptance form below would
+  // let a suspended agency's owner join a second agency without ever seeing why the first one
+  // stopped working — confusing at best, per this parcel's brief. Reuse the exact explanation
+  // `middleware.ts` renders for the same state (P22's `enforcement.suspended.*` keys), and offer
+  // the same "sign out and come back to this link" escape hatch the wrong-email case below uses,
+  // so choosing to pursue this invitation under a different account stays possible.
+  if (!state.ok && state.reason === "suspended") {
+    return (
+      <Shell>
+        <PageHeader title={t("onboarding.join.title")} />
+        <Card className="mt-6">{summary}</Card>
+        <Card className="mt-4">
+          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
+            {t("enforcement.suspended.title")}
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-[color:var(--color-muted)]">
+            {t("enforcement.suspended.body")}
+          </p>
+          <form action={signOutAndReturn} className="mt-4">
+            <input type="hidden" name="token" value={token} />
+            <Button type="submit" variant="secondary">
+              {t("enforcement.suspended.signout")}
+            </Button>
+          </form>
+        </Card>
+      </Shell>
+    );
+  }
+
   // Signed out: send them to the magic link and straight back here afterwards. `next` is a
   // relative path, which `safeNext` in app/login requires, so this cannot become an open redirect.
   if (!state.ok && state.reason === "anonymous") {

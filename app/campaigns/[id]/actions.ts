@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import type { CampaignStatus } from "@/app/campaigns/_shared";
 
 // Allowed forward moves. Terminal states (`completed`, `cancelled`) have none — status change is
@@ -24,7 +25,20 @@ export async function setCampaignStatus(
   next: CampaignStatus,
   _formData: FormData,
 ): Promise<void> {
-  await requireUser();
+  const user = await requireUser();
+
+  // P24 — a status change is exactly checkBilling's own worked example of "write" ("edit a
+  // campaign"), and unlike app/shifts/[id]/actions.ts's cancelAssignment this is not a factual
+  // correction forced on the agency by someone else's action (a no-show, a decline) — it is the
+  // coordinator's own deliberate decision, for every transition including "cancelled". So it is
+  // gated the same as any other edit, not carved out. No way to surface a specific message here:
+  // this action returns void and is bound straight to a plain <form action> in
+  // app/campaigns/[id]/page.tsx (not owned by this parcel), so a blocked request silently no-ops
+  // — the same behaviour this function already has for an invalid transition, two lines below.
+  // See docs/status/P24.md for the request to that page's owner to surface this.
+  const entitlement = await getEntitlement(user.agencyId);
+  if (entitlement && !checkBilling(entitlement, "write").allowed) return;
+
   const db = await createServerSupabase();
 
   const { data: campaign } = await db

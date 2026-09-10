@@ -1,6 +1,9 @@
 import "server-only";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
+import { getEntitlement, checkBilling, type BillingAction } from "@/lib/billing/subscription";
+import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
+import type { PlanId } from "@/lib/billing/plans";
 
 /**
  * Team membership: who belongs to an agency, in what role, and who may change that.
@@ -222,6 +225,55 @@ export async function ownerContext(): Promise<OwnerContext | null> {
   if (!data || !data.active || data.role !== "owner") return null;
 
   return { userId: data.id, agencyId: data.agency_id };
+}
+
+const t = translatorFor(DEFAULT_LOCALE);
+
+// Reuses P17/P22's plan-name keys (`billing.plan.*`) — see the identical constant in
+// app/promoters/actions.ts.
+const PLAN_LABEL_KEY: Record<PlanId, TranslationKey> = {
+  starter: "billing.plan.starter",
+  agency: "billing.plan.agency",
+  multi_brand: "billing.plan.multi_brand",
+};
+
+/**
+ * P24 — the general billing read-only guard for team writes (docs/commercial-architecture.md
+ * §3), mirroring `app/promoters/actions.ts`'s `checkPromoterCreationAllowed()`: `getEntitlement`
+ * then `checkBilling`, called before the write, with a specific message per block reason.
+ *
+ * **Not called from anywhere in this codebase yet.** The actual mutations this parcel was asked
+ * to gate — `inviteTeamMember`, `changeMemberRole`, `revokeInvitation`, `removeMember` — all live
+ * in `app/settings/team/actions.ts`, not in this file, and that path (all of `app/settings/**`)
+ * is explicitly off-limits to this parcel. Wiring this in also means adding a case to
+ * `app/settings/team/team-controls.tsx`'s `ERROR_KEYS: Record<TeamErrorCode, TranslationKey>`,
+ * which is exhaustive over `TeamErrorCode` — so this deliberately does *not* add a new value to
+ * `TEAM_ERROR_CODES` either; doing so without updating that map would fail `tsc` on a file this
+ * parcel cannot touch. This function returns a fully-resolved message string instead (same shape
+ * as `checkPromoterCreationAllowed`), so wiring it in needs no `TeamErrorCode` change — just a
+ * new `message?: string` field on `InviteState`/`MutationState` and one call per action, right
+ * before `ownerContext()`. See docs/status/P24.md's "Requests to other lanes" for the exact
+ * recommendation (which of the four should gate, and why two of them deliberately should not).
+ */
+export async function checkTeamWriteAllowed(
+  agencyId: string,
+  action: Extract<BillingAction, "write" | "add_staff">,
+): Promise<string | null> {
+  const entitlement = await getEntitlement(agencyId);
+  if (!entitlement) return null;
+
+  const gate = checkBilling(entitlement, action);
+  if (gate.allowed) return null;
+
+  if (gate.block === "seat_limit_reached") {
+    return t("enforcement.team.blocked_seat_limit", {
+      plan: t(PLAN_LABEL_KEY[entitlement.planId]),
+      limit: entitlement.seatLimit,
+    });
+  }
+
+  // "subscription_read_only" — the only other block "write"/"add_staff" can return.
+  return t("enforcement.team.blocked_read_only");
 }
 
 /**

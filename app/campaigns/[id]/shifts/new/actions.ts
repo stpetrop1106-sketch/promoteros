@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import {
   expandSeriesDates,
   fieldErrorsFromZodError,
@@ -84,6 +85,14 @@ const schema = z
 
 export async function createShifts(_prev: ShiftFormState, formData: FormData): Promise<ShiftFormState> {
   const user = await requireUser();
+
+  // P24 — creating shifts (and, along the way, possibly a new store) is new operational
+  // commitment, same reasoning as app/campaigns/new/actions.ts's createCampaign.
+  const entitlement = await getEntitlement(user.agencyId);
+  if (entitlement && !checkBilling(entitlement, "write").allowed) {
+    return { status: "error", formError: "enforcement.campaigns.blocked_read_only_shifts" };
+  }
+
   const db = await createServerSupabase();
 
   const campaignId = requiredText(formData.get("campaignId"));

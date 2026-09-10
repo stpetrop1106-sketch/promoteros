@@ -1002,4 +1002,18 @@ export const en: Record<TranslationKey, string> = {
     "This account is read-only right now, so you can't add a new promoter. Go to Billing in Settings to continue.",
   "enforcement.promoters.blocked_limit":
     "You've reached the {plan} plan limit ({limit} promoters). Upgrade from Billing in Settings to add another.",
+
+  // --- P24 — write guards on the remaining server actions (shifts, campaigns, team, invitations) ---
+  "enforcement.invitations.blocked_read_only":
+    "This account is read-only right now, so you can't send new invitations. Go to Billing in Settings to continue.",
+  "enforcement.campaigns.blocked_read_only_create":
+    "This account is read-only right now, so you can't create a new campaign. Go to Billing in Settings to continue.",
+  "enforcement.campaigns.blocked_read_only_brief":
+    "This account is read-only right now, so you can't save the brief. Go to Billing in Settings to continue.",
+  "enforcement.campaigns.blocked_read_only_shifts":
+    "This account is read-only right now, so you can't add new shifts. Go to Billing in Settings to continue.",
+  "enforcement.team.blocked_read_only":
+    "This account is read-only right now, so you can't invite or change a colleague's role. Go to Billing in Settings to continue.",
+  "enforcement.team.blocked_seat_limit":
+    "You've reached the {plan} plan's seat limit ({limit} users). Upgrade from Billing in Settings to invite another.",
 };

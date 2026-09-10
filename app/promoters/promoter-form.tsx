@@ -10,6 +10,31 @@ import type { GeocodeResult } from "@/lib/geocoding";
 
 const t = translatorFor(DEFAULT_LOCALE);
 
+// P24 — P22's checkPromoterCreationAllowed() (app/promoters/actions.ts, not owned by this
+// parcel) returns a plain resolved sentence, not a structured billing/non-billing discriminator,
+// so a billing block is told apart from an ordinary save failure by whether the sentence mentions
+// Billing at all — every billing-block message (read-only or over-limit) names it, and no other
+// `promoters.errors.*` general message does (checked against lib/i18n/el.ts). Splitting on that
+// word turns just that word into the real link, instead of naming "Ρυθμίσεις → Χρέωση" as prose.
+const BILLING_WORD = t("enforcement.banner.billing_cta");
+
+function GeneralError({ message }: { message: string }) {
+  const at = message.indexOf(BILLING_WORD);
+  if (at === -1) return <>{message}</>;
+  return (
+    <>
+      {message.slice(0, at)}
+      <Link
+        href="/settings/billing"
+        className="font-medium text-[color:var(--color-accent)] underline hover:no-underline"
+      >
+        {BILLING_WORD}
+      </Link>
+      {message.slice(at + BILLING_WORD.length)}
+    </>
+  );
+}
+
 export type AreaOption = { id: string; name: string; city: string };
 export type SkillOption = { id: string; name: string; category: string | null };
 
@@ -122,7 +147,7 @@ export function PromoterForm({
 
       {state.status === "error" && state.errors?.general ? (
         <div className="rounded-lg border border-[color:var(--color-bad)] bg-[color:var(--color-bad)]/10 px-4 py-3 text-sm text-[color:var(--color-ink)]">
-          {state.errors.general}
+          <GeneralError message={state.errors.general} />
         </div>
       ) : null}
 

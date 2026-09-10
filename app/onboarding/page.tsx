@@ -5,6 +5,7 @@ import { loadOnboardingProgress, PROMOTER_TARGET, type OnboardingStep } from "@/
 import { createServerSupabase } from "@/lib/supabase/server";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { PageHeader, Card, Button, Badge } from "@/components/ui";
+import { signOut } from "@/app/login/actions";
 import { AgencyForm } from "./agency-form";
 
 export const dynamic = "force-dynamic";
@@ -101,6 +102,32 @@ export default async function OnboardingPage() {
           <Link href="/login?next=%2Fonboarding">
             <Button>{t("onboarding.signin.cta")}</Button>
           </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (!state.ok && state.reason === "suspended") {
+    // A real signed-in user whose current agency was suspended by us (the admin console — see
+    // commercial-architecture.md §5), following an old link or an invitation into a second
+    // agency. `authState()`'s own contract is "never let this fall through to a flow that will
+    // not work" (see lib/auth.ts), and falling through to the "create your agency" branch below
+    // would let them start setting up a brand-new agency while their existing one is locked —
+    // confusing at best. Reuse the exact explanation `middleware.ts` renders for the same state
+    // (P22's `enforcement.suspended.*` keys) so the product never says two different things about
+    // one suspension, and give a real way out per commercial-architecture.md §6 ("no dead ends").
+    return (
+      <main className="mx-auto max-w-lg px-6 py-16">
+        <PageHeader
+          title={t("enforcement.suspended.title")}
+          subtitle={t("enforcement.suspended.body")}
+        />
+        <div className="mt-6">
+          <form action={signOut}>
+            <Button type="submit" variant="secondary">
+              {t("enforcement.suspended.signout")}
+            </Button>
+          </form>
         </div>
       </main>
     );

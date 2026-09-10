@@ -3,8 +3,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { matchPromoters, type Candidate } from "@/lib/matching";
 import { getAdapter } from "@/lib/messaging";
 import { mintToken, hashToken, verifyToken, linkFor } from "@/lib/tokens";
+import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
+import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 
 const DEFAULT_TTL_HOURS = 24;
+const t = translatorFor(DEFAULT_LOCALE);
 
 export type InvitationView = {
   invitationId: string;
@@ -38,6 +41,19 @@ export async function createInvitation(
     .eq("id", shiftId)
     .single();
   if (shiftErr || !shift) throw new Error("Shift not found");
+
+  // P24 — a read-only agency (canceled subscription, or past its 14-day grace) must not be able
+  // to offer new shifts; docs/commercial-architecture.md §3 and checkBilling's own "write"
+  // contract ("send an invitation" is its own example). Checked here rather than in the
+  // coordinator's `invite()` action (app/shifts/[id]/actions.ts) because this is the one place
+  // every invitation is actually created — an admin client, so `getEntitlement` is scoped by
+  // `shift.agency_id` just fetched, not by trusting an id from the caller. Any future caller of
+  // `createInvitation` inherits the same guard for free, the same way `checkBilling` itself is
+  // meant to be the single source of truth rather than copied into every call site.
+  const entitlement = await getEntitlement(shift.agency_id);
+  if (entitlement && !checkBilling(entitlement, "write").allowed) {
+    throw new Error(t("enforcement.invitations.blocked_read_only"));
+  }
 
   const { data: promoter, error: promoterErr } = await db
     .from("promoters")

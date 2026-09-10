@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import { fieldErrorsFromZodError, requiredText, type FormState } from "@/app/campaigns/_shared";
 
 type BriefField = "title" | "bodyMd";
@@ -20,6 +21,15 @@ const schema = z.object({
 
 export async function saveBrief(_prev: BriefFormState, formData: FormData): Promise<BriefFormState> {
   const user = await requireUser();
+
+  // P24 — saving or publishing a brief edits campaign content; a read-only agency (canceled, or
+  // past its 14-day grace) must not be able to. See app/campaigns/new/actions.ts's createCampaign
+  // for the identical shape and reasoning.
+  const entitlement = await getEntitlement(user.agencyId);
+  if (entitlement && !checkBilling(entitlement, "write").allowed) {
+    return { status: "error", formError: "enforcement.campaigns.blocked_read_only_brief" };
+  }
+
   const db = await createServerSupabase();
 
   const parsed = schema.safeParse({
