@@ -140,6 +140,7 @@ export const el = {
   "auth.no_agency_body": "Η σύνδεση πέτυχε, αλλά αυτή η διεύθυνση δεν έχει αντιστοιχιστεί σε agency, οπότε δεν βλέπεις κανένα δεδομένο. Ζήτησε από τον διαχειριστή να σου δώσει πρόσβαση.",
   "auth.signed_in_as": "Σύνδεση ως {email}",
   "auth.sign_out": "Αποσύνδεση",
+  "auth.completing": "Σε συνδέουμε…",
   "auth.create_agency_cta": "Δημιούργησε την εταιρεία σου",
 
   "promoters.add": "Προσθήκη promoter",

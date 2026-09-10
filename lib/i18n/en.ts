@@ -142,6 +142,7 @@ export const en: Record<TranslationKey, string> = {
   "auth.no_agency_body": "You are signed in, but this address has not been assigned to an agency, so no data is visible to you. Ask your administrator to grant access.",
   "auth.signed_in_as": "Signed in as {email}",
   "auth.sign_out": "Sign out",
+  "auth.completing": "Signing you in…",
   "auth.create_agency_cta": "Create your agency",
 
   "promoters.add": "Add promoter",

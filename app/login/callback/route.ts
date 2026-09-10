@@ -58,7 +58,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}${next}`);
   }
 
-  // Neither shape present. Most likely the Supabase project is on the implicit flow, which puts
-  // the tokens in the URL fragment where a server never sees them — see docs/status/P1.md.
-  return NextResponse.redirect(`${origin}/login?reason=link_failed`);
+  // Neither shape present, which is the NORMAL case on this project rather than a failure.
+  //
+  // Supabase's free tier forbids editing the magic-link email template, so every link goes through
+  // `{{ .ConfirmationURL }}` → `/auth/v1/verify`, which answers 303 to this route with the session
+  // in the URL FRAGMENT: `?next=…#access_token=…&refresh_token=…`. A server is never sent a
+  // fragment, so there is nothing here to read — and this route used to call that an expired link,
+  // which is what a real user saw when signing in for the first time.
+  //
+  // Browsers do carry a fragment across a redirect that has none of its own, so handing off to a
+  // client page is what makes the session reachable at all.
+  const handoff = new URL(`${origin}/login/complete`);
+  handoff.searchParams.set("next", next);
+  return NextResponse.redirect(handoff);
 }
