@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button, SelectField, TextField } from "@/components/ui";
@@ -15,6 +16,13 @@ import {
 import { INVITE_IDLE, MUTATION_IDLE, type InviteState, type MutationState } from "./state";
 
 const t = translatorFor(DEFAULT_LOCALE);
+
+// P27 — `checkTeamWriteAllowed()` (lib/team.ts) returns a fully-resolved sentence, not a
+// `TeamErrorCode` (see its note: a new code would break the exhaustive `ERROR_KEYS` map below).
+// Same trick as `app/promoters/promoter-form.tsx`'s `GeneralError`: split the sentence on the
+// word for "Billing" and turn just that word into a real link to /settings/billing, instead of
+// naming it as inert prose.
+const BILLING_WORD = t("enforcement.banner.billing_cta");
 
 /**
  * One sentence per failure. `unknown` is the only generic one and it still says what to do
@@ -54,7 +62,35 @@ const ROLE_LABEL: Record<TeamRole, TranslationKey> = {
   admin: "team.role.admin",
 };
 
-function ErrorNote({ code }: { code: TeamErrorCode }) {
+/**
+ * `message` (a resolved sentence from `checkTeamWriteAllowed()`) takes priority over `code` when
+ * both could apply — see the P27 note above `BILLING_WORD`. Every action still passes `code`
+ * unconditionally, so this is the only branch point; nothing else in the file needs to know
+ * about billing blocks specifically.
+ */
+function ErrorNote({ code, message }: { code: TeamErrorCode; message?: string }) {
+  if (message) {
+    const at = message.indexOf(BILLING_WORD);
+    return (
+      <p role="alert" className="text-xs font-medium text-[color:var(--color-bad)]">
+        {at === -1 ? (
+          message
+        ) : (
+          <>
+            {message.slice(0, at)}
+            <Link
+              href="/settings/billing"
+              className="font-medium text-[color:var(--color-accent)] underline hover:no-underline"
+            >
+              {BILLING_WORD}
+            </Link>
+            {message.slice(at + BILLING_WORD.length)}
+          </>
+        )}
+      </p>
+    );
+  }
+
   return (
     <p role="alert" className="text-xs font-medium text-[color:var(--color-bad)]">
       {t(ERROR_KEYS[code] ?? "team.errors.unknown")}
@@ -125,7 +161,7 @@ export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
         />
 
         {state.status === "error" && state.code !== "email_invalid" ? (
-          <ErrorNote code={state.code ?? "unknown"} />
+          <ErrorNote code={state.code ?? "unknown"} message={state.message} />
         ) : null}
 
         <div>
@@ -197,7 +233,7 @@ export function RoleControl({
         />
         <Submit label={t("team.role_change.submit")} size="sm" variant="secondary" />
       </div>
-      {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} /> : null}
+      {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} message={state.message} /> : null}
       {state.status === "done" ? (
         <p className="text-xs font-medium text-[color:var(--color-ok)]">
           {t("team.role_change.done")}
@@ -235,7 +271,7 @@ export function RemoveControl({
         <Button size="sm" variant="ghost" onClick={() => setOpen(true)}>
           {t("team.remove.action")}
         </Button>
-        {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} /> : null}
+        {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} message={state.message} /> : null}
       </div>
     );
   }
@@ -257,7 +293,7 @@ export function RemoveControl({
           {t("team.remove.cancel")}
         </Button>
       </form>
-      {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} /> : null}
+      {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} message={state.message} /> : null}
     </div>
   );
 }
@@ -274,7 +310,7 @@ export function RevokeControl({ invitationId }: { invitationId: string }) {
     <form action={formAction} className="flex flex-col gap-1">
       <input type="hidden" name="invitationId" value={invitationId} />
       <Submit label={t("team.pending.revoke")} size="sm" variant="ghost" />
-      {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} /> : null}
+      {state.status === "error" ? <ErrorNote code={state.code ?? "unknown"} message={state.message} /> : null}
     </form>
   );
 }

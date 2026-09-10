@@ -21,6 +21,14 @@ export type InviteState = {
   url?: string;
   email?: string;
   code?: TeamErrorCode;
+  /**
+   * P27 — a fully-resolved, translated sentence from `checkTeamWriteAllowed()`
+   * (`lib/team.ts`), used instead of `code` for a billing block. `TeamErrorCode` stays a fixed
+   * union (`team-controls.tsx`'s `ERROR_KEYS` map is exhaustive over it — see P24's note in
+   * `lib/team.ts`), so a billing reason is carried as a ready sentence rather than a new code.
+   * When both are absent, the UI falls back to `team.errors.unknown`.
+   */
+  message?: string;
 };
 
 export const INVITE_IDLE: InviteState = { status: "idle" };
@@ -30,6 +38,8 @@ export type MutationState = {
   code?: TeamErrorCode;
   /** Which row the message belongs to, so the list can render it in place. */
   targetId?: string;
+  /** P27 — see `InviteState.message`. */
+  message?: string;
 };
 
 export const MUTATION_IDLE: MutationState = { status: "idle" };

@@ -10,6 +10,7 @@ import {
   isAssignableRole,
   normalizeEmail,
   teamInviteUrl,
+  checkTeamWriteAllowed,
   EMAIL_PATTERN,
   TEAM_INVITE_TTL_SECONDS,
   type TeamErrorCode,
@@ -45,6 +46,13 @@ export async function inviteTeamMember(
 ): Promise<InviteState> {
   const owner = await ownerContext();
   if (!owner) return { status: "error", code: "not_owner" };
+
+  // P27 — inviting adds a seat and a cost, exactly the "consumes a seat" case
+  // `checkTeamWriteAllowed` exists for. Checked right after we know who's asking (so a
+  // non-owner still gets "not_owner", not a billing message) and before any validation or the
+  // token mint, so a blocked request does no unnecessary work.
+  const blockedMessage = await checkTeamWriteAllowed(owner.agencyId, "add_staff");
+  if (blockedMessage) return { status: "error", message: blockedMessage };
 
   const email = normalizeEmail(String(formData.get("email") ?? ""));
   const role = String(formData.get("role") ?? "");
@@ -122,6 +130,16 @@ export async function changeMemberRole(
 
   const owner = await ownerContext();
   if (!owner) return { status: "error", code: "not_owner", targetId: userId };
+
+  // P27 — changing a role is neither growth nor reduction of what the agency uses, but it is
+  // still an edit to existing configuration: the same shape checkBilling's own doc names as the
+  // canonical "write" example ("edit a campaign"). Checked right after we know who's asking and
+  // before the self-role-change / role-shape checks below, matching the established pattern
+  // (checkPromoterCreationAllowed, app/promoters/actions.ts) of gating before any other
+  // validation runs — a blocked request gets the billing reason, not a validation error for
+  // fields that were never going to be written anyway.
+  const blockedMessage = await checkTeamWriteAllowed(owner.agencyId, "write");
+  if (blockedMessage) return { status: "error", targetId: userId, message: blockedMessage };
 
   if (userId === owner.userId) {
     return { status: "error", code: "cannot_change_own_role", targetId: userId };

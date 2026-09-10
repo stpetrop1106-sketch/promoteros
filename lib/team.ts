@@ -240,22 +240,25 @@ const PLAN_LABEL_KEY: Record<PlanId, TranslationKey> = {
 };
 
 /**
- * P24 — the general billing read-only guard for team writes (docs/commercial-architecture.md
- * §3), mirroring `app/promoters/actions.ts`'s `checkPromoterCreationAllowed()`: `getEntitlement`
- * then `checkBilling`, called before the write, with a specific message per block reason.
+ * P24/P27 — the general billing read-only guard for team writes
+ * (docs/commercial-architecture.md §3), mirroring `app/promoters/actions.ts`'s
+ * `checkPromoterCreationAllowed()`: `getEntitlement` then `checkBilling`, called before the
+ * write, with a specific message per block reason.
  *
- * **Not called from anywhere in this codebase yet.** The actual mutations this parcel was asked
- * to gate — `inviteTeamMember`, `changeMemberRole`, `revokeInvitation`, `removeMember` — all live
- * in `app/settings/team/actions.ts`, not in this file, and that path (all of `app/settings/**`)
- * is explicitly off-limits to this parcel. Wiring this in also means adding a case to
- * `app/settings/team/team-controls.tsx`'s `ERROR_KEYS: Record<TeamErrorCode, TranslationKey>`,
- * which is exhaustive over `TeamErrorCode` — so this deliberately does *not* add a new value to
- * `TEAM_ERROR_CODES` either; doing so without updating that map would fail `tsc` on a file this
- * parcel cannot touch. This function returns a fully-resolved message string instead (same shape
- * as `checkPromoterCreationAllowed`), so wiring it in needs no `TeamErrorCode` change — just a
- * new `message?: string` field on `InviteState`/`MutationState` and one call per action, right
- * before `ownerContext()`. See docs/status/P24.md's "Requests to other lanes" for the exact
- * recommendation (which of the four should gate, and why two of them deliberately should not).
+ * Written by P24 (which could not wire it in — `app/settings/**` was outside that parcel's file
+ * scope) and wired by P27 into `app/settings/team/actions.ts`'s `inviteTeamMember` (`"add_staff"`)
+ * and `changeMemberRole` (`"write"`). `revokeInvitation` and `removeMember` deliberately do not
+ * call this — both free capacity (a seat, an outstanding invitation) rather than consuming it, so
+ * blocking them would trap a read-only agency with staff or invitations it cannot remove. See
+ * docs/status/P27.md's gate table for the full reasoning.
+ *
+ * This returns a fully-resolved message string rather than a `TeamErrorCode` on purpose:
+ * `app/settings/team/team-controls.tsx`'s `ERROR_KEYS: Record<TeamErrorCode, TranslationKey>` is
+ * exhaustive over `TeamErrorCode`, so adding a new code there would need a matching map entry in
+ * a file this parcel was told to touch only to render the message — not to grow the code union.
+ * `InviteState`/`MutationState` (`app/settings/team/state.ts`) instead carry an optional
+ * `message?: string`, rendered as-is (with the word for "Billing" turned into a real link) ahead
+ * of the `code` lookup.
  */
 export async function checkTeamWriteAllowed(
   agencyId: string,
