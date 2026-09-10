@@ -104,7 +104,26 @@ screens say billing is not configured, and no agency is ever locked out for it �
 
 ---
 
-## 4. Supabase — allow the new origin
+## 4. Supabase — allow the new origin ✅ done
+
+Configured on 2026-09-10 through the Management API and verified: a magic link minted for the
+production callback now comes back pointing at production rather than being silently rewritten to
+`localhost`, and following it sets a session that renders `/shifts`.
+
+```
+site_url:       https://promoteros.vercel.app
+uri_allow_list: http://localhost:3000/login/callback
+                https://promoteros.vercel.app/login/callback
+                https://*-stella-181a.vercel.app/login/callback
+```
+
+The third entry is the one that is easy to leave out and then miss: **preview deployments carry a
+random hash and change on every build, and they are the only way to test check-in geolocation on a
+real phone.** Geolocation needs HTTPS — `localhost` is exempt from that rule, a LAN address is not.
+
+The original instructions are kept below, since they are what to repeat when a custom domain lands.
+
+### Original steps
 
 Supabase → **Authentication → URL Configuration**:
 
