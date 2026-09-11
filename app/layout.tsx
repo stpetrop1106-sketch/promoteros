@@ -3,6 +3,7 @@ import { authState } from "@/lib/auth";
 import { getEntitlement } from "@/lib/billing/subscription";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { GlobalBillingBanner } from "./onboarding/global-billing-banner";
+import { CoordinatorNav } from "@/components/coordinator-nav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -64,24 +65,25 @@ export const viewport: Viewport = {
  * missing billing warning is a small loss; a marketing page or a promoter's shift link that 500s
  * because a billing lookup failed is an incident.
  */
-async function loadBillingNotice() {
+async function loadShell() {
   try {
     const state = await authState();
-    if (!state.ok) return null;
-    return await getEntitlement(state.user.agencyId);
+    if (!state.ok) return { signedIn: false, entitlement: null };
+    return { signedIn: true, entitlement: await getEntitlement(state.user.agencyId) };
   } catch {
-    return null;
+    return { signedIn: false, entitlement: null };
   }
 }
 
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const entitlement = await loadBillingNotice();
+  const { signedIn, entitlement } = await loadShell();
 
   return (
     <html lang={DEFAULT_LOCALE}>
       <body className="min-h-screen antialiased">
+        <CoordinatorNav signedIn={signedIn} />
         {entitlement ? (
           <GlobalBillingBanner
             notice={entitlement.notice}

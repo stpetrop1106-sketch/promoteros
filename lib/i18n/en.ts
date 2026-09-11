@@ -11,6 +11,8 @@ export const en: Record<TranslationKey, string> = {
   "nav.promoters": "Promoters",
   "nav.shifts": "Shifts",
   "nav.settings": "Settings",
+  "nav.today": "Today",
+  "nav.label": "Main navigation",
 
   "common.save": "Save",
   "common.cancel": "Cancel",
@@ -143,6 +145,12 @@ export const en: Record<TranslationKey, string> = {
   "auth.signed_in_as": "Signed in as {email}",
   "auth.sign_out": "Sign out",
   "auth.completing": "Signing you in…",
+  "auth.code_label": "Or enter the code from the email",
+  "auth.code_hint":
+    "Six digits. Works even when the link did not — some mail providers consume a one-time link by scanning it.",
+  "auth.code_submit": "Sign in with code",
+  "auth.code_checking": "Checking…",
+  "auth.code_invalid": "That code is wrong or has expired. Request a new one.",
   "auth.create_agency_cta": "Create your agency",
 
   "promoters.add": "Add promoter",
@@ -1096,4 +1104,138 @@ export const en: Record<TranslationKey, string> = {
   "dashboard.action.chase_reply": "Check the invitation",
   "dashboard.action.review_check_in": "Review check-in",
   "dashboard.action.request_report": "Check the report",
+
+  // --- P32 · Promoter privacy notice (/privacy/promoters) ------------------------------------
+  // Written to be read once, on a phone, standing in a supermarket.
+  // No consent anywhere: see docs/decisions.md D5.
+  "promoter_privacy.link": "Your personal data",
+  "promoter_privacy.title": "Your personal data",
+  "promoter_privacy.intro":
+    "This page says what {agency} holds about you, why it holds it, and what you can ask for. No legalese, one read.",
+
+  "promoter_privacy.controller_title": "Who is responsible",
+  "promoter_privacy.controller_body":
+    "The data controller is {agency} ({agencyLegal}) — the agency that invites you to shifts. It decides what is held about you and for how long.\n{processor} is only the software: it processes your data on {agency}'s behalf and on its instructions, never for its own purposes, and never shares it with another agency.\nFor anything about your data, write to {agencyEmail}.",
+
+  "promoter_privacy.data_title": "What we hold",
+  "promoter_privacy.data_body":
+    "• Your name, phone number and email.\n• The areas you are willing to work in, and whether you have a car or a licence.\n• The skills you have told us about.\n• Your availability — which days and hours you can work.\n• Your work history: which invitations you received, what you answered, which shifts you covered, which were cancelled.\n• The time you confirmed arrival, and how many metres you were from the store at that moment.\n• The field reports and photos you send after a shift.",
+
+  "promoter_privacy.not_held_title": "What we do not hold",
+  "promoter_privacy.not_held_body":
+    "We hold no location trail. None.\nWhen you tap \"I have arrived\", your phone gives us your position once, at that exact moment. We work out how many metres you are from the store and the position is discarded immediately. It is stored nowhere — the check-in table does not even have columns for coordinates.\nWe do not track you in the background, on shift or off it. We do not read your messages. We hold no ID document, tax number or bank details — payroll does not go through this system. And your details never go to another agency.\nIf location does not work, or you would rather not give it, you confirm arrival manually. Location is never the reason you do not get paid.",
+
+  "promoter_privacy.purpose_title": "Why we hold it",
+  "promoter_privacy.purpose_body":
+    "So {agency} can offer you shifts that actually suit you — near you, at hours you can work, doing work you know. So it can send you the invitation and keep your answer. So it knows who is covering each shift and can find a replacement if someone drops out. So it can confirm the shift happened and put the client's report together.",
+
+  "promoter_privacy.basis_title": "On what basis",
+  "promoter_privacy.basis_body":
+    "Two legal bases, and neither of them is your consent.\n• Performance of our agreement with you: without your phone number and your availability there is no way to offer you a shift.\n• The agency's legitimate interest: covering the shifts it has taken on, knowing who was there, and delivering an accurate report to the client.\nWe do not ask for your consent, and that is deliberate. In a working relationship consent is not genuinely free — it is hard to say no to the person who gives you work — so it would not be a valid basis and we do not rely on it. You do have the right to object to anything based on legitimate interest.",
+
+  "promoter_privacy.retention_title": "For how long",
+  "promoter_privacy.retention_body":
+    "The details that identify you are kept while you work with {agency} and for a set period after your last activity. {agency} decides that period — ask at {agencyEmail}.\nAfter it, they are deleted automatically: your profile, availability, skills, invitations and per-client history are permanently removed. What remains is only the operational trace of each shift — that it was covered and what happened there — with nothing left that leads back to you.",
+
+  "promoter_privacy.rights_title": "What you can ask for",
+  "promoter_privacy.rights_body":
+    "• A copy of everything we hold about you.\n• Correction of anything that is wrong.\n• Erasure of your details.\n• Objection to processing based on legitimate interest.\n• Restriction of processing, or portability of your data.\nEmail {agencyEmail}. You get an answer within one month at the latest, and it costs you nothing. If you are not satisfied, you can complain to the Hellenic Data Protection Authority (dpa.gr).",
+
+  "promoter_privacy.processor_note":
+    "The software is provided by {processor} as data processor. To contact us directly: {processorEmail}. For erasure or a copy of your data, go to the agency first — we act only on its instructions.",
+
+  // --- P29 · Campaign and client reporting (product-spec §11) -------------------------------
+  "campaign_report.back": "← Campaign",
+  "campaign_report.title": "Report: {campaign}",
+  "campaign_report.export_shifts": "CSV per shift",
+  "campaign_report.export_stores": "CSV per store",
+  "campaign_report.generated": "Generated {at} (Athens time).",
+  "campaign_report.of": "{done} of {total}",
+
+  "campaign_report.truncated.title": "This report covers only part of the campaign",
+  "campaign_report.truncated.body":
+    "The campaign has more rows than this page loads, so the figures do not cover the whole period. Do not send this report to a client — talk to us first.",
+
+  "campaign_report.overview.title": "Report details",
+  "campaign_report.overview.client": "Client",
+  "campaign_report.overview.period": "Period",
+  "campaign_report.overview.stores": "Stores ({count})",
+  "campaign_report.overview.promoters": "Promoters ({count})",
+
+  "campaign_report.basis.complete": "From all {expected} field reports.",
+  "campaign_report.basis.partial": "From {arrived} of {expected} field reports — {missing} missing.",
+  "campaign_report.basis.none_expected": "No field report is due yet.",
+  "campaign_report.basis.field_partial":
+    "{reported} of the {arrived} reports received filled this field in.",
+  "campaign_report.basis.incomplete": "Partial data",
+
+  "campaign_report.totals.title": "Field results",
+  "campaign_report.totals.units": "Units promoted",
+  "campaign_report.totals.sales": "Sales",
+  "campaign_report.totals.interactions": "Customer interactions",
+
+  "campaign_report.coverage.title": "Coverage",
+  "campaign_report.coverage.shifts": "Shifts",
+  "campaign_report.coverage.filled": "Slots filled",
+  "campaign_report.coverage.completion": "Completion rate",
+  "campaign_report.coverage.cancelled_shifts": "Cancelled shifts",
+  "campaign_report.coverage.cancellations": "Promoter cancellations",
+  "campaign_report.coverage.no_shows": "No-shows",
+  "campaign_report.coverage.note":
+    "A filled slot is a promoter who worked it or is booked to work it. A cancellation and a no-show do not count as filled, because the client did not get that person in that store. Cancelled shifts are left out of the denominator.",
+
+  "campaign_report.attendance.title": "Attendance",
+  "campaign_report.attendance.checked_in": "Checked in",
+  "campaign_report.attendance.not_checked_in": "Not checked in",
+  "campaign_report.attendance.within_geofence": "Within the store area",
+  "campaign_report.attendance.outside_geofence": "Outside the area",
+  "campaign_report.attendance.geofence_unknown": "No location reading",
+  "campaign_report.attendance.manual_overrides": "Confirmed manually",
+  "campaign_report.attendance.note":
+    "Two different axes over the same check-ins: where they were, and how it was captured. Never add them together. A manual confirmation is not a fault — it exists precisely so that location never decides who gets paid.",
+
+  "campaign_report.stores.title": "Per store",
+  "campaign_report.stores.hint": "This is where an underperforming store shows up.",
+  "campaign_report.stores.none": "No store has a shift yet.",
+  "campaign_report.stores.col_store": "Store",
+  "campaign_report.stores.col_shifts": "Shifts",
+  "campaign_report.stores.col_coverage": "Coverage",
+  "campaign_report.stores.col_attendance": "Checked in",
+  "campaign_report.stores.col_reports": "Reports",
+  "campaign_report.stores.col_units": "Units",
+  "campaign_report.stores.col_sales": "Sales",
+  "campaign_report.stores.col_interactions": "Interactions",
+  "campaign_report.stores.col_photos": "Photos",
+
+  "campaign_report.photos.title": "Photos",
+  "campaign_report.photos.count": "{count} in total",
+  "campaign_report.photos.none": "No photo has been uploaded yet.",
+  "campaign_report.photos.meta": "{date} · {promoter}",
+  "campaign_report.photos.alt": "Field photo from {store}, {date}",
+  "campaign_report.photos.unavailable": "This photo is not available right now",
+
+  "campaign_report.notes.title": "Notes and observations",
+  "campaign_report.notes.none": "Nothing has been reported from the field yet.",
+  "campaign_report.notes.meta": "{store} · {date} · {promoter}",
+  "campaign_report.notes.stock_issues": "Stock issues",
+  "campaign_report.notes.manager": "Store manager",
+
+  "campaign_report.shifts.title": "Per shift",
+  "campaign_report.shifts.col_date": "Date",
+  "campaign_report.shifts.col_store": "Store",
+  "campaign_report.shifts.col_promoters": "Promoters",
+  "campaign_report.shifts.col_coverage": "Coverage",
+  "campaign_report.shifts.col_reports": "Reports",
+  "campaign_report.shifts.col_units": "Units",
+  "campaign_report.shifts.col_photos": "Photos",
+
+  "campaign_report.empty.title": "Nothing has come back from the field yet",
+  "campaign_report.empty.body":
+    "The shifts exist, but no field report and no check-in has been recorded. We do not show zeroes as if they were a result.",
+  "campaign_report.empty.hint":
+    "{expected} field reports are due. They will appear here as the promoters send them.",
+  "campaign_report.empty.no_shifts.title": "This campaign has no shifts",
+  "campaign_report.empty.no_shifts.body":
+    "With no shifts there is nothing to report on. Add shifts and the report fills itself in as the campaign runs.",
+  "campaign_report.empty.no_shifts.cta": "Add shifts",
 };

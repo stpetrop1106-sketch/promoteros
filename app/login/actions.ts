@@ -1,10 +1,17 @@
 "use server";
 
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export type LoginState = {
   status: "idle" | "sent" | "invalid_email" | "rate_limited" | "error";
+  /** Echoed back so the code form knows which address the code belongs to. */
+  email?: string;
+};
+
+export type CodeState = {
+  status: "idle" | "invalid_code" | "error";
 };
 
 // Deliberately permissive: the authoritative check is that the message actually arrives.
@@ -52,11 +59,44 @@ export async function requestMagicLink(
     return { status: "error" };
   }
 
-  return { status: "sent" };
+  return { status: "sent", email };
 }
 
 export async function signOut(): Promise<void> {
   const db = await createServerSupabase();
   await db.auth.signOut();
   redirect("/login");
+}
+
+/**
+ * Sign in with the six-digit code from the email instead of the link.
+ *
+ * This path exists because a magic link is single-use and mail providers routinely fetch every
+ * link in an incoming message to scan it — consuming the token before the person clicks, so a
+ * perfectly valid link reports itself as already used. A typed code cannot be consumed by a
+ * scanner, which makes this the reliable route rather than the fallback.
+ *
+ * `verifyOtp` establishes the session in cookies here, in a Server Action, which is one of the
+ * few places Next allows a cookie to be written.
+ */
+export async function signInWithCode(
+  _prev: CodeState,
+  formData: FormData,
+): Promise<CodeState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const code = String(formData.get("code") ?? "").replace(/\D/g, "");
+  const next = safeNext(String(formData.get("next") ?? "") || null);
+
+  if (!EMAIL.test(email) || code.length !== 6) return { status: "invalid_code" };
+
+  const db = await createServerSupabase();
+  const { error } = await db.auth.verifyOtp({ email, token: code, type: "email" });
+
+  // Wrong code and expired code are reported identically on purpose: distinguishing them would
+  // tell someone guessing whether they are close.
+  if (error) return { status: "invalid_code" };
+
+  // `next` came through `safeNext()`, which rejects anything that is not a same-origin path,
+  // so this cast past typed routes asserts a check already made.
+  redirect(next as Route);
 }

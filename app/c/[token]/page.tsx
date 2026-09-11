@@ -119,6 +119,17 @@ export default async function CheckinPage({
       ) : (
         <CheckinForm token={token} reportHref={`/c/${token}/report`} labels={labels} />
       )}
+
+      {/* P32 · Gate 1. This is the page where location is asked for, so it is the page where
+          the notice explaining that no location is stored matters most. */}
+      <p className="mt-10 text-center text-xs">
+        <Link
+          className="text-[color:var(--color-muted)] underline underline-offset-2"
+          href="/privacy/promoters"
+        >
+          {t("promoter_privacy.link")}
+        </Link>
+      </p>
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { loadInvitation } from "@/lib/invitations";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { RespondForm } from "./respond-form";
@@ -79,6 +80,17 @@ export default async function InvitationPage({
           />
         </>
       )}
+
+      {/* P32 · Gate 1. The promoter must be able to reach the privacy notice from the first
+          page they ever see from us, without logging in and without asking anyone. */}
+      <p className="mt-10 text-center text-xs">
+        <Link
+          className="text-[color:var(--color-muted)] underline underline-offset-2"
+          href="/privacy/promoters"
+        >
+          {t("promoter_privacy.link")}
+        </Link>
+      </p>
     </main>
   );
 }

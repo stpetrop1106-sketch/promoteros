@@ -9,6 +9,8 @@ export const el = {
   "nav.promoters": "Promoters",
   "nav.shifts": "Βάρδιες",
   "nav.settings": "Ρυθμίσεις",
+  "nav.today": "Σήμερα",
+  "nav.label": "Κύρια πλοήγηση",
 
   "common.save": "Αποθήκευση",
   "common.cancel": "Ακύρωση",
@@ -141,6 +143,12 @@ export const el = {
   "auth.signed_in_as": "Σύνδεση ως {email}",
   "auth.sign_out": "Αποσύνδεση",
   "auth.completing": "Σε συνδέουμε…",
+  "auth.code_label": "Ή βάλε τον κωδικό από το email",
+  "auth.code_hint":
+    "Εξαψήφιος κωδικός. Δούλεψε ακόμα κι αν ο σύνδεσμος δεν άνοιξε — μερικοί πάροχοι email τον «καταναλώνουν» ελέγχοντάς τον.",
+  "auth.code_submit": "Σύνδεση με κωδικό",
+  "auth.code_checking": "Έλεγχος…",
+  "auth.code_invalid": "Ο κωδικός δεν είναι σωστός ή έληξε. Ζήτησε καινούριο.",
   "auth.create_agency_cta": "Δημιούργησε την εταιρεία σου",
 
   "promoters.add": "Προσθήκη promoter",
@@ -1116,4 +1124,139 @@ export const el = {
   "dashboard.action.chase_reply": "Έλεγχος πρόσκλησης",
   "dashboard.action.review_check_in": "Έλεγχος check-in",
   "dashboard.action.request_report": "Έλεγχος αναφοράς",
+
+  // --- P32 · Ενημέρωση promoter για τα προσωπικά δεδομένα (/privacy/promoters) ---------------
+  // Γραμμένο για να το διαβάσει promoter στο κινητό, μία φορά, όρθια σε ένα σούπερ μάρκετ.
+  // Καμία συγκατάθεση, πουθενά: δείτε docs/decisions.md D5.
+  "promoter_privacy.link": "Τα προσωπικά σου δεδομένα",
+  "promoter_privacy.title": "Τα προσωπικά σου δεδομένα",
+  "promoter_privacy.intro":
+    "Εδώ γράφει ποια στοιχεία σου κρατάει το {agency}, γιατί τα κρατάει και τι μπορείς να ζητήσεις. Χωρίς νομικά, μία φορά διάβασμα.",
+
+  "promoter_privacy.controller_title": "Ποιος είναι υπεύθυνος",
+  "promoter_privacy.controller_body":
+    "Υπεύθυνος επεξεργασίας των δεδομένων σου είναι το {agency} ({agencyLegal}) — το πρακτορείο που σε καλεί στις βάρδιες. Αυτό αποφασίζει τι κρατάει για σένα και για πόσο.\nΤο {processor} είναι μόνο το λογισμικό: επεξεργάζεται τα δεδομένα σου για λογαριασμό του {agency} και με δικές του εντολές, δεν τα χρησιμοποιεί για δικό του σκοπό και δεν τα δίνει σε άλλο πρακτορείο.\nΓια οτιδήποτε αφορά τα δεδομένα σου γράψε στο {agencyEmail}.",
+
+  "promoter_privacy.data_title": "Τι κρατάμε",
+  "promoter_privacy.data_body":
+    "• Ονοματεπώνυμο, τηλέφωνο και email.\n• Τις περιοχές όπου δέχεσαι να δουλέψεις και αν έχεις αυτοκίνητο ή δίπλωμα.\n• Τις δεξιότητες που έχεις δηλώσει.\n• Τη διαθεσιμότητά σου — ποιες μέρες και ώρες μπορείς.\n• Το ιστορικό της δουλειάς σου: ποιες προσκλήσεις έλαβες, τι απάντησες, ποιες βάρδιες κάλυψες, ποιες ακυρώθηκαν.\n• Την ώρα που δήλωσες άφιξη και πόσα μέτρα απείχες από το κατάστημα εκείνη τη στιγμή.\n• Τις αναφορές πεδίου και τις φωτογραφίες που στέλνεις μετά τη βάρδια.",
+
+  "promoter_privacy.not_held_title": "Τι δεν κρατάμε",
+  "promoter_privacy.not_held_body":
+    "Δεν κρατάμε ιστορικό τοποθεσίας. Καθόλου.\nΌταν πατάς «Δήλωσα άφιξη», το κινητό σου δίνει τη θέση σου μία φορά, εκείνη ακριβώς τη στιγμή. Υπολογίζουμε πόσα μέτρα απέχεις από το κατάστημα και η θέση σβήνεται αμέσως. Δεν αποθηκεύεται πουθενά — ο πίνακας των αφίξεων δεν έχει καν στήλες για συντεταγμένες.\nΔεν σε παρακολουθούμε στο παρασκήνιο, ούτε στη βάρδια ούτε εκτός. Δεν διαβάζουμε τα μηνύματά σου. Δεν κρατάμε ταυτότητα, ΑΦΜ ή τραπεζικά στοιχεία — η μισθοδοσία δεν περνάει από εδώ. Και τα στοιχεία σου δεν πάνε ποτέ σε άλλο πρακτορείο.\nΑν η τοποθεσία δεν δουλέψει ή δεν θέλεις να τη δώσεις, δηλώνεις άφιξη χειροκίνητα. Η τοποθεσία δεν είναι ποτέ ο λόγος που δεν θα πληρωθείς.",
+
+  "promoter_privacy.purpose_title": "Γιατί τα κρατάμε",
+  "promoter_privacy.purpose_body":
+    "Για να σου προτείνει το {agency} βάρδιες που όντως σου ταιριάζουν — κοντά σου, στις ώρες που μπορείς, σε δουλειά που ξέρεις. Για να σου στείλει την πρόσκληση και να κρατήσει την απάντησή σου. Για να ξέρει ποιος καλύπτει κάθε βάρδια και να βρει αντικατάσταση αν χρειαστεί. Για να επιβεβαιώσει ότι η βάρδια έγινε και να ετοιμάσει την αναφορά προς τον πελάτη.",
+
+  "promoter_privacy.basis_title": "Με ποιο δικαίωμα",
+  "promoter_privacy.basis_body":
+    "Δύο νομικές βάσεις, καμία από τις δύο δεν είναι η συγκατάθεσή σου.\n• Εκτέλεση της συμφωνίας μας μαζί σου: χωρίς το τηλέφωνό σου και τη διαθεσιμότητά σου δεν γίνεται να σε καλέσουμε σε βάρδια.\n• Έννομο συμφέρον του πρακτορείου: να καλύπτει τις βάρδιες που έχει αναλάβει, να ξέρει ποιος ήταν εκεί και να παραδίδει σωστή αναφορά στον πελάτη.\nΔεν σου ζητάμε συγκατάθεση και αυτό είναι σκόπιμο. Σε σχέση εργασίας η συγκατάθεση δεν είναι πραγματικά ελεύθερη — δύσκολα λες όχι σε αυτόν που σε καλεί στη δουλειά — οπότε δεν θα ήταν έγκυρη βάση και δεν στηριζόμαστε σε αυτήν. Έχεις πάντως δικαίωμα να εναντιωθείς σε ό,τι στηρίζεται στο έννομο συμφέρον.",
+
+  "promoter_privacy.retention_title": "Για πόσο καιρό",
+  "promoter_privacy.retention_body":
+    "Τα στοιχεία που σε ταυτοποιούν κρατιούνται όσο συνεργάζεσαι με το {agency} και για ένα ορισμένο διάστημα μετά την τελευταία σου δραστηριότητα. Το ακριβές διάστημα το ορίζει το {agency} — ρώτησέ το στο {agencyEmail}.\nΜετά από αυτό διαγράφονται αυτόματα: το προφίλ σου, η διαθεσιμότητα, οι δεξιότητες, οι προσκλήσεις και το ιστορικό ανά πελάτη σβήνονται οριστικά. Μένει μόνο το λειτουργικό ίχνος της κάθε βάρδιας — ότι καλύφθηκε και τι έγινε εκεί — χωρίς κανένα στοιχείο που να οδηγεί σε εσένα.",
+
+  "promoter_privacy.rights_title": "Τι μπορείς να ζητήσεις",
+  "promoter_privacy.rights_body":
+    "• Αντίγραφο όλων όσων κρατάμε για σένα.\n• Διόρθωση ό,τι είναι λάθος.\n• Διαγραφή των στοιχείων σου.\n• Εναντίωση στην επεξεργασία που στηρίζεται στο έννομο συμφέρον.\n• Περιορισμό της επεξεργασίας ή φορητότητα των δεδομένων σου.\nΣτείλε email στο {agencyEmail}. Παίρνεις απάντηση το αργότερο σε έναν μήνα και δεν πληρώνεις τίποτα. Αν δεν μείνεις ικανοποιημένη, μπορείς να προσφύγεις στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (dpa.gr).",
+
+  "promoter_privacy.processor_note":
+    "Το λογισμικό το παρέχει το {processor} ως εκτελών την επεξεργασία. Αν θέλεις να επικοινωνήσεις μαζί μας απευθείας: {processorEmail}. Για διαγραφή ή αντίγραφο των δεδομένων σου απευθύνσου πρώτα στο πρακτορείο — εμείς ενεργούμε μόνο κατ' εντολή του.",
+
+  // --- P29 · Campaign and client reporting (product-spec §11) -------------------------------
+  "campaign_report.back": "← Καμπάνια",
+  "campaign_report.title": "Αναφορά: {campaign}",
+  "campaign_report.export_shifts": "CSV ανά βάρδια",
+  "campaign_report.export_stores": "CSV ανά κατάστημα",
+  "campaign_report.generated": "Δημιουργήθηκε {at} (ώρα Ελλάδας).",
+  "campaign_report.of": "{done} από {total}",
+
+  "campaign_report.truncated.title": "Η αναφορά δείχνει μέρος της καμπάνιας",
+  "campaign_report.truncated.body":
+    "Η καμπάνια έχει περισσότερες γραμμές από όσες φορτώνει αυτή η σελίδα, οπότε τα νούμερα δεν καλύπτουν όλη την περίοδο. Μη στείλεις αυτή την αναφορά σε πελάτη — επικοινώνησε μαζί μας πρώτα.",
+
+  "campaign_report.overview.title": "Ταυτότητα αναφοράς",
+  "campaign_report.overview.client": "Πελάτης",
+  "campaign_report.overview.period": "Περίοδος",
+  "campaign_report.overview.stores": "Καταστήματα ({count})",
+  "campaign_report.overview.promoters": "Promoters ({count})",
+
+  "campaign_report.basis.complete": "Από όλες τις {expected} αναφορές πεδίου.",
+  "campaign_report.basis.partial":
+    "Από {arrived} από {expected} αναφορές πεδίου — λείπουν {missing}.",
+  "campaign_report.basis.none_expected": "Δεν αναμένεται ακόμη καμία αναφορά πεδίου.",
+  "campaign_report.basis.field_partial":
+    "{reported} από τις {arrived} αναφορές που ήρθαν συμπλήρωσαν αυτό το πεδίο.",
+  "campaign_report.basis.incomplete": "Μερικά δεδομένα",
+
+  "campaign_report.totals.title": "Αποτελέσματα πεδίου",
+  "campaign_report.totals.units": "Τεμάχια σε προώθηση",
+  "campaign_report.totals.sales": "Πωλήσεις",
+  "campaign_report.totals.interactions": "Επαφές με πελάτες",
+
+  "campaign_report.coverage.title": "Κάλυψη",
+  "campaign_report.coverage.shifts": "Βάρδιες",
+  "campaign_report.coverage.filled": "Θέσεις καλυμμένες",
+  "campaign_report.coverage.completion": "Ποσοστό κάλυψης",
+  "campaign_report.coverage.cancelled_shifts": "Ακυρωμένες βάρδιες",
+  "campaign_report.coverage.cancellations": "Ακυρώσεις promoter",
+  "campaign_report.coverage.no_shows": "Μη προσελεύσεις",
+  "campaign_report.coverage.note":
+    "Καλυμμένη θέση = promoter που δούλεψε ή είναι κλεισμένος. Ακύρωση και μη προσέλευση δεν μετρούν ως καλυμμένες, γιατί ο πελάτης δεν πήρε αυτό το άτομο στο κατάστημα. Οι ακυρωμένες βάρδιες δεν μπαίνουν στον παρονομαστή.",
+
+  "campaign_report.attendance.title": "Προσέλευση",
+  "campaign_report.attendance.checked_in": "Check-in",
+  "campaign_report.attendance.not_checked_in": "Χωρίς check-in",
+  "campaign_report.attendance.within_geofence": "Εντός περιοχής καταστήματος",
+  "campaign_report.attendance.outside_geofence": "Εκτός περιοχής",
+  "campaign_report.attendance.geofence_unknown": "Χωρίς ένδειξη θέσης",
+  "campaign_report.attendance.manual_overrides": "Χειροκίνητη επιβεβαίωση",
+  "campaign_report.attendance.note":
+    "Δύο διαφορετικοί άξονες πάνω στα ίδια check-in: πού ήταν και πώς καταγράφηκε. Μην τους προσθέτεις μεταξύ τους. Η χειροκίνητη επιβεβαίωση δεν είναι σφάλμα — υπάρχει ακριβώς για να μην κρίνει η τοποθεσία ποιος πληρώνεται.",
+
+  "campaign_report.stores.title": "Ανά κατάστημα",
+  "campaign_report.stores.hint": "Εδώ φαίνεται ποιο κατάστημα υστέρησε.",
+  "campaign_report.stores.none": "Καμία βάρδια σε κατάστημα ακόμη.",
+  "campaign_report.stores.col_store": "Κατάστημα",
+  "campaign_report.stores.col_shifts": "Βάρδιες",
+  "campaign_report.stores.col_coverage": "Κάλυψη",
+  "campaign_report.stores.col_attendance": "Check-in",
+  "campaign_report.stores.col_reports": "Αναφορές",
+  "campaign_report.stores.col_units": "Τεμάχια",
+  "campaign_report.stores.col_sales": "Πωλήσεις",
+  "campaign_report.stores.col_interactions": "Επαφές",
+  "campaign_report.stores.col_photos": "Φωτογραφίες",
+
+  "campaign_report.photos.title": "Φωτογραφίες",
+  "campaign_report.photos.count": "{count} συνολικά",
+  "campaign_report.photos.none": "Δεν έχει ανέβει καμία φωτογραφία ακόμη.",
+  "campaign_report.photos.meta": "{date} · {promoter}",
+  "campaign_report.photos.alt": "Φωτογραφία πεδίου από {store}, {date}",
+  "campaign_report.photos.unavailable": "Η φωτογραφία δεν είναι διαθέσιμη αυτή τη στιγμή",
+
+  "campaign_report.notes.title": "Σχόλια και παρατηρήσεις",
+  "campaign_report.notes.none": "Καμία παρατήρηση από το πεδίο ακόμη.",
+  "campaign_report.notes.meta": "{store} · {date} · {promoter}",
+  "campaign_report.notes.stock_issues": "Θέματα στοκ",
+  "campaign_report.notes.manager": "Υπεύθυνος καταστήματος",
+
+  "campaign_report.shifts.title": "Ανά βάρδια",
+  "campaign_report.shifts.col_date": "Ημερομηνία",
+  "campaign_report.shifts.col_store": "Κατάστημα",
+  "campaign_report.shifts.col_promoters": "Promoters",
+  "campaign_report.shifts.col_coverage": "Κάλυψη",
+  "campaign_report.shifts.col_reports": "Αναφορές",
+  "campaign_report.shifts.col_units": "Τεμάχια",
+  "campaign_report.shifts.col_photos": "Φωτογραφίες",
+
+  "campaign_report.empty.title": "Δεν έχει έρθει τίποτα από το πεδίο ακόμη",
+  "campaign_report.empty.body":
+    "Οι βάρδιες υπάρχουν, αλλά δεν έχει καταγραφεί καμία αναφορά και κανένα check-in. Δεν δείχνουμε μηδενικά σαν να ήταν αποτέλεσμα.",
+  "campaign_report.empty.hint":
+    "Αναμένονται {expected} αναφορές πεδίου. Θα εμφανιστούν εδώ μόλις τις στείλουν οι promoters.",
+  "campaign_report.empty.no_shifts.title": "Η καμπάνια δεν έχει βάρδιες",
+  "campaign_report.empty.no_shifts.body":
+    "Χωρίς βάρδιες δεν υπάρχει τίποτα να αναφερθεί. Πρόσθεσε βάρδιες και η αναφορά γεμίζει μόνη της καθώς τρέχει η καμπάνια.",
+  "campaign_report.empty.no_shifts.cta": "Προσθήκη βαρδιών",
 } as const;

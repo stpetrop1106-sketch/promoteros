@@ -82,6 +82,11 @@ export default async function LoginPage({
           invalidEmail: t("auth.error_invalid_email"),
           rateLimited: t("auth.error_rate_limited"),
           error: t("auth.error_generic"),
+          codeLabel: t("auth.code_label"),
+          codeHint: t("auth.code_hint"),
+          codeSubmit: t("auth.code_submit"),
+          codeChecking: t("auth.code_checking"),
+          codeInvalid: t("auth.code_invalid"),
         }}
       />
     </main>
