@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { authState } from "@/lib/auth";
 import { loadOnboardingProgress, PROMOTER_TARGET, type OnboardingStep } from "@/lib/onboarding";
+import { loadAgencyIdentity, identityComplete } from "@/lib/agency-settings";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { PageHeader, Card, Button, Badge } from "@/components/ui";
@@ -160,19 +161,25 @@ export default async function OnboardingPage() {
   }
 
   const db = await createServerSupabase();
-  const [progress, agencyResult] = await Promise.all([
+  const [progress, agencyResult, agencyIdentity] = await Promise.all([
     loadOnboardingProgress(),
     db
       .from("agencies")
       .select("name, trial_ends_at")
       .eq("id", state.user.agencyId)
       .maybeSingle<{ name: string; trial_ends_at: string | null }>(),
+    loadAgencyIdentity(),
   ]);
 
   const doneCount = progress.steps.filter((s) => !s.optional && s.done).length;
   const totalCount = progress.steps.filter((s) => !s.optional).length;
   const agencyName = agencyResult.data?.name ?? "";
   const trialEndsAt = agencyResult.data?.trial_ends_at ?? null;
+  // P33 — not one of `progress.steps`: `lib/onboarding.ts` is owned by another lane, and its
+  // `OnboardingStepId` union is not mine to extend. Rendered as its own skippable card instead,
+  // same position in the flow (after the aha moment, before the settings link) with the same
+  // "say what stays broken" honesty the other steps use.
+  const identityMissing = !agencyIdentity || !identityComplete(agencyIdentity);
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
@@ -223,6 +230,22 @@ export default async function OnboardingPage() {
           )}
         </div>
       </Card>
+
+      {identityMissing ? (
+        <Card className="mt-6">
+          <h2 className="text-base font-semibold text-[color:var(--color-ink)]">
+            {t("onboarding.identity.title")}
+          </h2>
+          <p className="mt-1 max-w-prose text-sm leading-6 text-[color:var(--color-muted)]">
+            {t("onboarding.identity.body")}
+          </p>
+          <div className="mt-4">
+            <Link href="/settings/agency">
+              <Button variant="secondary">{t("onboarding.identity.cta")}</Button>
+            </Link>
+          </div>
+        </Card>
+      ) : null}
 
       <p className="mt-6 text-sm text-[color:var(--color-muted)]">
         <Link href="/settings" className="font-medium text-[color:var(--color-accent)] hover:underline">

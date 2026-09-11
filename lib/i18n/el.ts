@@ -1259,4 +1259,136 @@ export const el = {
   "campaign_report.empty.no_shifts.body":
     "Χωρίς βάρδιες δεν υπάρχει τίποτα να αναφερθεί. Πρόσθεσε βάρδιες και η αναφορά γεμίζει μόνη της καθώς τρέχει η καμπάνια.",
   "campaign_report.empty.no_shifts.cta": "Προσθήκη βαρδιών",
+
+  // --- P33 · Στοιχεία πρακτορείου και διατήρηση (/settings/agency) --------------------------
+  // Ο υπεύθυνος επεξεργασίας που ονομάζει η /privacy/promoters (0014_retention.sql) και η
+  // διάρκεια διατήρησης που χρησιμοποιεί το scripts/retention-sweep.ts. Γραμμένο για owner
+  // που δεν είναι νομικός — η διατύπωση εδώ κουβαλάει όλο το βάρος.
+  "agency_settings.title": "Στοιχεία πρακτορείου",
+  "agency_settings.subtitle":
+    "Ποιος είναι ο υπεύθυνος επεξεργασίας για τους promoters σου και πόσο καιρό κρατάς τα στοιχεία τους.",
+  "agency_settings.back_to_settings": "Πίσω στις ρυθμίσεις",
+  "agency_settings.card_title": "Νομική ταυτότητα και διατήρηση",
+  "agency_settings.card_subtitle":
+    "Αυτά τα στοιχεία εμφανίζονται στην ενημέρωση προσωπικών δεδομένων που βλέπουν οι promoters σου.",
+  "agency_settings.incomplete.title": "Λείπουν στοιχεία",
+  "agency_settings.incomplete.body":
+    "Χωρίς επωνυμία και email επικοινωνίας, η σελίδα «Τα προσωπικά σου δεδομένα» δεν μπορεί να εμφανιστεί σε κανέναν promoter — θα δει σφάλμα αντί για την ενημέρωση που πρέπει να διαβάσει.",
+  "agency_settings.not_set": "Δεν έχει οριστεί",
+  "agency_settings.retention_value": "{months} μήνες",
+  "agency_settings.readonly_notice": "Μόνο ο owner του πρακτορείου μπορεί να αλλάξει αυτά τα στοιχεία.",
+
+  "agency_settings.form.legal_name.label": "Επωνυμία (νομικό πρόσωπο)",
+  "agency_settings.form.legal_name.hint":
+    "Όχι το όνομα που βλέπουν οι πελάτες — η επίσημη επωνυμία της εταιρείας σου, αυτή στην οποία απευθύνεται ένας promoter όταν ζητά διαγραφή των στοιχείων του.",
+  "agency_settings.form.privacy_email.label": "Email επικοινωνίας για προσωπικά δεδομένα",
+  "agency_settings.form.privacy_email.hint":
+    "Εδώ φτάνει το αίτημα ενός promoter για πρόσβαση ή διαγραφή των στοιχείων του. Φτάνει στο πρακτορείο σου, ποτέ στο PromoterOS.",
+  "agency_settings.form.retention.label": "Διατήρηση στοιχείων promoter (μήνες)",
+  "agency_settings.form.retention.hint":
+    "Πόσο καιρό κρατάς τα στοιχεία ενός promoter μετά την τελευταία του δραστηριότητα, πριν διαγραφούν αυτόματα.",
+  "agency_settings.form.retention.reasoning":
+    "Προτείνουμε 24 μήνες: η προωθητική δουλειά είναι εποχική, οπότε δύο κύκλοι είναι το μικρότερο διάστημα που δεν πετάει έναν χρήσιμο κατάλογο promoters.",
+  "agency_settings.form.retention.not_advice":
+    "Αυτό δεν είναι δική μας νομική σύσταση — επιβεβαίωσέ το με τον λογιστή ή τον νομικό σύμβουλο του πρακτορείου σου.",
+  "agency_settings.form.submit": "Αποθήκευση",
+  "agency_settings.form.submitting": "Αποθήκευση...",
+  "agency_settings.form.saved": "Αποθηκεύτηκε.",
+
+  "agency_settings.errors.not_owner": "Μόνο ο owner του πρακτορείου μπορεί να αλλάξει αυτά τα στοιχεία.",
+  "agency_settings.errors.legal_name_required": "Γράψε την επωνυμία του πρακτορείου.",
+  "agency_settings.errors.legal_name_too_long": "Η επωνυμία είναι πολύ μεγάλη — μέχρι 200 χαρακτήρες.",
+  "agency_settings.errors.email_required": "Γράψε ένα email επικοινωνίας.",
+  "agency_settings.errors.email_invalid": "Αυτό το email δεν φαίνεται σωστό.",
+  "agency_settings.errors.retention_out_of_range": "Ο αριθμός μηνών πρέπει να είναι από 1 έως 240.",
+  "agency_settings.errors.write_not_permitted":
+    "Η αποθήκευση δεν επιτρέπεται αυτή τη στιγμή από τη βάση δεδομένων. Ενημέρωσε την ομάδα του PromoterOS — χρειάζεται μια αλλαγή στο backend πριν αποθηκευτεί αυτή η ρύθμιση.",
+  "agency_settings.errors.unknown": "Η αποθήκευση δεν ολοκληρώθηκε. Φόρτωσε ξανά τη σελίδα και δοκίμασε πάλι.",
+
+  "settings.card.identity_title": "Στοιχεία πρακτορείου",
+  "settings.card.identity_body":
+    "Η νομική επωνυμία, το email επικοινωνίας και η διατήρηση στοιχείων που βλέπουν οι promoters σου στην ενημέρωση προσωπικών δεδομένων.",
+  "settings.card.identity_missing": "Λείπουν στοιχεία — η ενημέρωση προσωπικών δεδομένων δεν μπορεί να εμφανιστεί ακόμα.",
+  "settings.card.identity_cta": "Συμπλήρωση στοιχείων",
+
+  "onboarding.identity.title": "Συμπλήρωσε τα στοιχεία του πρακτορείου",
+  "onboarding.identity.body":
+    "Χωρίς επωνυμία και email επικοινωνίας, η ενημέρωση προσωπικών δεδομένων που πρέπει να δουν οι promoters σου δεν μπορεί να εμφανιστεί. Μπορείς να το κάνεις τώρα ή αργότερα.",
+  "onboarding.identity.cta": "Στοιχεία πρακτορείου",
+
+  // P30 — η promoter δηλώνει μόνη της τη διαθεσιμότητά της (/a/[token]).
+  "promoter_availability.title": "Η διαθεσιμότητά σου",
+  "promoter_availability.hello": "Γεια σου {name}.",
+  "promoter_availability.intro":
+    "Διάλεξε τις μέρες που μπορείς να δουλέψεις τις επόμενες δύο εβδομάδες. Κάθε επιλογή αποθηκεύεται αμέσως — δεν υπάρχει κουμπί στο τέλος.",
+  "promoter_availability.timezone_note": "Όλες οι ώρες είναι ώρα Ελλάδας ({tz}).",
+  "promoter_availability.footer":
+    "Άνοιξε ξανά αυτόν τον σύνδεσμο όποτε αλλάξει το πρόγραμμά σου.",
+  "promoter_availability.saving": "Αποθήκευση…",
+  "promoter_availability.saved": "Αποθηκεύτηκε",
+
+  "promoter_availability.choice.available": "Μπορώ",
+  "promoter_availability.choice.partial": "Ωράριο",
+  "promoter_availability.choice.unavailable": "Δεν μπορώ",
+  "promoter_availability.choice.clear": "Καθάρισε τη μέρα",
+
+  "promoter_availability.partial.from": "Από",
+  "promoter_availability.partial.to": "Έως",
+  "promoter_availability.partial.end_of_day": "Τέλος ημέρας",
+  "promoter_availability.partial.apply": "Αποθήκευση ωραρίου",
+
+  "promoter_availability.summary.not_set": "Δεν έχει οριστεί",
+  "promoter_availability.summary.available": "Διαθέσιμη όλη μέρα",
+  "promoter_availability.summary.unavailable": "Μη διαθέσιμη",
+  "promoter_availability.summary.available_from": "Διαθέσιμη από {from}",
+  "promoter_availability.summary.available_range": "Διαθέσιμη {from}–{to}",
+  "promoter_availability.summary.unavailable_from": "Μη διαθέσιμη από {from}",
+  "promoter_availability.summary.unavailable_range": "Μη διαθέσιμη {from}–{to}",
+
+  "promoter_availability.source.coordinator":
+    "Το καταχώρησε ο συντονιστής σου. Μπορείς να το αλλάξεις.",
+  "promoter_availability.source.contradiction":
+    "Υπάρχουν δύο διαφορετικές καταχωρήσεις γι' αυτή τη μέρα. Επίλεξε ξανά για να μείνει μία.",
+
+  "promoter_availability.error.title": "Ο σύνδεσμος δεν λειτουργεί",
+  "promoter_availability.error.ask_coordinator":
+    "Ζήτησε από τον συντονιστή σου να σου στείλει καινούργιο σύνδεσμο.",
+  "promoter_availability.error.expired": "Αυτός ο σύνδεσμος έληξε.",
+  "promoter_availability.error.inactive": "Αυτός ο σύνδεσμος δεν είναι πλέον ενεργός.",
+  "promoter_availability.error.not_found": "Δεν βρήκαμε το προφίλ σου.",
+  "promoter_availability.error.bad_token":
+    "Ο σύνδεσμος δεν είναι έγκυρος — μπορεί να κόπηκε κατά την αντιγραφή.",
+  "promoter_availability.error.unreachable":
+    "Δεν μπορέσαμε να διαβάσουμε τη διαθεσιμότητά σου αυτή τη στιγμή. Δοκίμασε ξανά σε λίγο.",
+  "promoter_availability.error.bad_date":
+    "Αυτή η ημερομηνία είναι εκτός των δύο εβδομάδων που εμφανίζονται.",
+  "promoter_availability.error.bad_time": "Διάλεξε έγκυρη ώρα.",
+  "promoter_availability.error.bad_range":
+    "Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης.",
+  "promoter_availability.error.bad_choice": "Μη έγκυρη επιλογή.",
+  "promoter_availability.error.save_failed": "Η μέρα δεν αποθηκεύτηκε. Πάτησε ξανά.",
+
+  // P30 — ο σύνδεσμος από την πλευρά του συντονιστή.
+  "availability_link.title": "Σύνδεσμος διαθεσιμότητας",
+  "availability_link.description":
+    "Στείλε τον στην promoter για να δηλώνει μόνη της πότε μπορεί. Δείχνει μόνο τη δική της διαθεσιμότητα — τίποτα άλλο από το σύστημα.",
+  "availability_link.create": "Δημιουργία συνδέσμου",
+  "availability_link.creating": "Δημιουργία…",
+  "availability_link.regenerate": "Νέος σύνδεσμος",
+  "availability_link.copied": "Αντιγράφηκε",
+  "availability_link.expires": "Λήγει {date}",
+  "availability_link.message_label": "Μήνυμα για αποστολή",
+  "availability_link.message.greeting": "Γεια σου {name}!",
+  "availability_link.message.body":
+    "Δήλωσε εδώ πότε μπορείς να δουλέψεις τις επόμενες δύο εβδομάδες:",
+  "availability_link.error.not_found": "Δεν βρέθηκε αυτή η promoter.",
+  "availability_link.error.failed":
+    "Δεν ήταν δυνατή η δημιουργία του συνδέσμου. Δοκίμασε ξανά.",
+
+  // P34 — the app shell. Labels for the sidebar chrome only.
+  "shell.section_operations": "Λειτουργία",
+  "shell.section_account": "Λογαριασμός",
+  "shell.open_menu": "Άνοιγμα μενού",
+  "shell.close_menu": "Κλείσιμο μενού",
+  "shell.skip_to_content": "Μετάβαση στο περιεχόμενο",
 } as const;

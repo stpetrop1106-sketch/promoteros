@@ -1238,4 +1238,130 @@ export const en: Record<TranslationKey, string> = {
   "campaign_report.empty.no_shifts.body":
     "With no shifts there is nothing to report on. Add shifts and the report fills itself in as the campaign runs.",
   "campaign_report.empty.no_shifts.cta": "Add shifts",
+
+  // --- P33 · Agency identity and retention (/settings/agency) --------------------------------
+  "agency_settings.title": "Agency identity",
+  "agency_settings.subtitle":
+    "Who is the controller for your promoters' data, and how long you keep their records.",
+  "agency_settings.back_to_settings": "Back to settings",
+  "agency_settings.card_title": "Legal identity and retention",
+  "agency_settings.card_subtitle":
+    "These details appear on the personal data notice your promoters see.",
+  "agency_settings.incomplete.title": "Details missing",
+  "agency_settings.incomplete.body":
+    "Without a legal name and a contact email, the \"Your personal data\" page cannot be shown to any promoter — they will see an error instead of the notice they are supposed to read.",
+  "agency_settings.not_set": "Not set",
+  "agency_settings.retention_value": "{months} months",
+  "agency_settings.readonly_notice": "Only the agency's owner can change these details.",
+
+  "agency_settings.form.legal_name.label": "Legal name (registered entity)",
+  "agency_settings.form.legal_name.hint":
+    "Not the name customers see — the registered legal entity, the one a promoter's erasure request is addressed to.",
+  "agency_settings.form.privacy_email.label": "Privacy contact email",
+  "agency_settings.form.privacy_email.hint":
+    "A promoter's access or erasure request arrives here. It reaches your agency, never PromoterOS.",
+  "agency_settings.form.retention.label": "Promoter record retention (months)",
+  "agency_settings.form.retention.hint":
+    "How long you keep a promoter's identifying record after their last activity, before it is erased automatically.",
+  "agency_settings.form.retention.reasoning":
+    "We suggest 24 months: promotion work is seasonal, so two cycles is the shortest window that does not throw away a usable roster.",
+  "agency_settings.form.retention.not_advice":
+    "This is not our legal recommendation — confirm the real number with your agency's own accountant or lawyer.",
+  "agency_settings.form.submit": "Save",
+  "agency_settings.form.submitting": "Saving...",
+  "agency_settings.form.saved": "Saved.",
+
+  "agency_settings.errors.not_owner": "Only the agency's owner can change these details.",
+  "agency_settings.errors.legal_name_required": "Enter the agency's legal name.",
+  "agency_settings.errors.legal_name_too_long": "That name is too long — 200 characters maximum.",
+  "agency_settings.errors.email_required": "Enter a contact email.",
+  "agency_settings.errors.email_invalid": "That email does not look right.",
+  "agency_settings.errors.retention_out_of_range": "The number of months must be between 1 and 240.",
+  "agency_settings.errors.write_not_permitted":
+    "Saving is not currently allowed by the database. Tell the PromoterOS team — a backend change is needed before this setting can be saved.",
+  "agency_settings.errors.unknown": "The save did not go through. Reload the page and try again.",
+
+  "settings.card.identity_title": "Agency identity",
+  "settings.card.identity_body":
+    "The legal name, contact email and retention period your promoters see on the personal data notice.",
+  "settings.card.identity_missing": "Details missing — the personal data notice cannot be shown yet.",
+  "settings.card.identity_cta": "Fill in details",
+
+  "onboarding.identity.title": "Fill in your agency's identity",
+  "onboarding.identity.body":
+    "Without a legal name and a contact email, the personal data notice your promoters are supposed to see cannot be shown. You can do this now or later.",
+  "onboarding.identity.cta": "Agency identity",
+
+  // P30 — the promoter declares her own availability (/a/[token]).
+  "promoter_availability.title": "Your availability",
+  "promoter_availability.hello": "Hi {name}.",
+  "promoter_availability.intro":
+    "Pick the days you can work over the next two weeks. Every choice saves straight away — there is no button at the bottom.",
+  "promoter_availability.timezone_note": "All times are Greek time ({tz}).",
+  "promoter_availability.footer": "Open this link again whenever your month changes.",
+  "promoter_availability.saving": "Saving…",
+  "promoter_availability.saved": "Saved",
+
+  "promoter_availability.choice.available": "I can",
+  "promoter_availability.choice.partial": "Hours",
+  "promoter_availability.choice.unavailable": "I can't",
+  "promoter_availability.choice.clear": "Clear this day",
+
+  "promoter_availability.partial.from": "From",
+  "promoter_availability.partial.to": "Until",
+  "promoter_availability.partial.end_of_day": "End of day",
+  "promoter_availability.partial.apply": "Save these hours",
+
+  "promoter_availability.summary.not_set": "Not set",
+  "promoter_availability.summary.available": "Available all day",
+  "promoter_availability.summary.unavailable": "Not available",
+  "promoter_availability.summary.available_from": "Available from {from}",
+  "promoter_availability.summary.available_range": "Available {from}–{to}",
+  "promoter_availability.summary.unavailable_from": "Not available from {from}",
+  "promoter_availability.summary.unavailable_range": "Not available {from}–{to}",
+
+  "promoter_availability.source.coordinator":
+    "Your coordinator entered this. You can change it.",
+  "promoter_availability.source.contradiction":
+    "There are two different entries for this day. Choose again to leave just one.",
+
+  "promoter_availability.error.title": "This link is not working",
+  "promoter_availability.error.ask_coordinator":
+    "Ask your coordinator to send you a new link.",
+  "promoter_availability.error.expired": "This link has expired.",
+  "promoter_availability.error.inactive": "This link is no longer active.",
+  "promoter_availability.error.not_found": "We could not find your profile.",
+  "promoter_availability.error.bad_token":
+    "This link is not valid — it may have been cut short when it was copied.",
+  "promoter_availability.error.unreachable":
+    "We could not read your availability just now. Try again in a moment.",
+  "promoter_availability.error.bad_date":
+    "That date is outside the two weeks shown here.",
+  "promoter_availability.error.bad_time": "Choose a valid time.",
+  "promoter_availability.error.bad_range": "The end time has to be after the start time.",
+  "promoter_availability.error.bad_choice": "That is not a valid choice.",
+  "promoter_availability.error.save_failed": "That day was not saved. Tap again.",
+
+  // P30 — the link, from the coordinator's side.
+  "availability_link.title": "Availability link",
+  "availability_link.description":
+    "Send it to the promoter so she declares her own availability. It shows only her availability — nothing else from the system.",
+  "availability_link.create": "Create link",
+  "availability_link.creating": "Creating…",
+  "availability_link.regenerate": "New link",
+  "availability_link.copied": "Copied",
+  "availability_link.expires": "Expires {date}",
+  "availability_link.message_label": "Message to send",
+  "availability_link.message.greeting": "Hi {name}!",
+  "availability_link.message.body":
+    "Tell us here when you can work over the next two weeks:",
+  "availability_link.error.not_found": "That promoter was not found.",
+  "availability_link.error.failed": "The link could not be created. Try again.",
+
+  // P34 — the app shell. Labels for the sidebar chrome only.
+  "shell.section_operations": "Operations",
+  "shell.section_account": "Account",
+  "shell.open_menu": "Open menu",
+  "shell.close_menu": "Close menu",
+  "shell.skip_to_content": "Skip to content",
 };

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { loadTeamSnapshot } from "@/lib/team";
 import { loadOnboardingProgress } from "@/lib/onboarding";
 import { getEntitlement } from "@/lib/billing/subscription";
+import { loadAgencyIdentity, identityComplete } from "@/lib/agency-settings";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { PageHeader, Card, Badge, Button, EmptyState } from "@/components/ui";
 import { BillingBanner } from "@/components/billing-banner";
@@ -64,10 +65,12 @@ export default async function SettingsPage() {
   }
 
   const { agency, viewer, seatsUsed } = snapshot;
-  const [progress, entitlement] = await Promise.all([
+  const [progress, entitlement, agencyIdentity] = await Promise.all([
     loadOnboardingProgress(),
     getEntitlement(agency.id),
+    loadAgencyIdentity(),
   ]);
+  const identityMissing = !agencyIdentity || !identityComplete(agencyIdentity);
 
   const planKey = PLAN_LABEL[agency.plan] ?? "settings.plan.starter";
   const statusKey = STATUS_LABEL[agency.subscriptionStatus] ?? "settings.subscription.trialing";
@@ -157,6 +160,29 @@ export default async function SettingsPage() {
         <div className="mt-4">
           <Link href="/settings/team">
             <Button variant="secondary">{t("settings.card.team_cta")}</Button>
+          </Link>
+        </div>
+      </Card>
+
+      <Card
+        className="mt-6"
+        header={
+          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
+            {t("settings.card.identity_title")}
+          </h2>
+        }
+      >
+        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+          {t("settings.card.identity_body")}
+        </p>
+        {identityMissing ? (
+          <p className="mt-2 text-sm font-medium text-[color:var(--color-warn)]">
+            {t("settings.card.identity_missing")}
+          </p>
+        ) : null}
+        <div className="mt-4">
+          <Link href="/settings/agency">
+            <Button variant="secondary">{t("settings.card.identity_cta")}</Button>
           </Link>
         </div>
       </Card>
