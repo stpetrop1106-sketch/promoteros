@@ -3,10 +3,12 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import {
+  Avatar,
   PageHeader,
   Button,
   Badge,
   EmptyState,
+  Icon,
   ScoreBar,
   Table,
   TableHead,
@@ -102,109 +104,160 @@ export default async function PromotersPage({
   const totalCount = all.length;
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12">
-      <PageHeader
-        title={t("nav.promoters")}
-        subtitle={
-          totalCount > 0
-            ? t("promoters.list.subtitle", { count: totalCount })
-            : undefined
-        }
-        actions={<LinkButton href="/promoters/new">{t("promoters.add")}</LinkButton>}
-      />
+    <main className="mx-auto max-w-6xl px-6 py-10 sm:py-12">
+      <div className="flex flex-col gap-6">
+        <PageHeader
+          title={t("nav.promoters")}
+          subtitle={
+            totalCount > 0
+              ? t("promoters.list.subtitle", { count: totalCount })
+              : undefined
+          }
+          icon={<Icon name="users" size={20} />}
+          actions={
+            <LinkButton href="/promoters/new" iconLeft={<Icon name="plus" size={16} />}>
+              {t("promoters.add")}
+            </LinkButton>
+          }
+        />
 
-      {totalCount > 0 && totalCount < 5 ? (
-        <p className="mt-3 text-sm text-[color:var(--color-warn)]">{t("promoters.list.low_count_hint")}</p>
-      ) : null}
+        {totalCount > 0 && totalCount < 5 ? (
+          <p className="flex items-start gap-2 rounded-xl border border-[color:var(--color-warn-line)] bg-[color:var(--color-warn-subtle)] px-4 py-3 text-sm text-[color:var(--color-warn-ink)]">
+            <Icon name="alert" size={18} className="mt-px text-[color:var(--color-warn)]" />
+            <span>{t("promoters.list.low_count_hint")}</span>
+          </p>
+        ) : null}
 
-      {totalCount > 0 ? (
-        <form className="mt-6 flex flex-wrap items-end gap-3 rounded-xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-4" method="get">
-          <TextField
-            id="q"
-            name="q"
-            label={t("promoters.filter.search_label")}
-            placeholder={t("promoters.filter.search_placeholder")}
-            defaultValue={q}
-            containerClassName="w-56"
-          />
-          <SelectField
-            id="status"
-            name="status"
-            label={t("promoters.filter.status_label")}
-            defaultValue={statusFilter}
-            containerClassName="w-44"
-            options={[
-              { value: "", label: t("promoters.filter.all_statuses") },
-              { value: "active", label: t("promoters.status.active") },
-              { value: "paused", label: t("promoters.status.paused") },
-              { value: "archived", label: t("promoters.status.archived") },
-              { value: "blocklisted", label: t("promoters.status.blocklisted") },
-            ]}
-          />
-          <SelectField
-            id="area"
-            name="area"
-            label={t("promoters.filter.area_label")}
-            defaultValue={areaFilter}
-            containerClassName="w-44"
-            options={[
-              { value: "", label: t("promoters.filter.all_areas") },
-              ...areaOptions.map((a) => ({ value: a.id, label: a.name })),
-            ]}
-          />
-          <SelectField
-            id="skill"
-            name="skill"
-            label={t("promoters.filter.skill_label")}
-            defaultValue={skillFilter}
-            containerClassName="w-44"
-            options={[
-              { value: "", label: t("promoters.filter.all_skills") },
-              ...skillOptions.map((s) => ({ value: s.id, label: s.name })),
-            ]}
-          />
-          <SelectField
-            id="car"
-            name="car"
-            label={t("promoters.filter.car_label")}
-            defaultValue={carFilter}
-            containerClassName="w-36"
-            options={[
-              { value: "", label: t("promoters.filter.car_any") },
-              { value: "yes", label: t("promoters.filter.car_yes") },
-              { value: "no", label: t("promoters.filter.car_no") },
-            ]}
-          />
-          <Button type="submit" variant="secondary">
-            {t("promoters.filter.apply")}
-          </Button>
-          {hasAnyFilter ? (
-            <Link href="/promoters" className="text-sm text-[color:var(--color-muted)] hover:underline">
-              {t("promoters.filter.clear")}
-            </Link>
-          ) : null}
-        </form>
-      ) : null}
+        {totalCount > 0 ? (
+          /*
+           * The filter bar used to be `flex-wrap` over fixed pixel widths — `w-56`, four × `w-44`,
+           * `w-36`. Greek labels ("Περιοχή δραστηριοποίησης", "Όλες οι ειδικότητες") do not fit a
+           * 176px select, so every label clipped; and the fixed widths wrapped into a ragged
+           * two-and-a-half-row block at laptop width. A grid instead: the columns are equal and
+           * the controls are fluid, so the labels get whatever the viewport can spare and the
+           * rows are always full.
+           */
+          <form
+            className="rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-5 py-5 shadow-[var(--elevation-card)] sm:px-6"
+            method="get"
+          >
+            <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              <TextField
+                id="q"
+                name="q"
+                label={t("promoters.filter.search_label")}
+                placeholder={t("promoters.filter.search_placeholder")}
+                defaultValue={q}
+                containerClassName="min-w-0"
+              />
+              <SelectField
+                id="status"
+                name="status"
+                label={t("promoters.filter.status_label")}
+                defaultValue={statusFilter}
+                containerClassName="min-w-0"
+                options={[
+                  { value: "", label: t("promoters.filter.all_statuses") },
+                  { value: "active", label: t("promoters.status.active") },
+                  { value: "paused", label: t("promoters.status.paused") },
+                  { value: "archived", label: t("promoters.status.archived") },
+                  { value: "blocklisted", label: t("promoters.status.blocklisted") },
+                ]}
+              />
+              <SelectField
+                id="area"
+                name="area"
+                label={t("promoters.filter.area_label")}
+                defaultValue={areaFilter}
+                containerClassName="min-w-0"
+                options={[
+                  { value: "", label: t("promoters.filter.all_areas") },
+                  ...areaOptions.map((a) => ({ value: a.id, label: a.name })),
+                ]}
+              />
+              <SelectField
+                id="skill"
+                name="skill"
+                label={t("promoters.filter.skill_label")}
+                defaultValue={skillFilter}
+                containerClassName="min-w-0"
+                options={[
+                  { value: "", label: t("promoters.filter.all_skills") },
+                  ...skillOptions.map((s) => ({ value: s.id, label: s.name })),
+                ]}
+              />
+              <SelectField
+                id="car"
+                name="car"
+                label={t("promoters.filter.car_label")}
+                defaultValue={carFilter}
+                containerClassName="min-w-0"
+                options={[
+                  { value: "", label: t("promoters.filter.car_any") },
+                  { value: "yes", label: t("promoters.filter.car_yes") },
+                  { value: "no", label: t("promoters.filter.car_no") },
+                ]}
+              />
+            </div>
 
-      <div className="mt-6">
+            {/* The actions get their own row under a divider rather than sitting as a sixth
+                "column" of the grid, where they lined up with the field *labels* instead of with
+                the controls. */}
+            <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-[color:var(--color-line)] pt-4">
+              <Button
+                type="submit"
+                variant="secondary"
+                iconLeft={<Icon name="filter" size={16} />}
+              >
+                {t("promoters.filter.apply")}
+              </Button>
+              {hasAnyFilter ? (
+                <>
+                  <Link
+                    href="/promoters"
+                    className="rounded-sm text-sm font-medium text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)] hover:underline focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                  >
+                    {t("promoters.filter.clear")}
+                  </Link>
+                  <span className="ml-auto text-xs tabular-nums text-[color:var(--color-muted)]">
+                    {t("promoters.filter.result_count", {
+                      shown: filtered.length,
+                      total: totalCount,
+                    })}
+                  </span>
+                </>
+              ) : null}
+            </div>
+          </form>
+        ) : null}
+
         {totalCount === 0 ? (
           <EmptyState
+            icon={<Icon name="users" size={24} />}
             title={t("promoters.empty.title")}
             description={t("promoters.empty.description")}
-            action={<LinkButton href="/promoters/new">{t("promoters.add")}</LinkButton>}
+            action={
+              <LinkButton href="/promoters/new" iconLeft={<Icon name="plus" size={16} />}>
+                {t("promoters.add")}
+              </LinkButton>
+            }
           />
         ) : filtered.length === 0 ? (
           <EmptyState
+            icon={<Icon name="search" size={24} />}
             title={t("promoters.empty_filtered.title")}
             description={t("promoters.empty_filtered.description")}
             action={
-              <Link href="/promoters" className="text-sm font-medium text-[color:var(--color-accent)] hover:underline">
+              <LinkButton href="/promoters" variant="secondary">
                 {t("promoters.filter.clear")}
-              </Link>
+              </LinkButton>
             }
           />
         ) : (
-          <Table>
+          // `fluid`, because two of these columns carry prose: a promoter with four areas and
+          // four skills drags an intrinsic-width table several screens wide and buries the
+          // score and status columns off the right-hand edge on a laptop.
+          <Table label={t("nav.promoters")} layout="fluid">
             <TableHead>
               <TableRow>
                 <TableHeaderCell>{t("promoters.table.name")}</TableHeaderCell>
@@ -212,8 +265,11 @@ export default async function PromotersPage({
                 <TableHeaderCell>{t("promoters.table.areas")}</TableHeaderCell>
                 <TableHeaderCell>{t("promoters.table.transport")}</TableHeaderCell>
                 <TableHeaderCell>{t("promoters.table.skills")}</TableHeaderCell>
-                <TableHeaderCell>{t("promoters.table.reliability")}</TableHeaderCell>
-                <TableHeaderCell>{t("promoters.table.status")}</TableHeaderCell>
+                {/* The score column is fixed-width so the bars form a single ruler down the
+                    page — a column of bars that each start at a different x is unreadable as a
+                    comparison, which is the only reason the column exists. */}
+                <TableHeaderCell className="w-44">{t("promoters.table.reliability")}</TableHeaderCell>
+                <TableHeaderCell className="text-right">{t("promoters.table.status")}</TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -222,16 +278,28 @@ export default async function PromotersPage({
                 return (
                   <TableRow key={p.id}>
                     <TableCell>
-                      <Link href={`/promoters/${p.id}`} className="font-medium text-[color:var(--color-accent)] hover:underline">
-                        {p.full_name}
-                      </Link>
-                      {missingCoords ? (
-                        <div className="mt-1">
-                          <Badge variant="warn">{t("promoters.missing_coordinates")}</Badge>
+                      {/* The avatar is what makes a roster of thirty names scannable — the same
+                          promoter is the same tint here, on the shift board and in a match list. */}
+                      <div className="flex items-center gap-3">
+                        <Avatar name={p.full_name} size="sm" />
+                        <div className="min-w-0">
+                          <Link
+                            href={`/promoters/${p.id}`}
+                            className="rounded-sm font-medium text-[color:var(--color-accent)] hover:underline focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                          >
+                            {p.full_name}
+                          </Link>
+                          {missingCoords ? (
+                            <div className="mt-1">
+                              <Badge variant="warn" size="sm" dot>
+                                {t("promoters.missing_coordinates")}
+                              </Badge>
+                            </div>
+                          ) : null}
                         </div>
-                      ) : null}
+                      </div>
                     </TableCell>
-                    <TableCell>{p.phone}</TableCell>
+                    <TableCell className="tabular-nums">{p.phone}</TableCell>
                     <TableCell>
                       {p.promoter_areas.length === 0
                         ? "—"
@@ -239,8 +307,16 @@ export default async function PromotersPage({
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {p.has_car ? <Badge variant="info">{t("promoters.form.has_car_label")}</Badge> : null}
-                        {p.has_licence ? <Badge variant="neutral">{t("promoters.form.has_licence_label")}</Badge> : null}
+                        {p.has_car ? (
+                          <Badge variant="info" size="sm">
+                            {t("promoters.form.has_car_label")}
+                          </Badge>
+                        ) : null}
+                        {p.has_licence ? (
+                          <Badge variant="neutral" size="sm">
+                            {t("promoters.form.has_licence_label")}
+                          </Badge>
+                        ) : null}
                         {!p.has_car && !p.has_licence ? "—" : null}
                       </div>
                     </TableCell>
@@ -256,8 +332,10 @@ export default async function PromotersPage({
                         label={t("promoters.table.reliability_aria", { name: p.full_name })}
                       />
                     </TableCell>
-                    <TableCell>
-                      <Badge variant={STATUS_BADGE[p.status]}>{t(`promoters.status.${p.status}`)}</Badge>
+                    <TableCell className="text-right">
+                      <Badge variant={STATUS_BADGE[p.status]} dot>
+                        {t(`promoters.status.${p.status}`)}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { Badge, Card, type BadgeVariant } from "@/components/ui";
+import { Badge, Card, Icon, type BadgeVariant } from "@/components/ui";
+import { cn } from "@/components/ui/cn";
 import type { TranslationKey } from "@/lib/i18n";
 import type { DetectedException, ExceptionSeverity, RelativeWhen } from "@/lib/exceptions";
 import { groupBySeverity } from "@/lib/exceptions";
@@ -27,6 +28,18 @@ const SEVERITY_BADGE: Record<ExceptionSeverity, BadgeVariant> = {
   critical: "bad",
   warning: "warn",
   info: "info",
+};
+
+/**
+ * The dot at the head of a row. The saturated base, not the subtle tint: design.md's rule is
+ * that the full-strength colour is for dots, icons and solid fills only — a 2px dot is exactly
+ * where a saturated colour earns its keep, and the row's own sentence carries the meaning
+ * regardless, so nothing depends on seeing it.
+ */
+const SEVERITY_DOT: Record<ExceptionSeverity, string> = {
+  critical: "bg-[color:var(--color-bad)]",
+  warning: "bg-[color:var(--color-warn)]",
+  info: "bg-[color:var(--color-accent)]",
 };
 
 const WHEN_KEY: Record<"future" | "past", Record<RelativeWhen["unit"], [TranslationKey, TranslationKey]>> = {
@@ -73,24 +86,47 @@ function ExceptionRow({ exception, t }: { exception: DetectedException; t: T }) 
   });
 
   return (
-    <li className="flex flex-col gap-2 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-      <div className="min-w-0">
-        <p className="text-sm leading-6 text-[color:var(--color-ink)]">{sentence}</p>
-        <p className="mt-0.5 text-xs text-[color:var(--color-muted)]">
-          {exception.campaignName}
-          {exception.standingForMinutes >= 1
-            ? ` · ${t("dashboard.standing_for", { duration: durationText(t, exception.standingForMinutes) })}`
-            : ""}
-        </p>
-      </div>
-      {/* Every href `lib/exceptions.ts` produces is `/shifts/<id>` — a real typed route — but
-          typed routes can only verify a literal, never a string computed at runtime. The cast is
-          the narrowest place to say so; the route itself is asserted in tests/exceptions.test.ts. */}
+    /*
+     * A whole-row link rather than a sentence with a link on the end. The sentence *is* the
+     * thing you want to open — "Η βάρδια στο Hyper Vega ξεκινά σε 2 ώρες και λείπει ένα άτομο"
+     * has exactly one useful response, and making the coordinator aim at a five-word link at the
+     * far right of the row on a phone was the cost of not saying so.
+     *
+     * Every href `lib/exceptions.ts` produces is `/shifts/<id>` — a real typed route — but typed
+     * routes can only verify a literal, never a string computed at runtime. The cast is the
+     * narrowest place to say so; the route itself is asserted in tests/exceptions.test.ts.
+     */
+    <li>
       <Link
         href={exception.action.href as Route}
-        className="shrink-0 text-sm font-medium text-[color:var(--color-accent)] hover:underline"
+        className="group flex items-start gap-3 px-5 py-3.5 transition-colors duration-150 ease-[var(--ease-out-soft)] hover:bg-[color:var(--color-surface-hover)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)] sm:px-6"
       >
-        {t(exception.action.labelKey)} →
+        <span
+          aria-hidden="true"
+          className={cn(
+            "mt-1.5 size-2 shrink-0 rounded-full",
+            SEVERITY_DOT[exception.severity],
+          )}
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm leading-6 text-[color:var(--color-ink)]">{sentence}</span>
+          <span className="mt-0.5 block text-xs text-[color:var(--color-muted)]">
+            {exception.campaignName}
+            {exception.standingForMinutes >= 1
+              ? ` · ${t("dashboard.standing_for", { duration: durationText(t, exception.standingForMinutes) })}`
+              : ""}
+          </span>
+        </span>
+        <span className="flex shrink-0 items-center gap-1.5 pt-0.5 text-xs font-semibold text-[color:var(--color-accent)]">
+          {/* The label is the action's name and it matters on a wide screen; on a phone the
+              chevron alone carries it, and the row is the target anyway. */}
+          <span className="hidden sm:inline">{t(exception.action.labelKey)}</span>
+          <Icon
+            name="chevronRight"
+            size={16}
+            className="transition-transform duration-150 ease-[var(--ease-out-soft)] group-hover:translate-x-0.5"
+          />
+        </span>
       </Link>
     </li>
   );
@@ -104,10 +140,21 @@ export function ExceptionList({ exceptions, t }: { exceptions: DetectedException
       {groups.map((group) => (
         <Card
           key={group.severity}
+          /* `flush` because the rows bring their own padding — they have to, so that the hover
+             and focus states cover the full width of the card instead of an inset rectangle
+             floating inside it. */
+          flush
+          /* The critical group is the one card the screen is about when it exists. Giving it the
+             raised elevation is the cheapest way to say "start here" without a second colour. */
+          elevation={group.severity === "critical" ? "raised" : "card"}
           header={
-            <div className="flex items-center gap-3">
-              <Badge variant={SEVERITY_BADGE[group.severity]}>{t(SEVERITY_LABEL[group.severity])}</Badge>
-              <span className="text-sm text-[color:var(--color-muted)]">{group.items.length}</span>
+            <div className="flex items-center gap-2.5">
+              <Badge variant={SEVERITY_BADGE[group.severity]} dot>
+                {t(SEVERITY_LABEL[group.severity])}
+              </Badge>
+              <span className="text-xs font-medium tabular-nums text-[color:var(--color-muted)]">
+                {group.items.length}
+              </span>
             </div>
           }
         >

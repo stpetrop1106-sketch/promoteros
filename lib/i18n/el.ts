@@ -41,6 +41,11 @@ export const el = {
 
   "shifts.title": "Βάρδιες",
   "shifts.none": "Δεν υπάρχουν βάρδιες.",
+  "shifts.list.subtitle": "{count} βάρδιες, με τη χρονολογικά πρώτη στην κορυφή.",
+  "shifts.empty.title": "Καμία βάρδια ακόμα",
+  "shifts.empty.body":
+    "Οι βάρδιες ζουν μέσα σε μια καμπάνια. Φτιάξε την πρώτη σου καμπάνια και πρόσθεσε τις βάρδιές της.",
+  "shifts.empty.cta": "Δημιουργία καμπάνιας",
   "shifts.date": "Ημερομηνία",
   "shifts.store": "Κατάστημα",
   "shifts.campaign": "Καμπάνια",
@@ -186,6 +191,7 @@ export const el = {
   "promoters.filter.car_no": "Χωρίς αυτοκίνητο",
   "promoters.filter.apply": "Φίλτρο",
   "promoters.filter.clear": "Καθαρισμός φίλτρων",
+  "promoters.filter.result_count": "{shown} από {total}",
 
   "promoters.empty.title": "Δεν υπάρχουν promoters ακόμη",
   "promoters.empty.description":

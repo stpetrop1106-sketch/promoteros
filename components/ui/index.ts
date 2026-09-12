@@ -1,4 +1,4 @@
-export { Button } from "./Button";
+export { Button, buttonClassName } from "./Button";
 export type { ButtonProps, ButtonVariant, ButtonSize } from "./Button";
 
 export { Card } from "./Card";
@@ -50,3 +50,16 @@ export type { StatTileProps, StatTileTone, StatStripProps } from "./StatTile";
 
 export { Skeleton, SkeletonText } from "./Skeleton";
 export type { SkeletonProps, SkeletonVariant, SkeletonTextProps } from "./Skeleton";
+
+/* --- Added in P35. Nothing above this line changed shape. --- */
+
+export { LinkButton } from "./LinkButton";
+export type { LinkButtonProps } from "./LinkButton";
+
+export { Section, SectionHeading, Detail, DetailList } from "./Section";
+export type {
+  SectionProps,
+  SectionHeadingProps,
+  DetailProps,
+  DetailListProps,
+} from "./Section";

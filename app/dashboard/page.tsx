@@ -1,8 +1,15 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { translatorFor, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
-import { Card, EmptyState, PageHeader } from "@/components/ui";
+import {
+  EmptyState,
+  Icon,
+  LinkButton,
+  PageHeader,
+  Section,
+  StatStrip,
+  StatTile,
+} from "@/components/ui";
 import {
   addDays,
   athensDate,
@@ -207,39 +214,85 @@ export default async function DashboardPage() {
   const todaySummary = summariseToday(input);
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <PageHeader
-        title={t("dashboard.title")}
-        subtitle={t("dashboard.subtitle", { date: formatDay(now, locale) })}
-        actions={
-          <Link
-            href="/shifts"
-            className="text-sm font-medium text-[color:var(--color-accent)] hover:underline"
-          >
-            {t("dashboard.all_shifts")} →
-          </Link>
-        }
-      />
+    <main className="mx-auto max-w-5xl px-6 py-10 sm:py-12">
+      {/* One column, one gap. Every section on this screen used to pick its own top margin —
+          mt-8 here, mt-10 there, mt-3 under each heading — and the uneven rhythm is the first
+          thing the eye reads as unfinished. */}
+      <div className="flex flex-col gap-8">
+        <PageHeader
+          size="lg"
+          title={t("dashboard.title")}
+          subtitle={t("dashboard.subtitle", { date: formatDay(now, locale) })}
+          actions={
+            <LinkButton
+              href="/shifts"
+              variant="secondary"
+              iconRight={<Icon name="arrowRight" size={16} />}
+            >
+              {t("dashboard.all_shifts")}
+            </LinkButton>
+          }
+        >
+          {/* The day's numbers sit *under the greeting*, not in a card three screens down. This
+              is the coordinator's home: the first thing on it should be the state of today. */}
+          {todaySummary.shiftCount > 0 ? (
+            <StatStrip className="xl:grid-cols-3">
+              <StatTile
+                label={t("dashboard.today.shifts")}
+                value={todaySummary.shiftCount}
+                icon={<Icon name="calendar" />}
+                tone="accent"
+              />
+              <StatTile
+                label={t("dashboard.today.coverage")}
+                value={t("dashboard.today.of", {
+                  done: todaySummary.confirmedCount,
+                  total: todaySummary.requiredCount,
+                })}
+                icon={<Icon name="users" />}
+                /* Tone is the caller's judgement and the tile has no way to guess it: fully
+                   covered is good, anything short of it is the reason this screen exists. */
+                tone={
+                  todaySummary.confirmedCount >= todaySummary.requiredCount ? "ok" : "warn"
+                }
+              />
+              <StatTile
+                label={t("dashboard.today.checked_in")}
+                value={t("dashboard.today.of", {
+                  done: todaySummary.checkedInCount,
+                  total: todaySummary.confirmedCount,
+                })}
+                icon={<Icon name="mapPin" />}
+                tone={
+                  todaySummary.checkedInCount >= todaySummary.confirmedCount ? "ok" : "neutral"
+                }
+              />
+            </StatStrip>
+          ) : (
+            <p className="rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-5 py-4 text-sm text-[color:var(--color-muted)] shadow-[var(--elevation-card)]">
+              {t("dashboard.today.none")}
+            </p>
+          )}
+        </PageHeader>
 
-      <section className="mt-8">
-        <h2 className="text-base font-medium text-[color:var(--color-ink)]">
-          {t("dashboard.exceptions.title")}
-        </h2>
-
-        <div className="mt-3">
+        <Section
+          title={t("dashboard.exceptions.title")}
+          meta={exceptions.length > 0 ? exceptions.length : undefined}
+        >
           {shifts.length === 0 ? (
             // A brand-new agency has nothing to be wrong yet. Teaching the next step beats an
             // empty board (docs/commercial-architecture.md §6: empty states teach; no dead ends).
             <EmptyState
+              icon={<Icon name="megaphone" size={24} />}
               title={t("dashboard.empty.no_shifts.title")}
               description={t("dashboard.empty.no_shifts.body")}
               action={
-                <Link
+                <LinkButton
                   href="/campaigns/new"
-                  className="text-sm font-medium text-[color:var(--color-accent)] hover:underline"
+                  iconRight={<Icon name="arrowRight" size={16} />}
                 >
-                  {t("dashboard.empty.no_shifts.cta")} →
-                </Link>
+                  {t("dashboard.empty.no_shifts.cta")}
+                </LinkButton>
               }
             />
           ) : exceptions.length === 0 ? (
@@ -247,7 +300,13 @@ export default async function DashboardPage() {
             // whole point of this product is that the coordinator can stop worrying — a blank
             // page would read as "not loaded yet" instead.
             <EmptyState
-              icon={<span className="text-xl">✓</span>}
+              // Was a bare "✓" glyph in a text span, which rendered at whatever weight the
+              // system emoji font felt like. The kit's check is on the same grid as every other
+              // icon in the product, and the tint says "good" without shouting it.
+              icon={
+                <Icon name="check" size={26} className="text-[color:var(--color-ok)]" />
+              }
+              className="[&>div:first-child]:bg-[color:var(--color-ok-subtle)] [&>div:first-child]:ring-[color:var(--color-ok-line)]"
               title={t("dashboard.empty.title")}
               description={t("dashboard.empty.body")}
               action={
@@ -262,54 +321,8 @@ export default async function DashboardPage() {
           ) : (
             <ExceptionList exceptions={exceptions} t={t} />
           )}
-        </div>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-base font-medium text-[color:var(--color-ink)]">
-          {t("dashboard.today.title")}
-        </h2>
-        <div className="mt-3">
-          <Card>
-            {todaySummary.shiftCount === 0 ? (
-              <p className="text-sm text-[color:var(--color-muted)]">{t("dashboard.today.none")}</p>
-            ) : (
-              <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-[color:var(--color-muted)]">
-                    {t("dashboard.today.shifts")}
-                  </dt>
-                  <dd className="mt-1 text-xl font-semibold text-[color:var(--color-ink)]">
-                    {todaySummary.shiftCount}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-[color:var(--color-muted)]">
-                    {t("dashboard.today.coverage")}
-                  </dt>
-                  <dd className="mt-1 text-xl font-semibold text-[color:var(--color-ink)]">
-                    {t("dashboard.today.of", {
-                      done: todaySummary.confirmedCount,
-                      total: todaySummary.requiredCount,
-                    })}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs uppercase tracking-wide text-[color:var(--color-muted)]">
-                    {t("dashboard.today.checked_in")}
-                  </dt>
-                  <dd className="mt-1 text-xl font-semibold text-[color:var(--color-ink)]">
-                    {t("dashboard.today.of", {
-                      done: todaySummary.checkedInCount,
-                      total: todaySummary.confirmedCount,
-                    })}
-                  </dd>
-                </div>
-              </dl>
-            )}
-          </Card>
-        </div>
-      </section>
+        </Section>
+      </div>
     </main>
   );
 }

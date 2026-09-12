@@ -5,6 +5,7 @@ import { getEntitlement } from "@/lib/billing/subscription";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { GlobalBillingBanner } from "./onboarding/global-billing-banner";
 import { AppShell } from "@/components/coordinator-nav";
+import { AccountRow } from "@/components/account-row";
 import "./globals.css";
 
 /**
@@ -88,17 +89,22 @@ export const viewport: Viewport = {
 async function loadShell() {
   try {
     const state = await authState();
-    if (!state.ok) return { signedIn: false, entitlement: null };
-    return { signedIn: true, entitlement: await getEntitlement(state.user.agencyId) };
+    if (!state.ok) return { signedIn: false, entitlement: null, email: null };
+    return {
+      signedIn: true,
+      entitlement: await getEntitlement(state.user.agencyId),
+      // P35: the sidebar's account row. Already loaded by the call above — no extra query.
+      email: state.user.email,
+    };
   } catch {
-    return { signedIn: false, entitlement: null };
+    return { signedIn: false, entitlement: null, email: null };
   }
 }
 
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { signedIn, entitlement } = await loadShell();
+  const { signedIn, entitlement, email } = await loadShell();
 
   return (
     <html lang={DEFAULT_LOCALE} className={inter.variable}>
@@ -123,6 +129,7 @@ export default async function RootLayout({
          */}
         <AppShell
           signedIn={signedIn}
+          account={email ? <AccountRow email={email} /> : null}
           banner={
             entitlement ? (
               <GlobalBillingBanner

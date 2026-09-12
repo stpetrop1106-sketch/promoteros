@@ -145,7 +145,15 @@ function NavItem({
 }
 
 /** The sidebar's contents, shared by the fixed desktop rail and the mobile drawer. */
-function NavPanel({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+function NavPanel({
+  pathname,
+  onNavigate,
+  account,
+}: {
+  pathname: string;
+  onNavigate?: () => void;
+  account?: ReactNode;
+}) {
   return (
     /* `min-h-full`, not `h-full`: inside the mobile drawer's scroll container a hard 100% height
        would clip the settings row on a short landscape phone instead of letting it scroll. On the
@@ -174,6 +182,11 @@ function NavPanel({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
           <div className="border-t border-[color:var(--color-line)] pt-3">
             <NavItem link={SETTINGS} pathname={pathname} onNavigate={onNavigate} />
           </div>
+          {/* P35: the account row. It is a node passed down from the server layout rather than
+              anything this client component fetches — see `components/account-row.tsx`. */}
+          {account ? (
+            <div className="mt-3 border-t border-[color:var(--color-line)] px-1 pt-3">{account}</div>
+          ) : null}
         </div>
       </nav>
     </div>
@@ -187,7 +200,7 @@ function NavPanel({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
  * supervisor checking a shift on a tablet in portrait is 768px wide — enough for the content, not
  * enough to give 256px of it away permanently to navigation.
  */
-function NavChrome({ pathname }: { pathname: string }) {
+function NavChrome({ pathname, account }: { pathname: string; account?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLDivElement | null>(null);
@@ -290,7 +303,7 @@ function NavChrome({ pathname }: { pathname: string }) {
         className="fixed inset-y-0 left-0 z-30 hidden w-[var(--shell-sidebar-w)] overflow-y-auto overscroll-contain border-r border-[color:var(--color-line)] bg-[color:var(--color-surface)] lg:block"
         style={{ boxShadow: "1px 0 0 0 rgb(20 26 41 / 0.02), 4px 0 24px -12px rgb(20 26 41 / 0.10)" }}
       >
-        <NavPanel pathname={pathname} />
+        <NavPanel pathname={pathname} account={account} />
       </div>
 
       {/* Mobile: a sticky bar with the mark and a menu button. */}
@@ -342,7 +355,7 @@ function NavChrome({ pathname }: { pathname: string }) {
             aria-label={t("nav.label")}
             className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col overflow-y-auto overscroll-contain shadow-[var(--elevation-overlay)]"
           >
-            <NavPanel pathname={pathname} onNavigate={close} />
+            <NavPanel pathname={pathname} onNavigate={close} account={account} />
           </div>
         </div>
       ) : null}
@@ -383,9 +396,20 @@ export function CoordinatorNav({ signedIn }: { signedIn: boolean }) {
 export function AppShell({
   signedIn,
   banner,
+  account,
   children,
 }: {
   signedIn: boolean;
+  /**
+   * Who is signed in, and the way out — rendered at the foot of the sidebar and of the mobile
+   * drawer. Added in P35, optional, so the original `{ signedIn, children }` call still compiles.
+   *
+   * It goes through this prop for exactly the reason `banner` does: "is this an agency screen" is
+   * a question only this file can answer, and the answer has to gate a coordinator's email
+   * address too. Passed as a child it would render on `/i/[token]`, where the person holding the
+   * phone is a promoter with no account.
+   */
+  account?: ReactNode;
   /**
    * Agency-wide chrome that belongs *inside* the shell — today just the billing banner.
    *
@@ -414,7 +438,7 @@ export function AppShell({
       >
         {t("shell.skip_to_content")}
       </a>
-      <NavChrome pathname={pathname} />
+      <NavChrome pathname={pathname} account={account} />
       <div id="promoteros-content" tabIndex={-1} className="min-w-0 focus:outline-none">
         {banner}
         {children}

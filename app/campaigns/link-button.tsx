@@ -1,35 +1,9 @@
-import Link from "next/link";
 import type { Route } from "next";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
-import { cn } from "@/components/ui/cn";
+import { LinkButton as KitLinkButton } from "@/components/ui";
 
 type LinkButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type LinkButtonSize = "sm" | "md";
-
-/**
- * A navigation link styled to match `components/ui/Button`. `Button` renders a real `<button>`
- * on purpose (so it drops into a `<form action>`), which makes it the wrong element for
- * navigation — nesting a `<button>` inside an `<a>` is invalid HTML. This mirrors its token
- * classes exactly rather than introducing a new visual language.
- */
-const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold " +
-  "transition-colors focus-visible:outline focus-visible:outline-2 " +
-  "focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent)]";
-
-const VARIANTS: Record<LinkButtonVariant, string> = {
-  primary:
-    "bg-[color:var(--color-accent)] text-white hover:bg-[color:var(--color-accent-hover)]",
-  secondary:
-    "border border-[color:var(--color-line)] bg-[color:var(--color-surface)] text-[color:var(--color-ink)] hover:bg-[color:var(--color-canvas)]",
-  ghost: "text-[color:var(--color-ink)] hover:bg-[color:var(--color-canvas)]",
-  danger: "bg-[color:var(--color-bad)] text-white hover:opacity-90",
-};
-
-const SIZES: Record<LinkButtonSize, string> = {
-  sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-sm",
-};
 
 export interface LinkButtonProps<RouteType extends string = string>
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
@@ -39,20 +13,47 @@ export interface LinkButtonProps<RouteType extends string = string>
   href: Route<RouteType>;
   variant?: LinkButtonVariant;
   size?: LinkButtonSize;
+  /** Added in P35, forwarded to the kit. Optional, so every existing call site is unaffected. */
+  iconLeft?: ReactNode;
+  iconRight?: ReactNode;
+  fullWidth?: boolean;
   children: ReactNode;
 }
 
+/**
+ * A navigation link styled to match `components/ui/Button`.
+ *
+ * P35 emptied this out. It used to mirror Button's token classes by hand, as did an identical
+ * copy under `app/promoters/` — two lanes each writing the same file because neither could import
+ * the other's. Both had drifted: 32/40px heights against Button's 36/44, a focus `outline`
+ * against Button's ring, no press translate. The shared implementation now lives in
+ * `components/ui/LinkButton`, which builds itself from Button's own chassis, so the two can never
+ * disagree again.
+ *
+ * The wrapper stays because a dozen screens import `LinkButton` from here and the prop shape is
+ * their contract — nothing about the call sites changed.
+ */
 export function LinkButton<RouteType extends string>({
   href,
   variant = "primary",
   size = "md",
-  className,
+  iconLeft,
+  iconRight,
+  fullWidth,
   children,
   ...rest
 }: LinkButtonProps<RouteType>) {
   return (
-    <Link href={href} className={cn(BASE, VARIANTS[variant], SIZES[size], className)} {...rest}>
+    <KitLinkButton
+      href={href}
+      variant={variant}
+      size={size}
+      iconLeft={iconLeft}
+      iconRight={iconRight}
+      fullWidth={fullWidth}
+      {...rest}
+    >
       {children}
-    </Link>
+    </KitLinkButton>
   );
 }

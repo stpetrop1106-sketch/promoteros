@@ -96,6 +96,34 @@ const SIZES: Record<ButtonSize, string> = {
 };
 
 /**
+ * The chassis as a string, for the one element that cannot be a `<button>`.
+ *
+ * Added in P35. `Button` renders a real `<button>` on purpose so it can sit inside a
+ * `<form action={…}>`, which makes it the wrong element for navigation — so two lanes each grew
+ * their own `LinkButton` that *mirrored* these classes by hand. Both copies had drifted: 32/40px
+ * heights against Button's 36/44, an `outline` focus state against Button's ring, no press
+ * translate, no inset hairline. A primary link sitting next to a primary button was four pixels
+ * shorter and a different shape, on nearly every screen in the product.
+ *
+ * Exporting the composition is the fix that cannot drift again: `Button` below and
+ * `LinkButton` both call this, so there is exactly one definition of what a button looks like.
+ * Purely additive — `Button`'s own output is unchanged.
+ */
+export function buttonClassName({
+  variant = "primary",
+  size = "md",
+  fullWidth = false,
+  className,
+}: {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  fullWidth?: boolean;
+  className?: string;
+} = {}): string {
+  return cn(BASE, VARIANTS[variant], SIZES[size], fullWidth && "w-full", className);
+}
+
+/**
  * Standard action button. Works as a plain <button>, so it also works
  * inside a <form action={...}> — pass type="submit" plus name/value to
  * identify which action triggered the submit (e.g. multiple submit
@@ -121,13 +149,7 @@ export function Button({
       type={type}
       disabled={isDisabled}
       aria-busy={loading || undefined}
-      className={cn(
-        BASE,
-        VARIANTS[variant],
-        SIZES[size],
-        fullWidth && "w-full",
-        className,
-      )}
+      className={buttonClassName({ variant, size, fullWidth, className })}
       {...rest}
     >
       {loading ? (

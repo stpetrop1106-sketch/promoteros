@@ -87,20 +87,25 @@ reason. See `CLAUDE.md` §1 — the constraint with legal consequences, not a pr
 
 ## 4. Current state — verified vs written
 
-Agents must know which ground is solid. Written ≠ working.
+Agents must know which ground is solid. Written is not working. **Updated 2026-09-12.**
 
 | Layer | State | Evidence |
 |---|---|---|
-| Schema (`0001`, `0002`) | **Verified** | Migrations applied to the cloud project |
-| Seed | **Verified** | Ran: 60 promoters, 15 stores, 3 campaigns, 24 shifts, 579 availability rows |
-| `match_promoters` (`0003`) | **Applied, never executed** | Migration ran after three fixes. No query has returned a row yet |
-| Invitation loop (`lib/invitations.ts`, `/i/[token]`) | **Written, never executed** | Typechecks. Nothing more |
-| Check-in, field reports | **Not started** | — |
-| Auth | **Not started** | Coordinator pages run on the service-role client — `TODO(L4)` |
-| Design system | **In progress (Codex)** | Tokens landed in `globals.css`, `layout.tsx` |
+| Schema and RLS (0001–0015) | **Verified** | All fifteen applied to the cloud project |
+| Seed | **Verified** | 60 promoters, 15 stores, 3 campaigns, 24 shifts, 579 availability rows |
+| match_promoters | **Verified by experiment** | 87 candidates over 3 shifts, 0 Pareto violations in 282 pairs |
+| Tenant isolation | **Proved, not asserted** | 30/30 assertions against the live database; both privilege-escalation attempts rejected by Postgres |
+| Auth | **Verified cold** | Magic link and six-digit code both sign in; the callback sets the session cookie |
+| Invitation loop | **Verified** | Accept and decline exercised end to end against real rows |
+| Check-in, field reports | **Verified** | Manual override exercised; the row was written with no coordinates |
+| Availability | **Verified** | Promoter side and coordinator side, both delete-then-insert, never upsert |
+| Brief acknowledgement | **Written, not yet exercised against a real link** | Builds; nothing had ever written to brief_ack before P31 |
+| Billing | **Verified without keys** | Webhook signature and idempotency exercised; enforcement wired, not advisory |
+| Design system | **Verified by looking** | Sidebar, drawer and dashboard seen rendered; docs/design.md is the authority |
+| Production deployment | **Behind develop** | The waitlist is live; the application itself has not been promoted |
 
-**P0 exists because of row three.** Nothing may be built on the matching engine until one query has
-returned candidates.
+The line that has repeatedly cost time: **npm run dev proves nothing about the build.** Five
+parcels shipped the same server/client boundary bug because dev accepted it. Run npm run build.
 
 ---
 

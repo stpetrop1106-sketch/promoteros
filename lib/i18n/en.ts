@@ -43,6 +43,11 @@ export const en: Record<TranslationKey, string> = {
 
   "shifts.title": "Shifts",
   "shifts.none": "No shifts yet.",
+  "shifts.list.subtitle": "{count} shifts, earliest first.",
+  "shifts.empty.title": "No shifts yet",
+  "shifts.empty.body":
+    "Shifts live inside a campaign. Create your first campaign and add its shifts to it.",
+  "shifts.empty.cta": "Create a campaign",
   "shifts.date": "Date",
   "shifts.store": "Store",
   "shifts.campaign": "Campaign",
@@ -188,6 +193,7 @@ export const en: Record<TranslationKey, string> = {
   "promoters.filter.car_no": "No car",
   "promoters.filter.apply": "Filter",
   "promoters.filter.clear": "Clear filters",
+  "promoters.filter.result_count": "{shown} of {total}",
 
   "promoters.empty.title": "No promoters yet",
   "promoters.empty.description":
