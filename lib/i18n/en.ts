@@ -1364,4 +1364,83 @@ export const en: Record<TranslationKey, string> = {
   "shell.open_menu": "Open menu",
   "shell.close_menu": "Close menu",
   "shell.skip_to_content": "Skip to content",
+
+  // P5 — a promoter's availability, from the coordinator's side
+  // (/promoters/[id]/availability). Same fortnight and rules as promoter_availability.*
+  // (/a/[token]) — see lib/availability-links.ts — but the row is stamped source: 'coordinator'.
+  "promoters.availability.title": "Availability — {name}",
+  "promoters.availability.subtitle":
+    "The same two weeks the promoter herself sees. All times are Greek time ({tz}).",
+  "promoters.availability.back_to_profile": "Back to profile",
+
+  "promoters.availability.choice.available": "Can work",
+  "promoters.availability.choice.partial": "Hours",
+  "promoters.availability.choice.unavailable": "Can't work",
+  "promoters.availability.choice.clear": "Clear this day",
+
+  "promoters.availability.partial.from": "From",
+  "promoters.availability.partial.to": "Until",
+  "promoters.availability.partial.end_of_day": "End of day",
+  "promoters.availability.partial.apply": "Save these hours",
+
+  "promoters.availability.saving": "Saving…",
+  "promoters.availability.saved": "Saved",
+
+  "promoters.availability.source.self": "She said this herself",
+  "promoters.availability.source.coordinator": "You entered this",
+  "promoters.availability.source.contradiction":
+    "There are two different entries for this day. Choose again to leave just one.",
+  "promoters.availability.status.undeclared": "Undeclared",
+
+  "promoters.availability.summary.not_set": "Not declared — not offered by matching",
+  "promoters.availability.summary.available": "Available all day",
+  "promoters.availability.summary.unavailable": "Not available",
+  "promoters.availability.summary.available_from": "Available from {from}",
+  "promoters.availability.summary.available_range": "Available {from}–{to}",
+  "promoters.availability.summary.unavailable_from": "Not available from {from}",
+  "promoters.availability.summary.unavailable_range": "Not available {from}–{to}",
+
+  "promoters.availability.error.not_found": "That promoter was not found.",
+  "promoters.availability.error.bad_date": "That date is outside the fortnight shown here.",
+  "promoters.availability.error.bad_time": "Choose a valid time.",
+  "promoters.availability.error.bad_range": "The end time has to be after the start time.",
+  "promoters.availability.error.bad_choice": "That is not a valid choice.",
+  "promoters.availability.error.save_failed": "That day was not saved. Tap again.",
+  "promoters.availability.error.blocked_read_only":
+    "This account is read-only right now, so availability cannot be changed.",
+  "promoters.availability.error.unreachable":
+    "We could not read availability just now. Try again in a moment.",
+
+  "promoters.availability.bulk.title": "Fast entry",
+  "promoters.availability.bulk.weekdays": "All weekdays",
+  "promoters.availability.bulk.weekend": "This weekend",
+  "promoters.availability.bulk.clear_all": "Clear the whole fortnight",
+  "promoters.availability.bulk.running": "Applying…",
+  "promoters.availability.bulk.done_weekdays": "Weekdays set to available.",
+  "promoters.availability.bulk.done_weekend": "The weekend set to available.",
+  "promoters.availability.bulk.done_clear_all": "The fortnight was cleared.",
+
+  /* --- P31: brief acknowledgement --- */
+  "invitation.brief.title": "Brief",
+  "invitation.brief.confirm": "I've read it",
+  "invitation.brief.acknowledged_on": "You read this on {date}.",
+  "invitation.brief.error": "We could not record that. Try again.",
+
+  "campaigns.brief.roster.title": "Who has read the brief",
+  "campaigns.brief.roster.column.promoter": "Promoter",
+  "campaigns.brief.roster.column.acknowledged_at": "Read on",
+  "campaigns.brief.roster.pending_title": "Have not read it yet",
+  "campaigns.brief.roster.acknowledged_title": "Have read it",
+  "campaigns.brief.roster.empty_pending": "Everyone scheduled has read the brief.",
+  "campaigns.brief.roster.empty_acknowledged": "No one has read it yet.",
+  "campaigns.brief.roster.no_staff": "No promoter is scheduled on this campaign yet.",
+  "campaigns.brief.roster.not_published":
+    "The brief has not been published yet, so no promoter can read it.",
+
+  "promoters.availability.bulk.clear_all_confirm": "Sure? Tap again to clear",
+  "promoters.availability.bulk.clear_all_cancel": "Cancel",
+  "promoters.availability.bulk.clear_all_warning":
+    "All fourteen days will be cleared. This cannot be undone.",
+  "promoters.availability.bulk.clear_all_warning_self":
+    "Careful: some of these days the promoter declared herself. Those will be cleared too, with no undo.",
 };

@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { loadInvitation } from "@/lib/invitations";
+import { loadBriefForInvitation } from "@/lib/briefs";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { Markdown } from "@/components/ui";
 import { RespondForm } from "./respond-form";
+import { AcknowledgeBriefForm } from "./acknowledge-brief-form";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +33,12 @@ export default async function InvitationPage({
 
   const v = result.view;
   const answered = v.status !== "pending";
+
+  // Independent of `result` above on purpose — see lib/briefs.ts's file comment. `briefResult`
+  // failing (a token race) just means the section below renders nothing; it never blocks the
+  // shift details or the accept/decline flow that already succeeded.
+  const briefResult = await loadBriefForInvitation(token);
+  const brief = briefResult.ok ? briefResult.view : null;
 
   return (
     <main className="mx-auto max-w-md px-6 py-12">
@@ -63,6 +72,20 @@ export default async function InvitationPage({
           </div>
         )}
       </dl>
+
+      {brief && (
+        <div className="mt-6 rounded-lg border border-[color:var(--color-line)] bg-white p-5">
+          <h2 className="text-sm font-semibold">{brief.title || t("invitation.brief.title")}</h2>
+          <Markdown source={brief.bodyMd} className="text-[color:var(--color-ink)]" />
+          <AcknowledgeBriefForm
+            token={token}
+            initialAcknowledgedAt={brief.acknowledgedAt}
+            confirmLabel={t("invitation.brief.confirm")}
+            acknowledgedTemplate={t("invitation.brief.acknowledged_on")}
+            errorLabel={t("invitation.brief.error")}
+          />
+        </div>
+      )}
 
       {answered ? (
         <p className="mt-6 text-sm text-[color:var(--color-muted)]">

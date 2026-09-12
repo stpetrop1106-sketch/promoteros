@@ -79,7 +79,14 @@ export function StatTile({
       ) : null}
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+        {/* Two lines, then clip — not one line with an ellipsis. "Βάρδιες χωρίς κάλυψη"
+            is 20 characters and the English is 13; truncating to one line hides the half
+            of the Greek label that says *which* shifts. `StatStrip` is a grid, so the
+            tiles in a row stretch to the tallest, and the label box is held at exactly two
+            lines (`min-h-9` = 2 × the 1.125rem `text-xs` line height) so a one-line label
+            and a two-line label next to it still put their numbers on the same baseline —
+            which is the whole reason the strip is scannable. */}
+        <p className="line-clamp-2 min-h-9 text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
           {label}
         </p>
         <p

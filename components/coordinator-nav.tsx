@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -147,7 +147,10 @@ function NavItem({
 /** The sidebar's contents, shared by the fixed desktop rail and the mobile drawer. */
 function NavPanel({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
-    <div className="flex h-full flex-col bg-[color:var(--color-surface)]">
+    /* `min-h-full`, not `h-full`: inside the mobile drawer's scroll container a hard 100% height
+       would clip the settings row on a short landscape phone instead of letting it scroll. On the
+       desktop rail the two resolve identically, so `mt-auto` still pins settings to the bottom. */
+    <div className="flex min-h-full flex-col bg-[color:var(--color-surface)]">
       <div className="flex items-center gap-2.5 px-6 pb-2 pt-5">
         <BrandMark />
         <Link
@@ -186,6 +189,10 @@ function NavPanel({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
  */
 function NavChrome({ pathname }: { pathname: string }) {
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
+  const drawerRef = useRef<HTMLDivElement | null>(null);
+
+  const close = useCallback(() => setOpen(false), []);
 
   // Close the drawer when the route changes. Without this, tapping a destination on a phone leaves
   // the drawer sitting over the page it just navigated to.
@@ -193,21 +200,85 @@ function NavChrome({ pathname }: { pathname: string }) {
     setOpen(false);
   }, [pathname]);
 
+  /**
+   * Close it when the viewport grows past the breakpoint.
+   *
+   * This one is not cosmetic. The drawer's container is `lg:hidden`, so widening the window while it
+   * is open — rotating a tablet, dragging a window wider, an on-screen keyboard closing — removes it
+   * from view while `open` stays `true`, and the effect below therefore keeps `overflow: hidden` on
+   * `<body>`. The result is a desktop page that cannot be scrolled and has no visible control to fix
+   * it. The media query is the same 1024px as the `lg:` classes; they have to agree.
+   *
+   * Both `change` and `resize` are listened for: a real browser window fires them together, but a
+   * media query that is re-evaluated without its own event still gets caught by the window's. A
+   * second `setOpen(false)` while it is already `false` is a no-op, so the overlap costs nothing.
+   *
+   * Caveat for whoever tests this next: a viewport driven by CDP/devtools emulation rather than by
+   * an actual window resize fires *neither* event — nor a `ResizeObserver` on the document element,
+   * which was tried. `window.innerWidth` simply changes and the page is given no signal at all, so
+   * this guard cannot be exercised by that route. Resize a real browser window.
+   */
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1024px)");
+    const sync = () => {
+      if (query.matches) setOpen(false);
+    };
+    sync();
+    query.addEventListener("change", sync);
+    window.addEventListener("resize", sync);
+    return () => {
+      query.removeEventListener("change", sync);
+      window.removeEventListener("resize", sync);
+    };
+  }, []);
+
   // Escape closes it, and the page behind it does not scroll while it is open.
   useEffect(() => {
     if (!open) return;
 
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        setOpen(false);
+        return;
+      }
+
+      // Keep Tab inside the drawer. Without this the focus ring walks off the overlay and onto the
+      // page underneath, which is both invisible and unscrollable while the drawer is open.
+      if (event.key !== "Tab") return;
+      const panel = drawerRef.current;
+      if (!panel) return;
+
+      const focusable = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !panel.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
+    // Move focus into the drawer, and put it back on the button that opened it when it closes —
+    // otherwise a keyboard user lands back at the top of the document on every close.
+    const opener = toggleRef.current;
+    drawerRef.current?.querySelector<HTMLElement>("a[href], button")?.focus();
+
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
+      opener?.focus();
     };
   }, [open]);
 
@@ -216,7 +287,7 @@ function NavChrome({ pathname }: { pathname: string }) {
       {/* Desktop: a fixed rail. Fixed rather than sticky so a long table scrolling under it never
           drags the navigation off screen. */}
       <div
-        className="fixed inset-y-0 left-0 z-30 hidden w-[var(--shell-sidebar-w)] border-r border-[color:var(--color-line)] bg-[color:var(--color-surface)] lg:block"
+        className="fixed inset-y-0 left-0 z-30 hidden w-[var(--shell-sidebar-w)] overflow-y-auto overscroll-contain border-r border-[color:var(--color-line)] bg-[color:var(--color-surface)] lg:block"
         style={{ boxShadow: "1px 0 0 0 rgb(20 26 41 / 0.02), 4px 0 24px -12px rgb(20 26 41 / 0.10)" }}
       >
         <NavPanel pathname={pathname} />
@@ -235,9 +306,11 @@ function NavChrome({ pathname }: { pathname: string }) {
         </Link>
 
         <button
+          ref={toggleRef}
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
+          aria-haspopup="dialog"
           aria-controls="promoteros-nav-drawer"
           aria-label={open ? t("shell.close_menu") : t("shell.open_menu")}
           className="flex size-10 items-center justify-center rounded-xl text-[color:var(--color-ink-soft)] transition-colors hover:bg-[color:var(--color-canvas-sunken)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
@@ -254,14 +327,22 @@ function NavChrome({ pathname }: { pathname: string }) {
             type="button"
             tabIndex={-1}
             aria-label={t("shell.close_menu")}
-            onClick={() => setOpen(false)}
+            onClick={close}
             className="absolute inset-0 h-full w-full cursor-default bg-[color:var(--color-n-950)]/35 backdrop-blur-[2px]"
           />
+          {/* A real dialog, not a styled div: `aria-modal` is what stops a screen reader walking
+              into the page behind the overlay, which the Tab trap above only handles for sighted
+              keyboard users. The panel scrolls on its own so a short phone in landscape can still
+              reach the settings row at the bottom. */}
           <div
+            ref={drawerRef}
             id="promoteros-nav-drawer"
-            className="absolute inset-y-0 left-0 w-[min(18rem,85vw)] shadow-[var(--elevation-overlay)]"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("nav.label")}
+            className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col overflow-y-auto overscroll-contain shadow-[var(--elevation-overlay)]"
           >
-            <NavPanel pathname={pathname} onNavigate={() => setOpen(false)} />
+            <NavPanel pathname={pathname} onNavigate={close} />
           </div>
         </div>
       ) : null}
@@ -299,7 +380,25 @@ export function CoordinatorNav({ signedIn }: { signedIn: boolean }) {
  * `children` is a server-rendered tree passed through as a prop, so marking this file `"use client"`
  * does not pull a single page component into the client bundle.
  */
-export function AppShell({ signedIn, children }: { signedIn: boolean; children: ReactNode }) {
+export function AppShell({
+  signedIn,
+  banner,
+  children,
+}: {
+  signedIn: boolean;
+  /**
+   * Agency-wide chrome that belongs *inside* the shell — today just the billing banner.
+   *
+   * It is a separate prop rather than another child because "is this an agency screen" is a
+   * question only this file can answer, and the answer has to gate the banner too. Passed as a
+   * child it rendered on `/i/[token]`: a signed-in coordinator opening their own invitation link
+   * to check it showed the promoter a payment warning addressed to the agency. Anything routed
+   * through `banner` disappears on the public, `/login` and promoter-token pages along with the
+   * navigation. Optional, so the original `{ signedIn, children }` call still compiles.
+   */
+  banner?: ReactNode;
+  children: ReactNode;
+}) {
   const pathname = usePathname() ?? "/";
 
   if (isHidden(pathname, signedIn)) return <>{children}</>;
@@ -317,6 +416,7 @@ export function AppShell({ signedIn, children }: { signedIn: boolean; children: 
       </a>
       <NavChrome pathname={pathname} />
       <div id="promoteros-content" tabIndex={-1} className="min-w-0 focus:outline-none">
+        {banner}
         {children}
       </div>
     </div>

@@ -113,19 +113,27 @@ export default async function RootLayout({
          * children and nothing else, so the landing page, `/login` and `/i/[token]` keep exactly
          * the markup they had.
          *
-         * The banner goes *inside* the shell so it lands in the content column rather than under
-         * the sidebar. Nothing about `loadShell()` above changed: it is still the fail-safe that
-         * keeps a billing lookup from taking down the marketing page.
+         * The banner goes through the shell's `banner` slot so it lands in the content column
+         * rather than under the sidebar — and, more importantly, so it is hidden on exactly the
+         * pages the navigation is hidden on. As a plain child it still rendered on the promoter
+         * token pages whenever the person holding the link was also signed in as a coordinator,
+         * which put an agency payment warning on a promoter's phone. Nothing about `loadShell()`
+         * above changed: it is still the fail-safe that keeps a billing lookup from taking down
+         * the marketing page.
          */}
-        <AppShell signedIn={signedIn}>
-          {entitlement ? (
-            <GlobalBillingBanner
-              notice={entitlement.notice}
-              access={entitlement.access}
-              graceDaysRemaining={entitlement.graceDaysRemaining}
-              trialDaysRemaining={entitlement.trialDaysRemaining}
-            />
-          ) : null}
+        <AppShell
+          signedIn={signedIn}
+          banner={
+            entitlement ? (
+              <GlobalBillingBanner
+                notice={entitlement.notice}
+                access={entitlement.access}
+                graceDaysRemaining={entitlement.graceDaysRemaining}
+                trialDaysRemaining={entitlement.trialDaysRemaining}
+              />
+            ) : null
+          }
+        >
           {children}
         </AppShell>
       </body>

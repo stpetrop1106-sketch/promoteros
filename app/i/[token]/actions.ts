@@ -2,8 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { respondToInvitation } from "@/lib/invitations";
+import { acknowledgeBriefForInvitation } from "@/lib/briefs";
 
 export type RespondState = { status: "idle" | "accepted" | "declined" | "error"; reason?: string };
+
+export type AcknowledgeBriefState =
+  | { status: "idle" }
+  | { status: "acknowledged"; acknowledgedAt: string }
+  | { status: "error"; reason: string };
 
 /**
  * Anonymous on purpose — and this is the one path that stays that way.
@@ -30,4 +36,21 @@ export async function respond(
 
   revalidatePath(`/i/${token}`);
   return { status: result.answer === "accept" ? "accepted" : "declined" };
+}
+
+/**
+ * "I've read this brief" — anonymous, same shape as `respond` above. Idempotent on the database
+ * side (`lib/briefs.ts`), so this never needs to distinguish a first tap from a retry.
+ */
+export async function acknowledgeBrief(
+  _prev: AcknowledgeBriefState,
+  formData: FormData,
+): Promise<AcknowledgeBriefState> {
+  const token = String(formData.get("token") ?? "");
+
+  const result = await acknowledgeBriefForInvitation(token);
+  if (!result.ok) return { status: "error", reason: result.reason };
+
+  revalidatePath(`/i/${token}`);
+  return { status: "acknowledged", acknowledgedAt: result.acknowledgedAt };
 }

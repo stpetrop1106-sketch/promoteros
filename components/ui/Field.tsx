@@ -31,7 +31,11 @@ const CONTROL_BASE =
   "hover:border-[color:var(--color-line-strong)] " +
   "focus-visible:border-[color:var(--color-accent)] focus-visible:bg-[color:var(--color-surface)] " +
   "focus-visible:shadow-[var(--focus-ring)] " +
-  "disabled:cursor-not-allowed disabled:bg-[color:var(--color-canvas-sunken)] disabled:opacity-55";
+  // `disabled:` sorts after `hover:` in Tailwind's variant order, so these win: without the
+  // border override a disabled control still darkened its edge under the pointer and read as
+  // editable, which is the opposite of what the state is for.
+  "disabled:cursor-not-allowed disabled:border-[color:var(--color-line)] " +
+  "disabled:bg-[color:var(--color-canvas-sunken)] disabled:opacity-55 disabled:shadow-none";
 
 function controlBorder(hasError: boolean) {
   return hasError

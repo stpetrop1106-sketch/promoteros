@@ -6,6 +6,7 @@ import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { PageHeader, Card, Badge, ScoreBar, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
 import { LinkButton } from "../link-button";
+import { AvailabilityLink } from "./availability-link";
 
 export const dynamic = "force-dynamic";
 
@@ -196,6 +197,12 @@ export default async function PromoterProfilePage({ params }: { params: Promise<
             </div>
           )}
         </Card>
+
+        {/* P30 mounted: the coordinator sends the promoter their own availability link.
+            Minting writes nothing — it is an HMAC over the promoter id — so this is safe to reopen. */}
+        <div className="sm:col-span-2">
+          <AvailabilityLink promoterId={p.id} promoterName={p.full_name} />
+        </div>
       </div>
 
       <Card className="mt-6" header={<h2 className="text-sm font-semibold">{t("promoters.profile.client_history_title")}</h2>}>

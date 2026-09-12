@@ -16,6 +16,27 @@ export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
    * Added in P34.
    */
   bare?: boolean;
+  /**
+   * Accessible name for the scroll container, e.g. t("shifts.title"). The
+   * container is focusable so a keyboard user can scroll a wide table sideways,
+   * and a focus stop that announces nothing is worse than no name at all — so
+   * the `region` role is only applied when there is something to call it.
+   * Added in P34; every existing call site omits it and is unaffected.
+   */
+  label?: string;
+  /**
+   * How the table decides its own width. Added in P34; the default is what
+   * every existing table already does.
+   *
+   * - `"intrinsic"` (default) — `min-w-max`: no cell ever wraps and the table
+   *   scrolls sideways instead. Right for the dense, short-valued tables the
+   *   product is mostly made of (date, store, status, score).
+   * - `"fluid"` — `min-w-full`: the table fits the column and long cells wrap.
+   *   Reach for it when a table carries a prose column (a note, an address, a
+   *   decline reason), which under `"intrinsic"` drags the whole table several
+   *   screens wide and buries every column after it.
+   */
+  layout?: "intrinsic" | "fluid";
 }
 
 /**
@@ -33,22 +54,32 @@ export function Table({
   className,
   wrapperClassName,
   bare = false,
+  label,
+  layout = "intrinsic",
   children,
   ...rest
 }: TableProps) {
   return (
     <div
-      role="region"
+      role={label ? "region" : undefined}
+      aria-label={label}
       tabIndex={0}
       className={cn(
         "w-full overflow-x-auto focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]",
+        // The edge shadows that say "there is more to the right". See the utility's comment in
+        // `app/globals.css` — it is pure CSS and only paints on a side that can actually scroll.
+        "scroll-shadow-x",
         !bare &&
           "rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] shadow-[var(--elevation-card)]",
         wrapperClassName,
       )}
     >
       <table
-        className={cn("w-full min-w-max border-collapse text-left text-sm", className)}
+        className={cn(
+          "w-full border-collapse text-left text-sm",
+          layout === "fluid" ? "min-w-full" : "min-w-max",
+          className,
+        )}
         {...rest}
       >
         {children}

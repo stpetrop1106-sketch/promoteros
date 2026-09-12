@@ -1391,4 +1391,85 @@ export const el = {
   "shell.open_menu": "Άνοιγμα μενού",
   "shell.close_menu": "Κλείσιμο μενού",
   "shell.skip_to_content": "Μετάβαση στο περιεχόμενο",
+
+  // P5 — η διαθεσιμότητα μιας promoter, από την πλευρά του συντονιστή
+  // (/promoters/[id]/availability). Ίδιο δεκαπενθήμερο και ίδιοι κανόνες με το promoter_availability.*
+  // (/a/[token]) — βλ. lib/availability-links.ts — αλλά η εγγραφή φέρει source: 'coordinator'.
+  "promoters.availability.title": "Διαθεσιμότητα — {name}",
+  "promoters.availability.subtitle":
+    "Το δεκαπενθήμερο που βλέπει και η ίδια η promoter. Όλες οι ώρες είναι ώρα Ελλάδας ({tz}).",
+  "promoters.availability.back_to_profile": "Πίσω στο προφίλ",
+
+  "promoters.availability.choice.available": "Μπορεί",
+  "promoters.availability.choice.partial": "Ωράριο",
+  "promoters.availability.choice.unavailable": "Δεν μπορεί",
+  "promoters.availability.choice.clear": "Καθάρισε τη μέρα",
+
+  "promoters.availability.partial.from": "Από",
+  "promoters.availability.partial.to": "Έως",
+  "promoters.availability.partial.end_of_day": "Τέλος ημέρας",
+  "promoters.availability.partial.apply": "Αποθήκευση ωραρίου",
+
+  "promoters.availability.saving": "Αποθήκευση…",
+  "promoters.availability.saved": "Αποθηκεύτηκε",
+
+  "promoters.availability.source.self": "Το δήλωσε η ίδια",
+  "promoters.availability.source.coordinator": "Το καταχώρησες εσύ",
+  "promoters.availability.source.contradiction":
+    "Υπάρχουν δύο διαφορετικές καταχωρήσεις γι' αυτή τη μέρα. Επίλεξε ξανά για να μείνει μία.",
+  "promoters.availability.status.undeclared": "Άγνωστη",
+
+  "promoters.availability.summary.not_set": "Δεν έχει δηλωθεί — δεν προτείνεται στο matching",
+  "promoters.availability.summary.available": "Διαθέσιμη όλη μέρα",
+  "promoters.availability.summary.unavailable": "Μη διαθέσιμη",
+  "promoters.availability.summary.available_from": "Διαθέσιμη από {from}",
+  "promoters.availability.summary.available_range": "Διαθέσιμη {from}–{to}",
+  "promoters.availability.summary.unavailable_from": "Μη διαθέσιμη από {from}",
+  "promoters.availability.summary.unavailable_range": "Μη διαθέσιμη {from}–{to}",
+
+  "promoters.availability.error.not_found": "Δεν βρέθηκε αυτή η promoter.",
+  "promoters.availability.error.bad_date":
+    "Αυτή η ημερομηνία είναι εκτός του δεκαπενθήμερου που εμφανίζεται.",
+  "promoters.availability.error.bad_time": "Διάλεξε έγκυρη ώρα.",
+  "promoters.availability.error.bad_range":
+    "Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης.",
+  "promoters.availability.error.bad_choice": "Μη έγκυρη επιλογή.",
+  "promoters.availability.error.save_failed": "Η μέρα δεν αποθηκεύτηκε. Πάτησε ξανά.",
+  "promoters.availability.error.blocked_read_only":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε η διαθεσιμότητα δεν μπορεί να αλλάξει.",
+  "promoters.availability.error.unreachable":
+    "Δεν μπορέσαμε να διαβάσουμε τη διαθεσιμότητα αυτή τη στιγμή. Δοκίμασε ξανά σε λίγο.",
+
+  "promoters.availability.bulk.title": "Γρήγορη καταχώρηση",
+  "promoters.availability.bulk.weekdays": "Όλες τις καθημερινές",
+  "promoters.availability.bulk.weekend": "Αυτό το Σαββατοκύριακο",
+  "promoters.availability.bulk.clear_all": "Καθάρισε όλο το δεκαπενθήμερο",
+  "promoters.availability.bulk.running": "Γίνεται καταχώρηση…",
+  "promoters.availability.bulk.done_weekdays": "Οι καθημερινές ορίστηκαν ως διαθέσιμες.",
+  "promoters.availability.bulk.done_weekend": "Το Σαββατοκύριακο ορίστηκε ως διαθέσιμο.",
+  "promoters.availability.bulk.done_clear_all": "Το δεκαπενθήμερο καθαρίστηκε.",
+
+  /* --- P31: brief acknowledgement --- */
+  "invitation.brief.title": "Brief",
+  "invitation.brief.confirm": "Το διάβασα",
+  "invitation.brief.acknowledged_on": "Το διάβασες στις {date}.",
+  "invitation.brief.error": "Δεν μπορέσαμε να το καταγράψουμε. Δοκίμασε ξανά.",
+
+  "campaigns.brief.roster.title": "Ποιοι έχουν διαβάσει το brief",
+  "campaigns.brief.roster.column.promoter": "Promoter",
+  "campaigns.brief.roster.column.acknowledged_at": "Το διάβασε στις",
+  "campaigns.brief.roster.pending_title": "Δεν το έχουν διαβάσει ακόμα",
+  "campaigns.brief.roster.acknowledged_title": "Το έχουν διαβάσει",
+  "campaigns.brief.roster.empty_pending": "Όλοι οι προγραμματισμένοι promoters έχουν διαβάσει το brief.",
+  "campaigns.brief.roster.empty_acknowledged": "Δεν το έχει διαβάσει κανείς ακόμα.",
+  "campaigns.brief.roster.no_staff": "Δεν έχει προγραμματιστεί καμία promoter σε αυτή την καμπάνια ακόμα.",
+  "campaigns.brief.roster.not_published":
+    "Το brief δεν έχει δημοσιευτεί ακόμα — καμία promoter δεν μπορεί να το διαβάσει.",
+
+  "promoters.availability.bulk.clear_all_confirm": "Σίγουρα; Πάτησε ξανά για να σβήσεις",
+  "promoters.availability.bulk.clear_all_cancel": "Άκυρο",
+  "promoters.availability.bulk.clear_all_warning":
+    "Θα σβηστούν και οι δεκατέσσερις μέρες. Δεν γίνεται αναίρεση.",
+  "promoters.availability.bulk.clear_all_warning_self":
+    "Προσοχή: κάποιες από αυτές τις μέρες τις δήλωσε η ίδια η promoter. Θα σβηστούν κι αυτές, χωρίς αναίρεση.",
 } as const;

@@ -46,8 +46,8 @@ const BASE =
   "transition-[background-color,border-color,color,box-shadow,transform] duration-150 " +
   "ease-[var(--ease-out-soft)] active:translate-y-px " +
   "focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)] " +
-  "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45 " +
-  "disabled:shadow-none disabled:active:translate-y-0";
+  "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 " +
+  "disabled:shadow-none disabled:ring-0 disabled:active:translate-y-0";
 
 const VARIANTS: Record<ButtonVariant, string> = {
   /* A hairline of the darker brand blue inside the fill keeps the button from
@@ -83,11 +83,16 @@ const VARIANTS: Record<ButtonVariant, string> = {
  * against a 44px input is exactly the kind of four-pixel mismatch that reads as
  * "nobody laid this out". 44px is also the minimum comfortable touch target,
  * which matters because the promoter-facing pages are phone-first.
+ *
+ * Heights are `min-h-*` plus vertical padding rather than a fixed `h-*`. A single-line label lands
+ * on exactly the same 36/44/48px as before, so nothing in the app shifts — but a Greek label that
+ * wraps to two lines inside a narrow column now grows the button instead of spilling its second
+ * line out through the bottom edge, which is what a fixed height did.
  */
 const SIZES: Record<ButtonSize, string> = {
-  sm: "h-9 gap-1.5 px-3 text-xs",
-  md: "h-11 px-4.5 text-sm",
-  lg: "h-12 px-6 text-base",
+  sm: "min-h-9 gap-1.5 px-3 py-1.5 text-xs",
+  md: "min-h-11 px-4.5 py-2 text-sm",
+  lg: "min-h-12 px-6 py-2.5 text-base",
 };
 
 /**
@@ -137,8 +142,10 @@ export function Button({
       ) : null}
       {/* Deliberately unconstrained: a Greek label is routinely 40% longer than
           its English twin, and clipping or forcing it onto one line is how a
-          button ends up reading "Αποθήκευση αλλαγ…". */}
-      <span>{children}</span>
+          button ends up reading "Αποθήκευση αλλαγ…". `text-center` is what makes
+          the second line of a wrapped label sit under the first rather than
+          ragged left against a centred glyph. */}
+      <span className="text-center">{children}</span>
       {iconRight && !loading ? (
         <span aria-hidden="true" className="-mr-0.5 shrink-0">
           {iconRight}

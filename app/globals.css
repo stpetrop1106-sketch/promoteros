@@ -290,6 +290,45 @@ h4 {
     box-shadow: var(--focus-ring);
   }
 
+  /*
+   * Horizontal scroll affordance, with no JavaScript.
+   *
+   * A wide table on a phone scrolls sideways inside its own box, and until this
+   * existed there was nothing on screen to say so — the last column simply ended
+   * at the edge and looked like the end of the data. That is the single most
+   * common way a coordinator misses a column on their phone.
+   *
+   * The trick is the four-layer background: two opaque "cover" gradients pinned
+   * to the content box (`background-attachment: local`, so they slide away as
+   * you scroll) sitting over two soft shadows pinned to the viewport of the
+   * scroller (`scroll`, so they stay put). The result is that a shadow is only
+   * visible on a side that actually has more content — no measuring, no resize
+   * observer, nothing to keep in sync.
+   *
+   * Only `background-image`/`-size`/`-position`/`-repeat`/`-attachment` are set,
+   * never the `background` shorthand, so a Tailwind `bg-[color:…]` class on the
+   * same element still supplies the fill underneath.
+   */
+  .scroll-shadow-x {
+    background-image:
+      linear-gradient(to right, var(--scroll-shadow-bg, var(--color-surface)), transparent),
+      linear-gradient(to left, var(--scroll-shadow-bg, var(--color-surface)), transparent),
+      linear-gradient(to right, rgb(20 26 41 / 0.11), transparent),
+      linear-gradient(to left, rgb(20 26 41 / 0.11), transparent);
+    background-position:
+      left center,
+      right center,
+      left center,
+      right center;
+    background-size:
+      2.5rem 100%,
+      2.5rem 100%,
+      0.875rem 100%,
+      0.875rem 100%;
+    background-repeat: no-repeat;
+    background-attachment: local, local, scroll, scroll;
+  }
+
   /* Skeleton shimmer. Declared here rather than in the component so the
      keyframes exist once. */
   .animate-shimmer {
