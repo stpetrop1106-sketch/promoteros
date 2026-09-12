@@ -1,25 +1,314 @@
 @import "tailwindcss";
 
+/* ===========================================================================
+   PromoterOS — design tokens (P34)
+   ---------------------------------------------------------------------------
+   The rules for changing anything in here are in `docs/design.md`. The short
+   version: 45 screens reference these names directly as `var(--color-*)`, so a
+   name is a public API. Values may be tuned; names are never removed.
+   =========================================================================== */
+
 @theme {
-  /* PromoterOS — Signal loop */
-  --color-ink: #161a24;
-  --color-muted: #65708a;
-  --color-line: #d6dae5;
-  --color-canvas: #f7f8fc;
-  --color-surface: #ffffff;
+  /* -----------------------------------------------------------------------
+     Typeface. Inter, loaded by `next/font` in `app/layout.tsx` with the greek
+     subset requested explicitly — `next/font` fails the BUILD if a requested
+     subset does not exist, so Greek coverage is verified by CI rather than by
+     eye. The system stack behind it is the fallback while the webfont loads.
+     ----------------------------------------------------------------------- */
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* -----------------------------------------------------------------------
+     Neutral ramp.
+
+     Before P34 every grey in the product was one of three values, so a border,
+     a divider, a disabled label and a table header all read at the same
+     weight and nothing had hierarchy. The ramp is a single blue-grey hue
+     (~222°) so neutrals sit under the brand blue instead of fighting it.
+     ----------------------------------------------------------------------- */
+  --color-n-0: #ffffff;
+  --color-n-25: #fbfcfe;
+  --color-n-50: #f6f8fc;
+  --color-n-100: #eef1f8;
+  --color-n-150: #e7ebf4;
+  --color-n-200: #dde3ee;
+  --color-n-300: #c3cbdd;
+  --color-n-400: #9aa5bf;
+  --color-n-500: #737f9c;
+  --color-n-600: #57637f;
+  --color-n-700: #3d4964;
+  --color-n-800: #262f45;
+  --color-n-900: #141a29;
+  --color-n-950: #0b0f1a;
+
+  /* -----------------------------------------------------------------------
+     Core surfaces and text. These nine names predate P34 and are referenced
+     across the whole app — the values are tuned, the names are permanent.
+     ----------------------------------------------------------------------- */
+  --color-ink: #141a29; /* primary text, headings */
+  --color-ink-soft: #3d4964; /* body copy inside cards, table cells */
+  --color-muted: #6b7796; /* labels, captions, secondary text */
+  --color-muted-soft: #9aa5bf; /* placeholders, disabled text, icon rests */
+  --color-line: #e3e8f2; /* default hairline: borders and dividers */
+  --color-line-strong: #cfd7e6; /* a border that has to be seen, e.g. focus-adjacent */
+  --color-canvas: #f5f7fc; /* the page behind the cards */
+  --color-canvas-sunken: #eef1f8; /* a well inside a card: table head, code, track */
+  --color-surface: #ffffff; /* cards, sheets, menus */
+  --color-surface-hover: #f8fafd; /* row and menu-item hover */
+
+  /* -----------------------------------------------------------------------
+     Brand. `accent` is the mark's blue (`public/promoteros-mark.svg`) and
+     `action` its teal counterpoint; neither moves without moving the mark.
+     ----------------------------------------------------------------------- */
   --color-accent: #1646b8;
-  --color-accent-subtle: #e9effc;
-  --color-accent-subtle: #e9effc;
   --color-accent-hover: #103a99;
+  --color-accent-press: #0d2f7d;
+  --color-accent-subtle: #eaf0fe; /* tinted fill behind accent text */
+  --color-accent-line: #c6d6fa;
+  --color-accent-ink: #123a96; /* accent text on an accent-subtle fill */
+
   --color-action: #2ed3c6;
   --color-action-hover: #12afa3;
-  --color-ok: #147d55;
-  --color-warn: #c97609;
-  --color-bad: #c93535;
+  --color-action-subtle: #e2faf7;
+  --color-action-ink: #0a7d74;
+
+  /* -----------------------------------------------------------------------
+     Status. Each one is a triple — a saturated `base` for solid fills and
+     icons, a `subtle` tint for pill and banner backgrounds, and an `ink` dark
+     enough to clear AA on that tint. A status pill is never a saturated
+     block; it is `subtle` behind `ink`.
+     ----------------------------------------------------------------------- */
+  --color-ok: #0f7a52;
+  --color-ok-subtle: #e4f5ed;
+  --color-ok-line: #b6e0cd;
+  --color-ok-ink: #0a5c3e;
+
+  --color-warn: #b26a05;
+  --color-warn-subtle: #fdf1dc;
+  --color-warn-line: #f0d6a4;
+  --color-warn-ink: #8a5104;
+
+  --color-bad: #c0362f;
+  --color-bad-subtle: #fdeceb;
+  --color-bad-line: #f3c6c3;
+  --color-bad-ink: #96261f;
+
+  --color-neutral-subtle: #eef1f8;
+  --color-neutral-line: #dde3ee;
+  --color-neutral-ink: #57637f;
+
+  /* -----------------------------------------------------------------------
+     Radius. Generous at the card level, tight at the control level. These
+     override Tailwind's defaults, so every existing `rounded-lg` in the app
+     softens by a couple of pixels without any screen being edited.
+     ----------------------------------------------------------------------- */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1.125rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+
+  /* -----------------------------------------------------------------------
+     Elevation. The single biggest reason the pre-P34 UI read as a prototype
+     is that nothing had depth: one flat 1px border did all the work.
+
+     Every shadow here is layered — a tight contact shadow plus a wide, very
+     soft ambient one — and tinted with the ink hue rather than pure black,
+     which is what stops a shadow looking like grey smudge on a blue-grey
+     canvas.
+     ----------------------------------------------------------------------- */
+  --shadow-2xs: 0 1px 1px 0 rgb(20 26 41 / 0.04);
+  --shadow-xs: 0 1px 2px 0 rgb(20 26 41 / 0.05);
+  --shadow-sm:
+    0 1px 2px -1px rgb(20 26 41 / 0.08), 0 2px 6px -1px rgb(20 26 41 / 0.05);
+  --shadow-md:
+    0 2px 4px -2px rgb(20 26 41 / 0.07), 0 8px 18px -4px rgb(20 26 41 / 0.08);
+  --shadow-lg:
+    0 4px 8px -4px rgb(20 26 41 / 0.07), 0 18px 36px -8px rgb(20 26 41 / 0.11);
+  --shadow-xl:
+    0 8px 16px -8px rgb(20 26 41 / 0.08), 0 32px 60px -12px rgb(20 26 41 / 0.16);
+  --shadow-2xl: 0 44px 80px -16px rgb(20 26 41 / 0.24);
+
+  /* -----------------------------------------------------------------------
+     Type scale. Deliberate weights and tracking: tracking tightens as the
+     size grows (a 30px heading at default tracking is the clearest "nobody
+     chose this" tell), and the small sizes get a touch of positive tracking
+     so Greek uppercase labels stay legible.
+     ----------------------------------------------------------------------- */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-2xs--letter-spacing: 0.04em;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-xs--letter-spacing: 0.01em;
+
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-sm--letter-spacing: 0em;
+
+  --text-base: 1rem;
+  --text-base--line-height: 1.625rem;
+  --text-base--letter-spacing: -0.006em;
+
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-lg--letter-spacing: -0.012em;
+
+  --text-xl: 1.3125rem;
+  --text-xl--line-height: 1.875rem;
+  --text-xl--letter-spacing: -0.016em;
+
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-2xl--letter-spacing: -0.021em;
+
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.375rem;
+  --text-3xl--letter-spacing: -0.024em;
+
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.625rem;
+  --text-4xl--letter-spacing: -0.028em;
+
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.08;
+  --text-5xl--letter-spacing: -0.032em;
+
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1.05;
+  --text-6xl--letter-spacing: -0.034em;
+
+  /* Easing used by every hover/press transition, so motion feels like one hand. */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Non-Tailwind tokens. These are not part of a Tailwind namespace (there is no
+   `elevation-*` or `shell-*` utility), so they live on :root and are consumed
+   as `var(...)` inside arbitrary values or inline styles.
+   --------------------------------------------------------------------------- */
+:root {
+  /* Semantic elevation. Reach for these names, not raw shadow utilities, so a
+     card and a popover cannot drift apart across parcels. */
+  --elevation-flat: none;
+  --elevation-card: var(--shadow-sm);
+  --elevation-card-hover: var(--shadow-md);
+  --elevation-raised: var(--shadow-lg);
+  --elevation-overlay: var(--shadow-xl);
+
+  /* The focus ring, in one place. Every interactive element uses this. */
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-accent);
+
+  /* App shell geometry. `coordinator-nav.tsx` and `layout.tsx` share these so
+     the sidebar width and the content offset can never disagree. */
+  --shell-sidebar-w: 16rem;
+  --shell-topbar-h: 3.5rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 html,
 body {
   color: var(--color-ink);
   background: var(--color-canvas);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings carry their own weight and tracking so a page that writes a bare
+   <h2> still looks considered. */
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-ink);
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-ink);
+}
+
+/* A quieter scrollbar inside panes — Firefox and WebKit spellings both. */
+* {
+  scrollbar-color: var(--color-n-300) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-n-300);
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-n-400);
+}
+
+/* Respect the operating-system setting. Everything below still works, it just
+   stops moving. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  /* The standard focus ring, as a class, for anything the kit does not cover. */
+  .focus-ring:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  /* Skeleton shimmer. Declared here rather than in the component so the
+     keyframes exist once. */
+  .animate-shimmer {
+    background-image: linear-gradient(
+      90deg,
+      var(--color-n-100) 0%,
+      var(--color-n-50) 40%,
+      var(--color-n-100) 80%
+    );
+    background-size: 200% 100%;
+    animation: promoteros-shimmer 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes promoteros-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
 }

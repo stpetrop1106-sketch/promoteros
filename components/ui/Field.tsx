@@ -11,16 +11,32 @@ function describedBy(...ids: Array<string | undefined>): string | undefined {
   return list.length ? list.join(" ") : undefined;
 }
 
+/**
+ * The control chassis.
+ *
+ * Three P34 changes account for most of the difference. The fill is the faint
+ * sunken neutral rather than pure white, so an input reads as a slot cut into
+ * the card instead of a white rectangle on a white card — it turns white on
+ * focus, which is what makes focus feel like the field "opening". The focus
+ * state is a double box-shadow ring rather than an `outline`, matching Button,
+ * so a form's tab order looks like one system. And the border darkens on hover,
+ * which is the small signal that tells someone the thing is editable before
+ * they click it.
+ */
 const CONTROL_BASE =
-  "w-full rounded-lg border bg-[color:var(--color-surface)] px-3 text-sm text-[color:var(--color-ink)] " +
-  "outline-none transition placeholder:text-[color:var(--color-muted)] " +
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 " +
-  "focus-visible:outline-[color:var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full rounded-lg border bg-[color:var(--color-canvas-sunken)]/50 px-3.5 text-sm " +
+  "text-[color:var(--color-ink)] outline-none " +
+  "transition-[background-color,border-color,box-shadow] duration-150 ease-[var(--ease-out-soft)] " +
+  "placeholder:text-[color:var(--color-muted-soft)] " +
+  "hover:border-[color:var(--color-line-strong)] " +
+  "focus-visible:border-[color:var(--color-accent)] focus-visible:bg-[color:var(--color-surface)] " +
+  "focus-visible:shadow-[var(--focus-ring)] " +
+  "disabled:cursor-not-allowed disabled:bg-[color:var(--color-canvas-sunken)] disabled:opacity-55";
 
 function controlBorder(hasError: boolean) {
   return hasError
-    ? "border-[color:var(--color-bad)]"
-    : "border-[color:var(--color-line)]";
+    ? "border-[color:var(--color-bad)] bg-[color:var(--color-bad-subtle)]/40 hover:border-[color:var(--color-bad)]"
+    : "border-[color:var(--color-line-strong)]";
 }
 
 interface FieldShellProps {
@@ -40,7 +56,10 @@ function FieldShell({ id, label, hint, error, required, className, children }: F
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-sm font-medium text-[color:var(--color-ink)]">
+      <label
+        htmlFor={id}
+        className="text-sm font-medium leading-5 text-[color:var(--color-ink)]"
+      >
         {label}
         {required ? (
           <span aria-hidden="true" className="ml-0.5 text-[color:var(--color-bad)]">
@@ -50,13 +69,21 @@ function FieldShell({ id, label, hint, error, required, className, children }: F
       </label>
       {children}
       {hint && !error ? (
-        <p id={hintId} className="text-xs text-[color:var(--color-muted)]">
+        <p id={hintId} className="text-xs leading-5 text-[color:var(--color-muted)]">
           {hint}
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} role="alert" className="text-xs font-medium text-[color:var(--color-bad)]">
-          {error}
+        <p
+          id={errorId}
+          role="alert"
+          className="flex items-start gap-1.5 text-xs font-medium leading-5 text-[color:var(--color-bad-ink)]"
+        >
+          <span
+            aria-hidden="true"
+            className="mt-1 size-1.5 shrink-0 rounded-full bg-[color:var(--color-bad)]"
+          />
+          <span>{error}</span>
         </p>
       ) : null}
     </div>
@@ -93,7 +120,7 @@ export function TextField({
         required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(hintId, errorId)}
-        className={cn(CONTROL_BASE, "h-10", controlBorder(Boolean(error)), className)}
+        className={cn(CONTROL_BASE, "h-11", controlBorder(Boolean(error)), className)}
         {...rest}
       />
     </FieldShell>
@@ -115,6 +142,17 @@ export interface SelectFieldProps extends Omit<SelectHTMLAttributes<HTMLSelectEl
   placeholder?: string;
   containerClassName?: string;
 }
+
+/**
+ * The chevron, as a data URI background.
+ *
+ * A native select's own arrow is a different shape on every platform and is the
+ * single most obvious "unstyled form" tell. Drawing our own means the control
+ * matches the icon set — and it is inlined here rather than pulled from a file
+ * so it costs no request and cannot 404.
+ */
+const SELECT_CHEVRON =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7796' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 9.5 12 16l6.5-6.5'/%3E%3C/svg%3E\")";
 
 /** Native <select>, labelled and described for assistive tech. */
 export function SelectField({
@@ -139,7 +177,18 @@ export function SelectField({
         required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(hintId, errorId)}
-        className={cn(CONTROL_BASE, "h-10", controlBorder(Boolean(error)), className)}
+        style={{
+          backgroundImage: SELECT_CHEVRON,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "right 0.75rem center",
+          backgroundSize: "1.25rem 1.25rem",
+        }}
+        className={cn(
+          CONTROL_BASE,
+          "h-11 cursor-pointer appearance-none pr-10",
+          controlBorder(Boolean(error)),
+          className,
+        )}
         {...rest}
       >
         {placeholder ? (
@@ -188,7 +237,12 @@ export function TextArea({
         required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(hintId, errorId)}
-        className={cn(CONTROL_BASE, "py-2 leading-6", controlBorder(Boolean(error)), className)}
+        className={cn(
+          CONTROL_BASE,
+          "resize-y py-2.5 leading-6",
+          controlBorder(Boolean(error)),
+          className,
+        )}
         {...rest}
       />
     </FieldShell>

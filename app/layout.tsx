@@ -1,10 +1,30 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import { authState } from "@/lib/auth";
 import { getEntitlement } from "@/lib/billing/subscription";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { GlobalBillingBanner } from "./onboarding/global-billing-banner";
-import { CoordinatorNav } from "@/components/coordinator-nav";
+import { AppShell } from "@/components/coordinator-nav";
 import "./globals.css";
+
+/**
+ * The typeface.
+ *
+ * `subsets` lists `greek` explicitly, and that is the point: `next/font/google`
+ * fails the **build** when a requested subset does not exist for a family, so
+ * Greek coverage is verified by CI rather than by somebody squinting at a
+ * screenshot. A font that silently falls back for Greek — which most of the
+ * fashionable ones do — would look worse than the system stack on the primary
+ * market's own language.
+ *
+ * `display: "swap"` means a promoter on a bad 4G connection reads the shift
+ * details in the fallback face immediately rather than staring at nothing.
+ */
+const inter = Inter({
+  subsets: ["latin", "latin-ext", "greek"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -81,18 +101,33 @@ export default async function RootLayout({
   const { signedIn, entitlement } = await loadShell();
 
   return (
-    <html lang={DEFAULT_LOCALE}>
+    <html lang={DEFAULT_LOCALE} className={inter.variable}>
       <body className="min-h-screen antialiased">
-        <CoordinatorNav signedIn={signedIn} />
-        {entitlement ? (
-          <GlobalBillingBanner
-            notice={entitlement.notice}
-            access={entitlement.access}
-            graceDaysRemaining={entitlement.graceDaysRemaining}
-            trialDaysRemaining={entitlement.trialDaysRemaining}
-          />
-        ) : null}
-        {children}
+        {/*
+         * `AppShell` replaced the bare `<CoordinatorNav>` in P34. It renders the same navigation
+         * under the same `signedIn` guard, and additionally owns the content offset for the fixed
+         * sidebar — which has to be applied from out here, because every coordinator page renders
+         * its own `<main className="mx-auto …">` and those pages belong to other lanes.
+         *
+         * On a public page, a promoter's token page or for a signed-out visitor it renders its
+         * children and nothing else, so the landing page, `/login` and `/i/[token]` keep exactly
+         * the markup they had.
+         *
+         * The banner goes *inside* the shell so it lands in the content column rather than under
+         * the sidebar. Nothing about `loadShell()` above changed: it is still the fail-safe that
+         * keeps a billing lookup from taking down the marketing page.
+         */}
+        <AppShell signedIn={signedIn}>
+          {entitlement ? (
+            <GlobalBillingBanner
+              notice={entitlement.notice}
+              access={entitlement.access}
+              graceDaysRemaining={entitlement.graceDaysRemaining}
+              trialDaysRemaining={entitlement.trialDaysRemaining}
+            />
+          ) : null}
+          {children}
+        </AppShell>
       </body>
     </html>
   );
