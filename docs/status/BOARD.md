@@ -39,12 +39,7 @@ not accepted on the agent's word. No agent ever set its own status to `done`.
 
 ## In flight
 
-| Parcel | Title | Model | Owns |
-|---|---|---|---|
-| **P34** | Visual design system — mobile pass + `docs/design.md` | Opus | `app/globals.css`, `components/ui/**`, `components/coordinator-nav.tsx`, `app/layout.tsx` |
-
-Their file sets are disjoint. Both append to the i18n dictionaries and were told to re-read
-immediately before editing. Concurrency stays capped at two (see I3).
+Nothing. P5, P31, P34, P35, P35b and P35c are all `in_review` and verified by the manager.
 
 ## Queued
 
@@ -128,3 +123,16 @@ compile. The manager repaired it, committed the finished half deliberately at th
 and split the remainder into two smaller parcels with disjoint file sets — smaller parcels lose
 less when they are killed. `components/ui` was frozen for both, since two agents adding components
 means two agents editing one `index.ts`.
+
+---
+
+## Production
+
+`main` is at `1acfa5a`, fast-forwarded from `develop` on 2026-09-12. Vercel builds `main` on push.
+
+**A correction worth keeping.** While `git push` was hanging on the credential helper, the manager
+read `origin/develop` missing from the local refs and concluded the branch had never reached
+GitHub. It had — `bc6d060` was already there. The remote-tracking ref was absent only because no
+fetch had ever succeeded against this clone. **An absent local ref says nothing about the remote**;
+the push itself reported `bc6d060..1acfa5a`, which is what settled it. Same family of error as I6:
+reading a conclusion off a signal that could not carry it.
