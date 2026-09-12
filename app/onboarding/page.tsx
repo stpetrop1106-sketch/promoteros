@@ -5,13 +5,13 @@ import { loadOnboardingProgress, PROMOTER_TARGET, type OnboardingStep } from "@/
 import { loadAgencyIdentity, identityComplete } from "@/lib/agency-settings";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { PageHeader, Card, Button, Badge } from "@/components/ui";
+import { PageHeader, Card, Button, LinkButton, Badge, Icon, SectionHeading } from "@/components/ui";
 import { signOut } from "@/app/login/actions";
 import { AgencyForm } from "./agency-form";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "PromoterOS" };
+export const metadata: Metadata = { title: translatorFor(DEFAULT_LOCALE)("page_title.onboarding") };
 
 const t = translatorFor(DEFAULT_LOCALE);
 
@@ -43,28 +43,24 @@ const STEP_CTA: Record<OnboardingStep["id"], TranslationKey> = {
 
 function StepRow({ step, index }: { step: OnboardingStep; index: number }) {
   return (
-    <li className="flex flex-col gap-3 border-t border-[color:var(--color-line)] py-5 first:border-t-0 first:pt-0 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex gap-3">
+    <li className="flex flex-col gap-3 px-5 py-5 first:pt-4 last:pb-4 sm:flex-row sm:items-start sm:justify-between sm:px-6">
+      <div className="flex gap-3.5">
         <span
           aria-hidden="true"
           className={
-            "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold " +
+            "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ring-1 ring-inset " +
             (step.done
-              ? "bg-[color:var(--color-ok)] text-white"
-              : "border border-[color:var(--color-line)] text-[color:var(--color-muted)]")
+              ? "bg-[color:var(--color-ok)] text-white ring-[color:var(--color-ok)]"
+              : "bg-[color:var(--color-canvas-sunken)] text-[color:var(--color-muted)] ring-[color:var(--color-line)]")
           }
         >
-          {step.done ? "✓" : index + 1}
+          {step.done ? <Icon name="check" size={14} strokeWidth={2.25} /> : index + 1}
         </span>
-        <div>
+        <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-[color:var(--color-ink)]">
             {t(STEP_TITLE[step.id])}
             {step.optional ? <Badge variant="neutral">{t("onboarding.step.optional")}</Badge> : null}
-            {step.done ? (
-              <span className="text-xs font-medium text-[color:var(--color-ok)]">
-                {t("onboarding.step.done")}
-              </span>
-            ) : null}
+            {step.done ? <Badge variant="ok">{t("onboarding.step.done")}</Badge> : null}
           </p>
           <p className="mt-1 max-w-prose text-sm leading-6 text-[color:var(--color-muted)]">
             {t(STEP_WHY[step.id])}
@@ -74,12 +70,10 @@ function StepRow({ step, index }: { step: OnboardingStep; index: number }) {
           </p>
         </div>
       </div>
-      <div className="shrink-0 sm:pl-4">
-        <Link href={step.href}>
-          <Button variant={step.done ? "ghost" : "secondary"} size="sm">
-            {t(STEP_CTA[step.id])}
-          </Button>
-        </Link>
+      <div className="shrink-0 pl-10 sm:pl-4">
+        <LinkButton href={step.href} variant={step.done ? "ghost" : "secondary"} size="sm">
+          {t(STEP_CTA[step.id])}
+        </LinkButton>
       </div>
     </li>
   );
@@ -97,12 +91,10 @@ export default async function OnboardingPage() {
 
   if (!state.ok && state.reason === "anonymous") {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
+      <main className="mx-auto max-w-md px-6 py-16">
         <PageHeader title={t("onboarding.signin.title")} subtitle={t("onboarding.signin.body")} />
-        <div className="mt-6">
-          <Link href="/login?next=%2Fonboarding">
-            <Button>{t("onboarding.signin.cta")}</Button>
-          </Link>
+        <div className="mt-8">
+          <LinkButton href="/login?next=%2Fonboarding">{t("onboarding.signin.cta")}</LinkButton>
         </div>
       </main>
     );
@@ -118,12 +110,12 @@ export default async function OnboardingPage() {
     // (P22's `enforcement.suspended.*` keys) so the product never says two different things about
     // one suspension, and give a real way out per commercial-architecture.md §6 ("no dead ends").
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
+      <main className="mx-auto max-w-md px-6 py-16">
         <PageHeader
           title={t("enforcement.suspended.title")}
           subtitle={t("enforcement.suspended.body")}
         />
-        <div className="mt-6">
+        <div className="mt-8">
           <form action={signOut}>
             <Button type="submit" variant="secondary">
               {t("enforcement.suspended.signout")}
@@ -145,15 +137,15 @@ export default async function OnboardingPage() {
       (user?.user_metadata?.full_name as string | undefined) ?? undefined;
 
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
+      <main className="mx-auto max-w-md px-6 py-16">
         <PageHeader
           title={t("onboarding.create.title")}
           subtitle={t("onboarding.create.subtitle")}
         />
-        <Card className="mt-6">
+        <Card className="mt-8" elevation="raised">
           <AgencyForm suggestedName={suggestedName} />
         </Card>
-        <p className="mt-4 text-xs text-[color:var(--color-muted)]">
+        <p className="mt-4 text-center text-xs text-[color:var(--color-muted)]">
           {t("onboarding.create.invited_instead")}
         </p>
       </main>
@@ -187,68 +179,73 @@ export default async function OnboardingPage() {
         title={t("onboarding.title")}
         subtitle={t("onboarding.subtitle", { agency: agencyName })}
         actions={
-          <Link href="/shifts">
-            <Button variant="ghost" size="sm">
-              {t("onboarding.skip_all")}
-            </Button>
-          </Link>
+          <LinkButton href="/shifts" variant="ghost" size="sm">
+            {t("onboarding.skip_all")}
+          </LinkButton>
         }
-      />
-
-      <p className="mt-2 text-sm text-[color:var(--color-muted)]">
-        {t("onboarding.progress", { done: doneCount, total: totalCount })}
-        {trialEndsAt ? ` · ${t("onboarding.trial_ends", { date: formatDate(trialEndsAt) })}` : ""}
-      </p>
-
-      <Card className="mt-6">
-        <ol className="flex flex-col">
-          {progress.steps.map((step, index) => (
-            <StepRow key={step.id} step={step} index={index} />
-          ))}
-        </ol>
-      </Card>
-
-      {/* The aha moment. Everything above exists to make this link real. */}
-      <Card className="mt-6">
-        <h2 className="text-base font-semibold text-[color:var(--color-ink)]">
-          {t("onboarding.aha.title")}
-        </h2>
-        <p className="mt-1 max-w-prose text-sm leading-6 text-[color:var(--color-muted)]">
-          {progress.rankingReady
-            ? t("onboarding.aha.body")
-            : t("onboarding.aha.locked", { count: PROMOTER_TARGET })}
+      >
+        <p className="text-sm text-[color:var(--color-muted)]">
+          {t("onboarding.progress", { done: doneCount, total: totalCount })}
+          {trialEndsAt ? ` · ${t("onboarding.trial_ends", { date: formatDate(trialEndsAt) })}` : ""}
         </p>
-        <div className="mt-4">
-          {progress.rankingReady && progress.firstShiftId ? (
-            <Link href={`/shifts/${progress.firstShiftId}`}>
-              <Button>{t("onboarding.aha.cta")}</Button>
-            </Link>
-          ) : (
-            <Link href={progress.campaignCount >= 1 ? "/campaigns" : "/campaigns/new"}>
-              <Button variant="secondary">{t("onboarding.aha.locked_cta")}</Button>
-            </Link>
-          )}
-        </div>
-      </Card>
+      </PageHeader>
 
-      {identityMissing ? (
-        <Card className="mt-6">
-          <h2 className="text-base font-semibold text-[color:var(--color-ink)]">
-            {t("onboarding.identity.title")}
-          </h2>
-          <p className="mt-1 max-w-prose text-sm leading-6 text-[color:var(--color-muted)]">
-            {t("onboarding.identity.body")}
-          </p>
-          <div className="mt-4">
-            <Link href="/settings/agency">
-              <Button variant="secondary">{t("onboarding.identity.cta")}</Button>
-            </Link>
+      <div className="mt-8 flex flex-col gap-6">
+        <Card flush>
+          <ol className="flex flex-col divide-y divide-[color:var(--color-line)]">
+            {progress.steps.map((step, index) => (
+              <StepRow key={step.id} step={step} index={index} />
+            ))}
+          </ol>
+        </Card>
+
+        {/* The aha moment. Everything above exists to make this link real — the one card the
+            page is about, so it gets the raised elevation and the accent-tinted icon chip
+            `docs/design.md` reserves for that. */}
+        <Card elevation="raised">
+          <div className="flex items-start gap-3.5">
+            <span
+              aria-hidden="true"
+              className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-accent-subtle)] text-[color:var(--color-accent-ink)]"
+            >
+              <Icon name="spark" size={20} />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold text-[color:var(--color-ink)]">{t("onboarding.aha.title")}</h2>
+              <p className="mt-1 max-w-prose text-sm leading-6 text-[color:var(--color-muted)]">
+                {progress.rankingReady
+                  ? t("onboarding.aha.body")
+                  : t("onboarding.aha.locked", { count: PROMOTER_TARGET })}
+              </p>
+              <div className="mt-4">
+                {progress.rankingReady && progress.firstShiftId ? (
+                  <LinkButton href={`/shifts/${progress.firstShiftId}`}>{t("onboarding.aha.cta")}</LinkButton>
+                ) : (
+                  <LinkButton href={progress.campaignCount >= 1 ? "/campaigns" : "/campaigns/new"} variant="secondary">
+                    {t("onboarding.aha.locked_cta")}
+                  </LinkButton>
+                )}
+              </div>
+            </div>
           </div>
         </Card>
-      ) : null}
+
+        {identityMissing ? (
+          <Card header={<SectionHeading level={3} title={t("onboarding.identity.title")} />}>
+            <p className="max-w-prose text-sm leading-6 text-[color:var(--color-muted)]">
+              {t("onboarding.identity.body")}
+            </p>
+            <div className="mt-4">
+              <LinkButton href="/settings/agency" variant="secondary">
+                {t("onboarding.identity.cta")}
+              </LinkButton>
+            </div>
+          </Card>
+        ) : null}
+      </div>
 
       <p className="mt-6 text-sm text-[color:var(--color-muted)]">
-        <Link href="/settings" className="font-medium text-[color:var(--color-accent)] hover:underline">
+        <Link href="/settings" className="font-medium text-[color:var(--color-accent)] underline-offset-2 hover:underline">
           {t("onboarding.settings_link")}
         </Link>
       </p>

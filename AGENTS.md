@@ -67,6 +67,17 @@ So:
   See `lib/team-shared.ts`, `lib/admin/plans.ts`.
 - **Re-exporting does not help.** A re-export is still an export.
 
+**A function is not a prop.** A server component may not pass a function to a client component —
+props cross that boundary by serialisation. The translator is the one everybody reaches for:
+`<BriefForm t={t} />` builds perfectly and then throws on every single load. It sat in
+`/campaigns/[id]/brief` from P3b until P35b found it, because nothing in CI opens a page. A client
+component resolves its own `t` with `translatorFor(DEFAULT_LOCALE)`; see
+`app/campaigns/[id]/brief/brief-form.tsx`. Passing `t` to another *server* component is fine —
+the boundary is what matters, not the prop name.
+
+**`npm run build` does not catch that one either.** It is a runtime error, so the only thing that
+finds it is opening the page. Open the screens you built.
+
 **`npm run dev` does not catch any of this. Run `npm run build` before claiming a parcel is done.**
 
 ## Conventions

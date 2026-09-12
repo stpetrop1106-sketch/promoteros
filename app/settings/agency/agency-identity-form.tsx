@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button, TextField } from "@/components/ui";
+import { Button, TextField, Icon } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import type { AgencyIdentityErrorCode } from "@/lib/agency-settings";
 import { saveAgencyIdentity } from "./actions";
@@ -28,11 +28,17 @@ const ERROR_KEYS: Record<AgencyIdentityErrorCode, TranslationKey> = {
   unknown: "agency_settings.errors.unknown",
 };
 
+/** Same subtle/line/ink triple every other form-level banner in this parcel uses — see
+ * `app/promoters/promoter-form.tsx`'s `Banner`. Local because `components/ui/**` is frozen. */
 function ErrorNote({ code }: { code: AgencyIdentityErrorCode }) {
   return (
-    <p role="alert" className="text-xs font-medium text-[color:var(--color-bad)]">
-      {t(ERROR_KEYS[code] ?? "agency_settings.errors.unknown")}
-    </p>
+    <div
+      role="alert"
+      className="flex items-start gap-2.5 rounded-xl border border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] px-4 py-3 text-sm font-medium leading-5 text-[color:var(--color-bad-ink)]"
+    >
+      <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
+      <span>{t(ERROR_KEYS[code] ?? "agency_settings.errors.unknown")}</span>
+    </div>
   );
 }
 
@@ -117,12 +123,14 @@ export function AgencyIdentityForm({
         required
         containerClassName="max-w-xs"
       />
-      <p className="-mt-3 text-xs text-[color:var(--color-muted)]">
-        {t("agency_settings.form.retention.reasoning")}
-      </p>
-      <p className="text-xs text-[color:var(--color-muted)]">
-        {t("agency_settings.form.retention.not_advice")}
-      </p>
+      <div className="-mt-2 flex flex-col gap-1">
+        <p className="text-xs leading-5 text-[color:var(--color-muted)]">
+          {t("agency_settings.form.retention.reasoning")}
+        </p>
+        <p className="text-xs leading-5 text-[color:var(--color-muted)]">
+          {t("agency_settings.form.retention.not_advice")}
+        </p>
+      </div>
 
       {state.status === "error" &&
       state.code !== "legal_name_required" &&
@@ -135,12 +143,16 @@ export function AgencyIdentityForm({
       ) : null}
 
       {state.status === "saved" ? (
-        <p className="text-sm font-medium text-[color:var(--color-ok)]">
+        <div
+          role="status"
+          className="flex items-center gap-2.5 rounded-xl border border-[color:var(--color-ok-line)] bg-[color:var(--color-ok-subtle)] px-4 py-3 text-sm font-medium leading-5 text-[color:var(--color-ok-ink)]"
+        >
+          <Icon name="check" size={18} className="shrink-0" />
           {t("agency_settings.form.saved")}
-        </p>
+        </div>
       ) : null}
 
-      <div>
+      <div className="border-t border-[color:var(--color-line)] pt-6">
         <Submit />
       </div>
     </form>

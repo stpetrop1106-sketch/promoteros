@@ -2,18 +2,15 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { Button, Icon } from "@/components/ui";
 import { invite, type InviteState } from "./actions";
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="mt-2 rounded border border-[color:var(--color-line)] px-3 py-1 text-sm hover:bg-white disabled:opacity-50"
-    >
+    <Button type="submit" variant="secondary" size="sm" loading={pending}>
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -36,30 +33,37 @@ export function InviteButton({
   // what they do today. Showing the exact text is the feature, not a fallback apology.
   if (state.status === "manual" && state.manualBody) {
     return (
-      <div className="mt-2 w-64 text-left">
+      <div className="w-64 text-left">
         <textarea
           readOnly
           value={state.manualBody}
           rows={5}
-          className="w-full rounded border border-[color:var(--color-line)] bg-white p-2 text-xs"
+          className="w-full rounded-lg border border-[color:var(--color-line-strong)] bg-[color:var(--color-surface)] p-2.5 text-xs leading-5 text-[color:var(--color-ink-soft)] shadow-[var(--shadow-2xs)]"
         />
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-1.5"
+          iconLeft={<Icon name="check" size={14} />}
           onClick={() => navigator.clipboard.writeText(state.manualBody ?? "")}
-          className="mt-1 rounded border border-[color:var(--color-line)] px-2 py-1 text-xs hover:bg-white"
         >
           {copyLabel}
-        </button>
+        </Button>
       </div>
     );
   }
 
   if (state.status === "sent") {
-    return <p className="mt-2 text-xs text-[color:var(--color-ok)]">✓</p>;
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--color-ok-ink)]">
+        <Icon name="check" size={14} />
+      </span>
+    );
   }
 
   if (state.status === "error") {
-    return <p className="mt-2 text-xs text-[color:var(--color-bad)]">{state.reason}</p>;
+    return <p className="text-xs text-[color:var(--color-bad-ink)]">{state.reason}</p>;
   }
 
   return (

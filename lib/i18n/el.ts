@@ -1478,4 +1478,21 @@ export const el = {
     "Θα σβηστούν και οι δεκατέσσερις μέρες. Δεν γίνεται αναίρεση.",
   "promoters.availability.bulk.clear_all_warning_self":
     "Προσοχή: κάποιες από αυτές τις μέρες τις δήλωσε η ίδια η promoter. Θα σβηστούν κι αυτές, χωρίς αναίρεση.",
+
+  /* --- P35b: the detail screens — badges for a raw assignment status, never printed verbatim --- */
+  "promoters.profile.assignment_status.confirmed": "Επιβεβαιωμένη",
+  "promoters.profile.assignment_status.completed": "Ολοκληρωμένη",
+  "promoters.profile.assignment_status.cancelled": "Ακυρωμένη",
+  "promoters.profile.assignment_status.no_show": "Μη προσέλευση",
+
+  /* --- P35c: forms and settings craft pass — no field/behaviour change, composition only --- */
+  "promoters.new.back": "← Promoters",
+  "campaigns.new.section_details": "Στοιχεία καμπάνιας",
+
+  "page_title.settings": "Ρυθμίσεις",
+  "page_title.settings_team": "Ομάδα",
+  "page_title.settings_agency": "Στοιχεία γραφείου",
+  "page_title.settings_billing": "Συνδρομή",
+  "page_title.onboarding": "Καλωσόρισες",
+  "page_title.onboarding_join": "Πρόσκληση",
 } as const;

@@ -1,6 +1,8 @@
 import {
+  Avatar,
   Badge,
   EmptyState,
+  Icon,
   Table,
   TableHead,
   TableBody,
@@ -77,6 +79,7 @@ export function StatusBoard({ shiftId, rows, t }: { shiftId: string; rows: Board
   if (rows.length === 0) {
     return (
       <EmptyState
+        icon={<Icon name="users" size={24} />}
         title={t("shifts.board.none_title")}
         description={t("shifts.board.none_description")}
       />
@@ -84,27 +87,32 @@ export function StatusBoard({ shiftId, rows, t }: { shiftId: string; rows: Board
   }
 
   return (
-    <Table>
+    <Table label={t("shifts.board.title")} layout="fluid">
       <TableHead>
         <TableRow>
           <TableHeaderCell>{t("shifts.board.column.promoter")}</TableHeaderCell>
           <TableHeaderCell>{t("shifts.board.column.state")}</TableHeaderCell>
           <TableHeaderCell>{t("shifts.board.column.detail")}</TableHeaderCell>
-          <TableHeaderCell>{t("shifts.board.column.actions")}</TableHeaderCell>
+          <TableHeaderCell className="text-right">{t("shifts.board.column.actions")}</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.assignmentId ?? row.promoterId}>
-            <TableCell className="font-medium">{row.fullName}</TableCell>
+            <TableCell className="font-medium text-[color:var(--color-ink)]">
+              <div className="flex items-center gap-2.5">
+                <Avatar name={row.fullName} size="sm" />
+                {row.fullName}
+              </div>
+            </TableCell>
             <TableCell>
-              <Badge variant={badgeVariant(row)}>{t(STATE_KEY[row.state])}</Badge>
+              <Badge variant={badgeVariant(row)} dot>{t(STATE_KEY[row.state])}</Badge>
             </TableCell>
             <TableCell>
               <DetailLines row={row} t={t} />
             </TableCell>
-            <TableCell>
-              <div className="flex flex-col gap-2">
+            <TableCell className="text-right">
+              <div className="flex flex-col items-end gap-2">
                 {row.markableNoShow && row.assignmentId ? (
                   <MarkNoShowButton
                     shiftId={shiftId}

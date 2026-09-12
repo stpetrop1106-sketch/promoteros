@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { matchPromoters } from "@/lib/matching";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { Badge, PageHeader } from "@/components/ui";
+import { Badge, Icon, PageHeader, Section } from "@/components/ui";
 import { buildBoard, summariseCoverage, type RawAssignment, type RawCheckIn, type RawInvitation } from "./board";
 import { StatusBoard } from "./status-board";
 import { ReplacementPanel } from "./replacement-panel";
@@ -11,6 +12,16 @@ import { ReplacementPanel } from "./replacement-panel";
 export const dynamic = "force-dynamic";
 
 type PromoterRef = { full_name: string } | null;
+
+/**
+ * "YYYY-MM-DD" → "09/09/2026", rebuilt from its own parts — same reasoning as `app/shifts/page.tsx`
+ * and `app/dashboard/page.tsx`: never through a `Date`, which parses a bare date string as UTC
+ * midnight and prints the previous day west of Greenwich.
+ */
+function formatDateString(onDate: string): string {
+  const [y, m, d] = onDate.split("-");
+  return `${d}/${m}/${y}`;
+}
 
 export default async function ShiftDetailPage({
   params,
@@ -104,32 +115,44 @@ export default async function ShiftDetailPage({
   const replacementCandidates = coverage.coverageMet ? [] : await matchPromoters(id, 3);
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <PageHeader
-        title={campaign?.name ?? "—"}
-        subtitle={`${store?.name ?? ""} · ${shift.on_date} · ${startTime}–${endTime}`}
-        actions={
-          <Badge variant={coverage.coverageMet ? "ok" : "warn"}>
-            {t("shifts.coverage.filled", {
-              filled: coverage.confirmedCount,
-              required: coverage.requiredCount,
-            })}
-          </Badge>
-        }
-      />
+    <main className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
+      <div className="flex flex-col gap-8">
+        <PageHeader
+          eyebrow={
+            <Link
+              href="/shifts"
+              className="inline-flex items-center gap-1 rounded-sm hover:text-[color:var(--color-ink)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            >
+              <Icon name="chevronLeft" size={14} />
+              {t("shifts.title")}
+            </Link>
+          }
+          icon={<Icon name="calendar" size={20} />}
+          title={campaign?.name ?? "—"}
+          subtitle={`${store?.name ?? "—"} · ${formatDateString(shift.on_date)} · ${startTime}–${endTime}`}
+          actions={
+            <Badge variant={coverage.coverageMet ? "ok" : "warn"} dot size="md">
+              {t("shifts.coverage.filled", {
+                filled: coverage.confirmedCount,
+                required: coverage.requiredCount,
+              })}
+            </Badge>
+          }
+        />
 
-      <section className="mt-8">
-        <h2 className="text-base font-medium">{t("shifts.board.title")}</h2>
-        <div className="mt-3">
+        <Section title={t("shifts.board.title")} meta={boardRows.length > 0 ? boardRows.length : undefined}>
           <StatusBoard shiftId={id} rows={boardRows} t={t} />
-        </div>
-      </section>
+        </Section>
 
-      {!coverage.coverageMet ? (
-        <ReplacementPanel shiftId={id} coverage={coverage} candidates={replacementCandidates} t={t} />
-      ) : (
-        <p className="mt-6 text-sm text-[color:var(--color-muted)]">{t("shifts.coverage.full")}</p>
-      )}
+        {!coverage.coverageMet ? (
+          <ReplacementPanel shiftId={id} coverage={coverage} candidates={replacementCandidates} t={t} />
+        ) : (
+          <p className="flex items-center gap-2 rounded-2xl border border-[color:var(--color-ok-line)] bg-[color:var(--color-ok-subtle)] px-4 py-3.5 text-sm font-medium text-[color:var(--color-ok-ink)]">
+            <Icon name="check" size={18} />
+            {t("shifts.coverage.full")}
+          </p>
+        )}
+      </div>
     </main>
   );
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button } from "@/components/ui";
+import { Button, Icon } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { acceptInvitation } from "./actions";
 import { ACCEPT_IDLE, type AcceptState } from "./state";
@@ -51,15 +51,15 @@ export function AcceptForm({ token }: { token: string }) {
       {state.status === "error" ? (
         <div
           role="alert"
-          className="rounded-lg border border-[color:var(--color-bad)] bg-[color:var(--color-bad)]/10 px-4 py-3 text-sm text-[color:var(--color-ink)]"
+          className="flex items-start gap-2.5 rounded-xl border border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] px-4 py-3 text-sm leading-5 text-[color:var(--color-bad-ink)]"
         >
-          <p>{errorKey ? t(errorKey) : t("team.errors.unknown")}</p>
-          <Link
-            href="/onboarding"
-            className="mt-1 inline-block font-medium text-[color:var(--color-accent)] hover:underline"
-          >
-            {t("onboarding.join.error_way_out")}
-          </Link>
+          <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
+          <div>
+            <p className="font-medium">{errorKey ? t(errorKey) : t("team.errors.unknown")}</p>
+            <Link href="/onboarding" className="mt-1 inline-block font-semibold underline hover:no-underline">
+              {t("onboarding.join.error_way_out")}
+            </Link>
+          </div>
         </div>
       ) : null}
 

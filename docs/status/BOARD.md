@@ -111,3 +111,20 @@ manager tested `/i/<invalid-token>`, got 200, and concluded the service key was 
 `verifyToken` rejects before the database client is ever constructed, so the test never reached the
 code under suspicion. **A negative path that short-circuits proves nothing about the positive path.**
 The real fix needed a valid token.
+
+**I7 — a screen that had never once been opened.** `/campaigns/[id]/brief` passed the translator
+function as a prop into a `"use client"` component. Props cross that boundary by serialisation, so
+a function cannot make the trip: the page threw on every load. It typechecked, it built, it passed
+every test, and it had been that way since P3b. P35b found it by opening the screen.
+
+The lesson is not the bug, it is the gap it exposes: **this project verifies by building, and a
+build cannot open a page.** Six parcels were accepted on `tsc` + tests + `npm run build`, and that
+triplet is blind to an entire class of runtime failure. The rule is now in `CLAUDE.md` next to the
+`"use server"` one, and agents are told to open what they built.
+
+**I8 — the session limit took a sixth parcel.** P35 died mid-edit with a JSX comment block left in
+an expression position, which is a syntax error rather than a logic error, so the tree would not
+compile. The manager repaired it, committed the finished half deliberately at the half-way point,
+and split the remainder into two smaller parcels with disjoint file sets — smaller parcels lose
+less when they are killed. `components/ui` was frozen for both, since two agents adding components
+means two agents editing one `index.ts`.

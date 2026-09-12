@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { PageHeader } from "@/components/ui";
+import { PageHeader, Card, LinkButton } from "@/components/ui";
 import { ShiftSeriesForm } from "./shift-series-form";
 
 export const dynamic = "force-dynamic";
@@ -31,20 +30,20 @@ export default async function NewShiftsPage({ params }: { params: Promise<{ id: 
   }));
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
-      <Link href={`/campaigns/${id}`} className="text-sm text-[color:var(--color-accent)] hover:underline">
-        {t("campaigns.shifts_new.back")}
-      </Link>
-
+    <main className="mx-auto max-w-4xl px-6 py-12">
       <PageHeader
-        className="mt-4"
         title={t("campaigns.shifts_new.title")}
         subtitle={t("campaigns.shifts_new.subtitle", { campaign: campaign.name })}
+        actions={
+          <LinkButton href={`/campaigns/${id}`} variant="ghost" size="sm">
+            {t("campaigns.shifts_new.back")}
+          </LinkButton>
+        }
       />
 
-      <div className="mt-8">
-        <ShiftSeriesForm t={t} campaignId={id} stores={storeOptions} />
-      </div>
+      <Card className="mt-8" elevation="raised">
+        <ShiftSeriesForm campaignId={id} stores={storeOptions} />
+      </Card>
     </main>
   );
 }

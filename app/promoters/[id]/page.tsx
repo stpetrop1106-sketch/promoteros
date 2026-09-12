@@ -2,8 +2,23 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
-import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { PageHeader, Card, Badge, ScoreBar, Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from "@/components/ui";
+import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
+import {
+  PageHeader,
+  Card,
+  Badge,
+  DetailList,
+  Detail,
+  EmptyState,
+  Icon,
+  ScoreBar,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+} from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
 import { LinkButton } from "../link-button";
 import { AvailabilityLink } from "./availability-link";
@@ -57,6 +72,21 @@ const STATUS_BADGE: Record<PromoterStatus, BadgeVariant> = {
   blocklisted: "bad",
 };
 
+/** Raw `assignments.status` values, badged rather than printed verbatim — see docs/status/P35b.md. */
+const ASSIGNMENT_STATUS_BADGE: Record<string, BadgeVariant> = {
+  confirmed: "ok",
+  completed: "neutral",
+  cancelled: "bad",
+  no_show: "bad",
+};
+
+const ASSIGNMENT_STATUS_KEY: Record<string, TranslationKey> = {
+  confirmed: "promoters.profile.assignment_status.confirmed",
+  completed: "promoters.profile.assignment_status.completed",
+  cancelled: "promoters.profile.assignment_status.cancelled",
+  no_show: "promoters.profile.assignment_status.no_show",
+};
+
 export default async function PromoterProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const t = translatorFor(DEFAULT_LOCALE);
@@ -103,194 +133,236 @@ export default async function PromoterProfilePage({ params }: { params: Promise<
   const missingCoords = p.home_lat == null || p.home_lng == null;
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <PageHeader
-        title={p.full_name}
-        subtitle={`${p.phone}`}
-        actions={
-          <>
-            <LinkButton href={`/promoters/${p.id}/edit`} variant="secondary">
-              {t("promoters.profile.edit_button")}
-            </LinkButton>
-            <LinkButton href={`/promoters/${p.id}/availability`} variant="secondary">
-              {t("promoters.profile.availability_button")}
-            </LinkButton>
-          </>
-        }
-      />
+    <main className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
+      <div className="flex flex-col gap-8">
+        <PageHeader
+          eyebrow={
+            <Link
+              href="/promoters"
+              className="inline-flex items-center gap-1 rounded-sm hover:text-[color:var(--color-ink)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            >
+              <Icon name="chevronLeft" size={14} />
+              {t("nav.promoters")}
+            </Link>
+          }
+          title={p.full_name}
+          subtitle={p.phone}
+          actions={
+            <>
+              <LinkButton href={`/promoters/${p.id}/edit`} variant="secondary">
+                {t("promoters.profile.edit_button")}
+              </LinkButton>
+              <LinkButton href={`/promoters/${p.id}/availability`} variant="secondary">
+                {t("promoters.profile.availability_button")}
+              </LinkButton>
+            </>
+          }
+        />
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Badge variant={STATUS_BADGE[p.status]}>{t(`promoters.status.${p.status}`)}</Badge>
-      </div>
+        {missingCoords ? (
+          <p className="flex items-start gap-2 rounded-2xl border border-[color:var(--color-warn-line)] bg-[color:var(--color-warn-subtle)] px-4 py-3.5 text-sm text-[color:var(--color-warn-ink)]">
+            <Icon name="alert" size={18} className="mt-px shrink-0 text-[color:var(--color-warn)]" />
+            <span>
+              {t("promoters.profile.missing_coordinates_banner")}{" "}
+              <Link
+                href={`/promoters/${p.id}/edit`}
+                className="font-semibold underline underline-offset-2 hover:text-[color:var(--color-ink)]"
+              >
+                {t("promoters.profile.edit_button")}
+              </Link>
+            </span>
+          </p>
+        ) : null}
 
-      {missingCoords ? (
-        <div className="mt-4 rounded-lg border border-[color:var(--color-warn)] bg-[color:var(--color-warn)]/10 px-4 py-3 text-sm text-[color:var(--color-ink)]">
-          {t("promoters.profile.missing_coordinates_banner")}{" "}
-          <Link href={`/promoters/${p.id}/edit`} className="font-medium text-[color:var(--color-accent)] hover:underline">
-            {t("promoters.profile.edit_button")}
-          </Link>
-        </div>
-      ) : null}
-
-      <div className="mt-6 grid gap-6 sm:grid-cols-2">
-        <Card header={<h2 className="text-sm font-semibold">{t("promoters.profile.details_title")}</h2>}>
-          <dl className="flex flex-col gap-2 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-[color:var(--color-muted)]">{t("promoters.form.email")}</dt>
-              <dd className="text-[color:var(--color-ink)]">{p.email ?? "—"}</dd>
+        {/* The identity card is the one thing this screen is about — reliability, contact and
+            transport, at `elevation="raised"` while everything below sits at the default card
+            depth. Areas, skills, history and the shift lists explain the promoter; they are not
+            themselves the subject. */}
+        <Card
+          elevation="raised"
+          header={
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
+                {t("promoters.profile.details_title")}
+              </h2>
+              <Badge variant={STATUS_BADGE[p.status]} dot>
+                {t(`promoters.status.${p.status}`)}
+              </Badge>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-[color:var(--color-muted)]">{t("promoters.form.birth_year")}</dt>
-              <dd className="text-[color:var(--color-ink)]">{p.birth_year ?? "—"}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-[color:var(--color-muted)]">{t("promoters.form.has_car_label")}</dt>
-              <dd className="text-[color:var(--color-ink)]">{p.has_car ? t("promoters.value_yes") : t("promoters.value_no")}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-[color:var(--color-muted)]">{t("promoters.form.has_licence_label")}</dt>
-              <dd className="text-[color:var(--color-ink)]">{p.has_licence ? t("promoters.value_yes") : t("promoters.value_no")}</dd>
-            </div>
+          }
+        >
+          <DetailList columns={2}>
+            <Detail label={t("promoters.form.email")}>{p.email ?? "—"}</Detail>
+            <Detail label={t("promoters.form.birth_year")}>{p.birth_year ?? "—"}</Detail>
+            <Detail label={t("promoters.form.has_car_label")}>
+              {p.has_car ? t("promoters.value_yes") : t("promoters.value_no")}
+            </Detail>
+            <Detail label={t("promoters.form.has_licence_label")}>
+              {p.has_licence ? t("promoters.value_yes") : t("promoters.value_no")}
+            </Detail>
             {p.transport_notes ? (
-              <div className="flex flex-col gap-1">
-                <dt className="text-[color:var(--color-muted)]">{t("promoters.form.transport_notes_label")}</dt>
-                <dd className="text-[color:var(--color-ink)]">{p.transport_notes}</dd>
-              </div>
+              <Detail label={t("promoters.form.transport_notes_label")} wide>
+                {p.transport_notes}
+              </Detail>
             ) : null}
-            <div className="flex flex-col gap-1 pt-2">
-              <dt className="text-[color:var(--color-muted)]">{t("promoters.profile.reliability_label")}</dt>
-              <dd>
-                <ScoreBar value={p.reliability_score} size="sm" label={t("promoters.table.reliability_aria", { name: p.full_name })} />
-              </dd>
-            </div>
-          </dl>
+            <Detail label={t("promoters.profile.reliability_label")} wide>
+              <ScoreBar
+                value={p.reliability_score}
+                size="md"
+                className="max-w-xs"
+                label={t("promoters.table.reliability_aria", { name: p.full_name })}
+              />
+            </Detail>
+          </DetailList>
         </Card>
 
-        <Card header={<h2 className="text-sm font-semibold">{t("promoters.profile.areas_title")}</h2>}>
-          {p.promoter_areas.length === 0 ? (
-            <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.profile.no_areas")}</p>
-          ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {p.promoter_areas.map((pa) =>
-                pa.area ? (
-                  <Badge key={pa.area.id} variant="neutral">
-                    {pa.area.name}
-                  </Badge>
-                ) : null,
-              )}
-            </div>
-          )}
-        </Card>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("promoters.profile.areas_title")}</h2>}>
+            {p.promoter_areas.length === 0 ? (
+              <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.profile.no_areas")}</p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {p.promoter_areas.map((pa) =>
+                  pa.area ? (
+                    <Badge key={pa.area.id} variant="neutral">
+                      {pa.area.name}
+                    </Badge>
+                  ) : null,
+                )}
+              </div>
+            )}
+          </Card>
 
-        <Card header={<h2 className="text-sm font-semibold">{t("promoters.profile.skills_title")}</h2>} className="sm:col-span-2">
-          {p.promoter_skills.length === 0 ? (
-            <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.profile.no_skills")}</p>
-          ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {p.promoter_skills.map((ps) =>
-                ps.skill ? (
-                  <Badge key={ps.skill.id} variant="info">
-                    {ps.skill.name} · {t(`promoters.form.level_${ps.level as 1 | 2 | 3}`)}
-                  </Badge>
-                ) : null,
-              )}
-            </div>
-          )}
-        </Card>
+          <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("promoters.profile.skills_title")}</h2>}>
+            {p.promoter_skills.length === 0 ? (
+              <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.profile.no_skills")}</p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {p.promoter_skills.map((ps) =>
+                  ps.skill ? (
+                    <Badge key={ps.skill.id} variant="info">
+                      {ps.skill.name} · {t(`promoters.form.level_${ps.level as 1 | 2 | 3}`)}
+                    </Badge>
+                  ) : null,
+                )}
+              </div>
+            )}
+          </Card>
+        </div>
 
         {/* P30 mounted: the coordinator sends the promoter their own availability link.
             Minting writes nothing — it is an HMAC over the promoter id — so this is safe to reopen. */}
-        <div className="sm:col-span-2">
-          <AvailabilityLink promoterId={p.id} promoterName={p.full_name} />
-        </div>
-      </div>
+        <AvailabilityLink promoterId={p.id} promoterName={p.full_name} />
 
-      <Card className="mt-6" header={<h2 className="text-sm font-semibold">{t("promoters.profile.client_history_title")}</h2>}>
-        {clientHistory.length === 0 ? (
-          <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.profile.client_history_empty")}</p>
-        ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("promoters.profile.table.client")}</TableHeaderCell>
-                <TableHeaderCell>{t("promoters.profile.table.shifts_completed")}</TableHeaderCell>
-                <TableHeaderCell>{t("promoters.profile.table.last_worked")}</TableHeaderCell>
-                <TableHeaderCell>{t("promoters.profile.table.avg_rating")}</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {clientHistory.map((h) => (
-                <TableRow key={h.client_id}>
-                  <TableCell>{h.client?.name ?? "—"}</TableCell>
-                  <TableCell>{h.shifts_completed}</TableCell>
-                  <TableCell>{h.last_worked_on ?? "—"}</TableCell>
-                  <TableCell>{h.avg_rating != null ? h.avg_rating.toFixed(1) : "—"}</TableCell>
+        <Card
+          flush
+          header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("promoters.profile.client_history_title")}</h2>}
+        >
+          {clientHistory.length === 0 ? (
+            <EmptyState bare title={t("promoters.profile.client_history_empty")} />
+          ) : (
+            <Table bare>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>{t("promoters.profile.table.client")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("promoters.profile.table.shifts_completed")}</TableHeaderCell>
+                  <TableHeaderCell>{t("promoters.profile.table.last_worked")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("promoters.profile.table.avg_rating")}</TableHeaderCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+              </TableHead>
+              <TableBody>
+                {clientHistory.map((h) => (
+                  <TableRow key={h.client_id}>
+                    <TableCell className="font-medium text-[color:var(--color-ink)]">{h.client?.name ?? "—"}</TableCell>
+                    <TableCell className="text-right tabular-nums">{h.shifts_completed}</TableCell>
+                    <TableCell>{h.last_worked_on ?? "—"}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {h.avg_rating != null ? h.avg_rating.toFixed(1) : "—"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Card>
 
-      <Card className="mt-6" header={<h2 className="text-sm font-semibold">{t("promoters.profile.upcoming_shifts_title")}</h2>}>
-        {upcoming.length === 0 ? (
-          <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.profile.upcoming_empty")}</p>
-        ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("shifts.date")}</TableHeaderCell>
-                <TableHeaderCell>{t("shifts.campaign")}</TableHeaderCell>
-                <TableHeaderCell>{t("shifts.store")}</TableHeaderCell>
-                <TableHeaderCell>{t("promoters.profile.table.assignment_status")}</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {upcoming.map((a) => (
-                <TableRow key={a.id}>
-                  <TableCell>
-                    <Link href={`/shifts/${a.shift!.id}`} className="text-[color:var(--color-accent)] hover:underline">
+        <Card
+          flush
+          header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("promoters.profile.upcoming_shifts_title")}</h2>}
+        >
+          {upcoming.length === 0 ? (
+            <EmptyState bare icon={<Icon name="calendar" size={22} />} title={t("promoters.profile.upcoming_empty")} />
+          ) : (
+            <Table bare>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>{t("shifts.date")}</TableHeaderCell>
+                  <TableHeaderCell>{t("shifts.campaign")}</TableHeaderCell>
+                  <TableHeaderCell>{t("shifts.store")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("promoters.profile.table.assignment_status")}</TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {upcoming.map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell>
+                      <Link
+                        href={`/shifts/${a.shift!.id}`}
+                        className="rounded-sm font-medium text-[color:var(--color-accent)] hover:underline focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+                      >
+                        {a.shift!.on_date} · {a.shift!.start_time.slice(0, 5)}–{a.shift!.end_time.slice(0, 5)}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{a.shift?.campaign?.name ?? "—"}</TableCell>
+                    <TableCell>{a.shift?.store?.name ?? "—"}</TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant={ASSIGNMENT_STATUS_BADGE[a.status] ?? "neutral"} dot>
+                        {t(ASSIGNMENT_STATUS_KEY[a.status] ?? "promoters.profile.assignment_status.confirmed")}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Card>
+
+        <Card
+          flush
+          header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("promoters.profile.past_shifts_title")}</h2>}
+        >
+          {past.length === 0 ? (
+            <EmptyState bare title={t("promoters.profile.past_empty")} />
+          ) : (
+            <Table bare>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>{t("shifts.date")}</TableHeaderCell>
+                  <TableHeaderCell>{t("shifts.campaign")}</TableHeaderCell>
+                  <TableHeaderCell>{t("shifts.store")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("promoters.profile.table.assignment_status")}</TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {past.slice(0, 20).map((a) => (
+                  <TableRow key={a.id}>
+                    <TableCell>
                       {a.shift!.on_date} · {a.shift!.start_time.slice(0, 5)}–{a.shift!.end_time.slice(0, 5)}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{a.shift?.campaign?.name ?? "—"}</TableCell>
-                  <TableCell>{a.shift?.store?.name ?? "—"}</TableCell>
-                  <TableCell>{a.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
-
-      <Card className="mt-6" header={<h2 className="text-sm font-semibold">{t("promoters.profile.past_shifts_title")}</h2>}>
-        {past.length === 0 ? (
-          <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.profile.past_empty")}</p>
-        ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>{t("shifts.date")}</TableHeaderCell>
-                <TableHeaderCell>{t("shifts.campaign")}</TableHeaderCell>
-                <TableHeaderCell>{t("shifts.store")}</TableHeaderCell>
-                <TableHeaderCell>{t("promoters.profile.table.assignment_status")}</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {past.slice(0, 20).map((a) => (
-                <TableRow key={a.id}>
-                  <TableCell>
-                    {a.shift!.on_date} · {a.shift!.start_time.slice(0, 5)}–{a.shift!.end_time.slice(0, 5)}
-                  </TableCell>
-                  <TableCell>{a.shift?.campaign?.name ?? "—"}</TableCell>
-                  <TableCell>{a.shift?.store?.name ?? "—"}</TableCell>
-                  <TableCell>{a.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+                    </TableCell>
+                    <TableCell>{a.shift?.campaign?.name ?? "—"}</TableCell>
+                    <TableCell>{a.shift?.store?.name ?? "—"}</TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant={ASSIGNMENT_STATUS_BADGE[a.status] ?? "neutral"} dot>
+                        {t(ASSIGNMENT_STATUS_KEY[a.status] ?? "promoters.profile.assignment_status.confirmed")}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Card>
+      </div>
     </main>
   );
 }

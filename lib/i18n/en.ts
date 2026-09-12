@@ -1449,4 +1449,21 @@ export const en: Record<TranslationKey, string> = {
     "All fourteen days will be cleared. This cannot be undone.",
   "promoters.availability.bulk.clear_all_warning_self":
     "Careful: some of these days the promoter declared herself. Those will be cleared too, with no undo.",
+
+  /* --- P35b: the detail screens — badges for a raw assignment status, never printed verbatim --- */
+  "promoters.profile.assignment_status.confirmed": "Confirmed",
+  "promoters.profile.assignment_status.completed": "Completed",
+  "promoters.profile.assignment_status.cancelled": "Cancelled",
+  "promoters.profile.assignment_status.no_show": "No-show",
+
+  /* --- P35c: forms and settings craft pass — no field/behaviour change, composition only --- */
+  "promoters.new.back": "← Promoters",
+  "campaigns.new.section_details": "Campaign details",
+
+  "page_title.settings": "Settings",
+  "page_title.settings_team": "Team",
+  "page_title.settings_agency": "Agency details",
+  "page_title.settings_billing": "Subscription",
+  "page_title.onboarding": "Welcome",
+  "page_title.onboarding_join": "Invitation",
 };

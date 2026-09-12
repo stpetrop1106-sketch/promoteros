@@ -4,13 +4,13 @@ import { authState } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { hashToken, verifyToken } from "@/lib/tokens";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { PageHeader, Card, Button, Badge } from "@/components/ui";
+import { PageHeader, Card, Button, LinkButton, Badge, SectionHeading } from "@/components/ui";
 import { AcceptForm } from "./accept-form";
 import { signOutAndReturn } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "PromoterOS" };
+export const metadata: Metadata = { title: translatorFor(DEFAULT_LOCALE)("page_title.onboarding_join") };
 
 const t = translatorFor(DEFAULT_LOCALE);
 
@@ -36,17 +36,17 @@ function formatDate(value: string): string {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
-  return <main className="mx-auto max-w-lg px-6 py-16">{children}</main>;
+  return <main className="mx-auto max-w-md px-6 py-16">{children}</main>;
 }
 
 function DeadEndFree({ titleKey, bodyKey }: { titleKey: TranslationKey; bodyKey: TranslationKey }) {
   return (
     <Shell>
       <PageHeader title={t(titleKey)} subtitle={t(bodyKey)} />
-      <div className="mt-6 flex flex-wrap gap-2">
-        <Link href="/onboarding">
-          <Button variant="secondary">{t("onboarding.join.error_way_out")}</Button>
-        </Link>
+      <div className="mt-8 flex flex-wrap gap-2">
+        <LinkButton href="/onboarding" variant="secondary">
+          {t("onboarding.join.error_way_out")}
+        </LinkButton>
       </div>
     </Shell>
   );
@@ -127,21 +127,20 @@ export default async function JoinPage({ params }: { params: Promise<{ token: st
     return (
       <Shell>
         <PageHeader title={t("onboarding.join.title")} />
-        <Card className="mt-6">{summary}</Card>
-        <Card className="mt-4">
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("enforcement.suspended.title")}
-          </h2>
-          <p className="mt-1 text-sm leading-6 text-[color:var(--color-muted)]">
-            {t("enforcement.suspended.body")}
-          </p>
-          <form action={signOutAndReturn} className="mt-4">
-            <input type="hidden" name="token" value={token} />
-            <Button type="submit" variant="secondary">
-              {t("enforcement.suspended.signout")}
-            </Button>
-          </form>
-        </Card>
+        <div className="mt-8 flex flex-col gap-5">
+          <Card>{summary}</Card>
+          <Card header={<SectionHeading level={3} title={t("enforcement.suspended.title")} />}>
+            <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+              {t("enforcement.suspended.body")}
+            </p>
+            <form action={signOutAndReturn} className="mt-4">
+              <input type="hidden" name="token" value={token} />
+              <Button type="submit" variant="secondary">
+                {t("enforcement.suspended.signout")}
+              </Button>
+            </form>
+          </Card>
+        </div>
       </Shell>
     );
   }
@@ -153,20 +152,17 @@ export default async function JoinPage({ params }: { params: Promise<{ token: st
     return (
       <Shell>
         <PageHeader title={t("onboarding.join.title")} />
-        <Card className="mt-6">{summary}</Card>
-        <Card className="mt-4">
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("onboarding.join.signin_title")}
-          </h2>
-          <p className="mt-1 text-sm leading-6 text-[color:var(--color-muted)]">
-            {t("onboarding.join.signin_body", { email: invitation.invited_email })}
-          </p>
-          <div className="mt-4">
-            <Link href={`/login?next=${next}`}>
-              <Button>{t("onboarding.join.signin_cta")}</Button>
-            </Link>
-          </div>
-        </Card>
+        <div className="mt-8 flex flex-col gap-5">
+          <Card>{summary}</Card>
+          <Card elevation="raised" header={<SectionHeading level={3} title={t("onboarding.join.signin_title")} />}>
+            <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+              {t("onboarding.join.signin_body", { email: invitation.invited_email })}
+            </p>
+            <div className="mt-4">
+              <LinkButton href={`/login?next=${next}`}>{t("onboarding.join.signin_cta")}</LinkButton>
+            </div>
+          </Card>
+        </div>
       </Shell>
     );
   }
@@ -183,24 +179,23 @@ export default async function JoinPage({ params }: { params: Promise<{ token: st
     return (
       <Shell>
         <PageHeader title={t("onboarding.join.title")} />
-        <Card className="mt-6">{summary}</Card>
-        <Card className="mt-4">
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("onboarding.join.wrong_email_title")}
-          </h2>
-          <p className="mt-1 text-sm leading-6 text-[color:var(--color-muted)]">
-            {t("onboarding.join.wrong_email_body", {
-              invited: invitation.invited_email,
-              current: signedInEmail,
-            })}
-          </p>
-          <form action={signOutAndReturn} className="mt-4">
-            <input type="hidden" name="token" value={token} />
-            <Button type="submit" variant="secondary">
-              {t("onboarding.join.sign_out_and_return")}
-            </Button>
-          </form>
-        </Card>
+        <div className="mt-8 flex flex-col gap-5">
+          <Card>{summary}</Card>
+          <Card header={<SectionHeading level={3} title={t("onboarding.join.wrong_email_title")} />}>
+            <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+              {t("onboarding.join.wrong_email_body", {
+                invited: invitation.invited_email,
+                current: signedInEmail,
+              })}
+            </p>
+            <form action={signOutAndReturn} className="mt-4">
+              <input type="hidden" name="token" value={token} />
+              <Button type="submit" variant="secondary">
+                {t("onboarding.join.sign_out_and_return")}
+              </Button>
+            </form>
+          </Card>
+        </div>
       </Shell>
     );
   }
@@ -211,17 +206,19 @@ export default async function JoinPage({ params }: { params: Promise<{ token: st
     return (
       <Shell>
         <PageHeader title={t("onboarding.join.title")} />
-        <Card className="mt-6">{summary}</Card>
-        <Card className="mt-4">
-          <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-            {t("onboarding.join.already_in_agency_body")}
-          </p>
-          <div className="mt-4">
-            <Link href="/shifts">
-              <Button variant="secondary">{t("onboarding.join.go_to_app")}</Button>
-            </Link>
-          </div>
-        </Card>
+        <div className="mt-8 flex flex-col gap-5">
+          <Card>{summary}</Card>
+          <Card>
+            <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+              {t("onboarding.join.already_in_agency_body")}
+            </p>
+            <div className="mt-4">
+              <LinkButton href="/shifts" variant="secondary">
+                {t("onboarding.join.go_to_app")}
+              </LinkButton>
+            </div>
+          </Card>
+        </div>
       </Shell>
     );
   }
@@ -229,15 +226,17 @@ export default async function JoinPage({ params }: { params: Promise<{ token: st
   return (
     <Shell>
       <PageHeader title={t("onboarding.join.title")} />
-      <Card className="mt-6">{summary}</Card>
-      <Card className="mt-4">
-        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-          {t("onboarding.join.accept_body", { agency: invitation.agency_name })}
-        </p>
-        <div className="mt-4">
-          <AcceptForm token={token} />
-        </div>
-      </Card>
+      <div className="mt-8 flex flex-col gap-5">
+        <Card>{summary}</Card>
+        <Card elevation="raised">
+          <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+            {t("onboarding.join.accept_body", { agency: invitation.agency_name })}
+          </p>
+          <div className="mt-4">
+            <AcceptForm token={token} />
+          </div>
+        </Card>
+      </div>
     </Shell>
   );
 }

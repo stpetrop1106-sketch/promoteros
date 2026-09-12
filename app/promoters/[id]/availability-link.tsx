@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { Button, Card, Icon } from "@/components/ui";
 import {
   createAvailabilityLink,
   type MintLinkState,
@@ -56,14 +57,11 @@ export function AvailabilityLink({
       : "";
 
   return (
-    <section className="rounded-xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-4">
-      <h2 className="text-sm font-semibold">{t("availability_link.title")}</h2>
-      <p className="mt-1 text-sm text-[color:var(--color-muted)]">
-        {t("availability_link.description")}
-      </p>
+    <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("availability_link.title")}</h2>}>
+      <p className="text-sm text-[color:var(--color-muted)]">{t("availability_link.description")}</p>
 
       {state.status === "error" && (
-        <p role="alert" className="mt-3 text-sm text-[color:var(--color-bad)]">
+        <p role="alert" className="mt-3 text-sm font-medium text-[color:var(--color-bad-ink)]">
           {state.reason === "not_found"
             ? t("availability_link.error.not_found")
             : t("availability_link.error.failed")}
@@ -72,7 +70,7 @@ export function AvailabilityLink({
 
       {state.status === "ready" ? (
         <div className="mt-3">
-          <label className="block text-xs text-[color:var(--color-muted)]" htmlFor="availability-link-message">
+          <label className="text-xs font-medium text-[color:var(--color-muted)]" htmlFor="availability-link-message">
             {t("availability_link.message_label")}
           </label>
           <textarea
@@ -80,45 +78,37 @@ export function AvailabilityLink({
             readOnly
             value={message}
             rows={4}
-            className="mt-1 w-full rounded-lg border border-[color:var(--color-line)] bg-white p-2 text-xs"
+            className="mt-1.5 w-full rounded-lg border border-[color:var(--color-line-strong)] bg-[color:var(--color-canvas-sunken)]/50 p-2.5 text-xs leading-5 text-[color:var(--color-ink-soft)]"
           />
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <button
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <Button
               type="button"
+              variant="secondary"
+              size="sm"
+              iconLeft={copied ? <Icon name="check" size={14} /> : undefined}
               onClick={() => {
                 void navigator.clipboard.writeText(message).then(
                   () => setCopied(true),
                   () => setCopied(false),
                 );
               }}
-              className="rounded-lg border border-[color:var(--color-line)] px-3 py-1.5 text-sm font-medium hover:bg-[color:var(--color-canvas)]"
             >
               {copied ? t("availability_link.copied") : t("common.copy")}
-            </button>
-            <button
-              type="button"
-              onClick={create}
-              disabled={pending}
-              className="rounded-lg px-3 py-1.5 text-sm text-[color:var(--color-muted)] underline underline-offset-2 disabled:opacity-50"
-            >
+            </Button>
+            <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={create}>
               {t("availability_link.regenerate")}
-            </button>
+            </Button>
           </div>
-          <p className="mt-2 text-xs text-[color:var(--color-muted)]">
+          <p className="mt-2.5 text-xs text-[color:var(--color-muted)]">
             {t("availability_link.expires", { date: formatExpiry(state.expiresAt) })}
           </p>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={create}
-          disabled={pending}
-          className="mt-3 rounded-lg bg-[color:var(--color-accent)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
-        >
+        <Button type="button" size="sm" className="mt-3" loading={pending} onClick={create}>
           {pending ? t("availability_link.creating") : t("availability_link.create")}
-        </button>
+        </Button>
       )}
-    </section>
+    </Card>
   );
 }
 

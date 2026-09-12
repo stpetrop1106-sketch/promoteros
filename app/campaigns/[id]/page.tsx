@@ -3,7 +3,22 @@ import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { Badge, Card, PageHeader, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  Detail,
+  DetailList,
+  EmptyState,
+  Icon,
+  PageHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/components/ui";
 import { LinkButton } from "@/app/campaigns/link-button";
 import {
   CAMPAIGN_STATUS_BADGE,
@@ -94,57 +109,56 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <Link href="/campaigns" className="text-sm text-[color:var(--color-accent)] hover:underline">
-        {t("campaigns.detail.back")}
-      </Link>
+    <main className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
+      <div className="flex flex-col gap-8">
+        <PageHeader
+          eyebrow={
+            <Link
+              href="/campaigns"
+              className="inline-flex items-center gap-1 rounded-sm hover:text-[color:var(--color-ink)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            >
+              <Icon name="chevronLeft" size={14} />
+              {t("campaigns.list.title")}
+            </Link>
+          }
+          icon={<Icon name="megaphone" size={20} />}
+          title={c.name}
+          subtitle={[c.clients?.name, c.campaign_type].filter(Boolean).join(" · ") || undefined}
+          actions={
+            <LinkButton href={`/campaigns/${id}/shifts/new`} iconLeft={<Icon name="plus" size={16} />}>
+              {t("campaigns.detail.add_shifts")}
+            </LinkButton>
+          }
+        />
 
-      <PageHeader
-        className="mt-4"
-        title={c.name}
-        subtitle={[c.clients?.name, c.campaign_type].filter(Boolean).join(" · ")}
-        actions={
-          <LinkButton href={`/campaigns/${id}/shifts/new`}>{t("campaigns.detail.add_shifts")}</LinkButton>
-        }
-      />
-
-      <div className="mt-8 flex flex-col gap-6">
-        <Card header={<h2 className="text-base font-semibold">{t("campaigns.detail.overview_title")}</h2>}>
-          <dl className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaigns.detail.dates_label")}
-              </dt>
-              <dd className="mt-1 text-sm text-[color:var(--color-ink)]">{formatDateRange(c.starts_on, c.ends_on)}</dd>
+        {/* The overview card is the one this screen is about — a campaign's identity, its rate
+            and its status — raised above the brief, the store list and the shift table, which
+            all explain rather than define it. */}
+        <Card
+          elevation="raised"
+          header={
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
+                {t("campaigns.detail.overview_title")}
+              </h2>
+              <Badge variant={CAMPAIGN_STATUS_BADGE[c.status]} dot>
+                {t(CAMPAIGN_STATUS_KEY[c.status])}
+              </Badge>
             </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaigns.detail.status_label")}
-              </dt>
-              <dd className="mt-1">
-                <Badge variant={CAMPAIGN_STATUS_BADGE[c.status]}>{t(CAMPAIGN_STATUS_KEY[c.status])}</Badge>
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaigns.detail.rate_label")}
-              </dt>
-              <dd className="mt-1 text-sm text-[color:var(--color-ink)]">{formatCents(c.rate_cents)} €</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaigns.detail.dress_code_label")}
-              </dt>
-              <dd className="mt-1 text-sm text-[color:var(--color-ink)]">{c.dress_code ?? "—"}</dd>
-            </div>
-          </dl>
+          }
+        >
+          <DetailList columns={2}>
+            <Detail label={t("campaigns.detail.dates_label")}>{formatDateRange(c.starts_on, c.ends_on)}</Detail>
+            <Detail label={t("campaigns.detail.rate_label")}>{formatCents(c.rate_cents)} €</Detail>
+            <Detail label={t("campaigns.detail.dress_code_label")}>{c.dress_code ?? "—"}</Detail>
+          </DetailList>
         </Card>
 
-        <Card header={<h2 className="text-base font-semibold">{t("campaigns.detail.brief_title")}</h2>}>
+        <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaigns.detail.brief_title")}</h2>}>
           {brief ? (
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-[color:var(--color-ink)]">{brief.title}</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-[color:var(--color-ink)]">{brief.title}</p>
                 <p className="mt-1 text-xs text-[color:var(--color-muted)]">
                   {brief.published_at ? t("campaigns.detail.brief_published") : t("campaigns.detail.brief_draft")}
                 </p>
@@ -154,7 +168,7 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
               </LinkButton>
             </div>
           ) : (
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <p className="text-sm text-[color:var(--color-muted)]">{t("campaigns.detail.brief_none")}</p>
               <LinkButton href={`/campaigns/${id}/brief`} variant="secondary" size="sm">
                 {t("campaigns.detail.brief_write")}
@@ -163,20 +177,27 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
           )}
         </Card>
 
-        <Card header={<h2 className="text-base font-semibold">{t("campaigns.detail.stores_title")}</h2>}>
+        <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaigns.detail.stores_title")}</h2>}>
           {storeNames.length === 0 ? (
             <p className="text-sm text-[color:var(--color-muted)]">{t("campaigns.detail.stores_none")}</p>
           ) : (
-            <p className="text-sm text-[color:var(--color-ink)]">{storeNames.join(" · ")}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {storeNames.map((name) => (
+                <Badge key={name} variant="neutral">
+                  {name}
+                </Badge>
+              ))}
+            </div>
           )}
         </Card>
 
         <Card
+          flush={shifts.length > 0}
           header={
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-base font-semibold">{t("campaigns.detail.shifts_title")}</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaigns.detail.shifts_title")}</h2>
               {shifts.length > 0 ? (
-                <span className="text-sm text-[color:var(--color-muted)]">
+                <span className="text-xs font-medium tabular-nums text-[color:var(--color-muted)]">
                   {t("shift.coverage", { filled: totalFilled, required: totalRequired })}
                 </span>
               ) : null}
@@ -184,26 +205,26 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
           }
         >
           {shifts.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <p className="text-sm font-semibold text-[color:var(--color-ink)]">
-                {t("campaigns.detail.shifts_none_title")}
-              </p>
-              <p className="max-w-sm text-sm text-[color:var(--color-muted)]">
-                {t("campaigns.detail.shifts_none_body")}
-              </p>
-              <LinkButton href={`/campaigns/${id}/shifts/new`} size="sm">
-                {t("campaigns.detail.add_shifts")}
-              </LinkButton>
-            </div>
+            <EmptyState
+              bare
+              icon={<Icon name="calendar" size={22} />}
+              title={t("campaigns.detail.shifts_none_title")}
+              description={t("campaigns.detail.shifts_none_body")}
+              action={
+                <LinkButton href={`/campaigns/${id}/shifts/new`} size="sm">
+                  {t("campaigns.detail.add_shifts")}
+                </LinkButton>
+              }
+            />
           ) : (
-            <Table>
+            <Table bare>
               <TableHead>
                 <TableRow>
                   <TableHeaderCell>{t("shifts.date")}</TableHeaderCell>
                   <TableHeaderCell>{t("shifts.store")}</TableHeaderCell>
-                  <TableHeaderCell>{t("shifts.needed")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("shifts.needed")}</TableHeaderCell>
                   <TableHeaderCell>{t("campaigns.detail.col_coverage")}</TableHeaderCell>
-                  <TableHeaderCell>{t("campaigns.list.col_status")}</TableHeaderCell>
+                  <TableHeaderCell className="text-right">{t("campaigns.list.col_status")}</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -214,21 +235,21 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
                       <TableCell>
                         <Link
                           href={`/shifts/${shift.id}`}
-                          className="text-[color:var(--color-accent)] hover:underline"
+                          className="rounded-sm font-medium text-[color:var(--color-accent)] hover:underline focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
                         >
                           {shift.on_date} · {timeLabel(shift.start_time)}–{timeLabel(shift.end_time)}
                         </Link>
                       </TableCell>
                       <TableCell>{shift.stores?.name ?? "—"}</TableCell>
-                      <TableCell>{shift.promoters_required}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-right tabular-nums">{shift.promoters_required}</TableCell>
+                      <TableCell className="tabular-nums">
                         {t("shift.coverage", {
                           filled: Math.min(confirmed, shift.promoters_required),
                           required: shift.promoters_required,
                         })}
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={SHIFT_STATUS_BADGE[shift.status]}>{t(SHIFT_STATUS_KEY[shift.status])}</Badge>
+                      <TableCell className="text-right">
+                        <Badge variant={SHIFT_STATUS_BADGE[shift.status]} dot>{t(SHIFT_STATUS_KEY[shift.status])}</Badge>
                       </TableCell>
                     </TableRow>
                   );
@@ -239,27 +260,21 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
         </Card>
 
         {(c.status === "draft" || c.status === "active") && (
-          <Card header={<h2 className="text-base font-semibold">{t("campaigns.detail.status_title")}</h2>}>
+          <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaigns.detail.status_title")}</h2>}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex flex-wrap gap-3">
                 {c.status === "draft" ? (
                   <form action={setCampaignStatus.bind(null, id, "active")}>
-                    <button
-                      type="submit"
-                      className="inline-flex h-8 items-center rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 text-sm font-semibold text-[color:var(--color-ink)] hover:bg-[color:var(--color-canvas)]"
-                    >
+                    <Button type="submit" variant="secondary" size="sm">
                       {t("campaigns.detail.mark_active")}
-                    </button>
+                    </Button>
                   </form>
                 ) : null}
                 {c.status === "active" ? (
                   <form action={setCampaignStatus.bind(null, id, "completed")}>
-                    <button
-                      type="submit"
-                      className="inline-flex h-8 items-center rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 text-sm font-semibold text-[color:var(--color-ink)] hover:bg-[color:var(--color-canvas)]"
-                    >
+                    <Button type="submit" variant="secondary" size="sm">
                       {t("campaigns.detail.mark_completed")}
-                    </button>
+                    </Button>
                   </form>
                 ) : null}
               </div>

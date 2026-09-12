@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { PageHeader, Card } from "@/components/ui";
+import { PageHeader, Card, LinkButton, Icon, SectionHeading } from "@/components/ui";
 import { updatePromoter } from "../../actions";
 import { PromoterForm, type PromoterFormInitial } from "../../promoter-form";
 import { ArchiveControl } from "./archive-control";
@@ -66,20 +66,27 @@ export default async function EditPromoterPage({ params }: { params: Promise<{ i
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <PageHeader title={t("promoters.edit.title", { name: p.full_name })} />
+    <main className="mx-auto max-w-4xl px-6 py-12">
+      <PageHeader
+        title={t("promoters.edit.title", { name: p.full_name })}
+        actions={
+          <LinkButton href={`/promoters/${p.id}`} variant="ghost" size="sm" iconLeft={<Icon name="chevronLeft" size={16} />}>
+            {t("promoters.availability.back_to_profile")}
+          </LinkButton>
+        }
+      />
 
-      <Card className="mt-6">
+      <Card className="mt-8" elevation="raised">
         <PromoterForm mode="edit" action={updatePromoter} areas={areas ?? []} skills={skills ?? []} initial={initial} />
       </Card>
 
+      {/* Archive is destructive-adjacent, so it gets its own quiet card well below the primary
+          "Save changes" action rather than sitting in the same panel — the dangerous action is
+          never adjacent to the common one (see archive-control.tsx). */}
       {p.status !== "archived" ? (
-        <Card
-          className="mt-6"
-          header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("promoters.edit.archive_section_title")}</h2>}
-        >
-          <p className="text-sm text-[color:var(--color-muted)]">{t("promoters.edit.archive_description")}</p>
-          <div className="mt-3">
+        <Card className="mt-6" header={<SectionHeading level={3} title={t("promoters.edit.archive_section_title")} />}>
+          <p className="text-sm leading-6 text-[color:var(--color-muted)]">{t("promoters.edit.archive_description")}</p>
+          <div className="mt-4">
             <ArchiveControl
               promoterId={p.id}
               labels={{

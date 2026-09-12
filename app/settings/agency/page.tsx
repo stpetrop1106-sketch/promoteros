@@ -1,28 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   loadAgencyIdentity,
   agencyIdentityOwnerContext,
   identityComplete,
 } from "@/lib/agency-settings";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { PageHeader, Card, Button, EmptyState } from "@/components/ui";
+import { PageHeader, Card, LinkButton, EmptyState, SectionHeading, DetailList, Detail, Icon } from "@/components/ui";
 import { AgencyIdentityForm } from "./agency-identity-form";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "PromoterOS" };
+export const metadata: Metadata = { title: translatorFor(DEFAULT_LOCALE)("page_title.settings_agency") };
 
 const t = translatorFor(DEFAULT_LOCALE);
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-2 py-2">
-      <dt className="text-sm text-[color:var(--color-muted)]">{label}</dt>
-      <dd className="text-sm font-medium text-[color:var(--color-ink)]">{children}</dd>
-    </div>
-  );
-}
 
 /**
  * The screen that closes the gap `docs/status/P33.md` describes: `agencies.legal_name`,
@@ -45,17 +35,13 @@ export default async function AgencyIdentityPage() {
 
   if (!identity) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-12">
+      <main className="mx-auto max-w-3xl px-6 py-12">
         <PageHeader title={t("agency_settings.title")} />
-        <div className="mt-6">
+        <div className="mt-8">
           <EmptyState
             title={t("team.no_agency_title")}
             description={t("team.no_agency_body")}
-            action={
-              <Link href="/onboarding">
-                <Button>{t("team.no_agency_cta")}</Button>
-              </Link>
-            }
+            action={<LinkButton href="/onboarding">{t("team.no_agency_cta")}</LinkButton>}
           />
         </div>
       </main>
@@ -65,40 +51,34 @@ export default async function AgencyIdentityPage() {
   const complete = identityComplete(identity);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-3xl px-6 py-12">
       <PageHeader
         title={t("agency_settings.title")}
         subtitle={t("agency_settings.subtitle")}
         actions={
-          <Link href="/settings">
-            <Button variant="ghost" size="sm">
-              {t("agency_settings.back_to_settings")}
-            </Button>
-          </Link>
+          <LinkButton href="/settings" variant="ghost" size="sm">
+            {t("agency_settings.back_to_settings")}
+          </LinkButton>
         }
       />
 
       {!complete ? (
-        <div className="mt-6 rounded-lg border border-[color:var(--color-warn)] bg-[color:var(--color-warn)]/10 px-4 py-3 text-sm text-[color:var(--color-ink)]">
-          <p className="font-medium">{t("agency_settings.incomplete.title")}</p>
-          <p className="mt-1 text-[color:var(--color-muted)]">
-            {t("agency_settings.incomplete.body")}
-          </p>
+        <div
+          role="status"
+          className="mt-8 flex items-start gap-2.5 rounded-xl border border-[color:var(--color-warn-line)] bg-[color:var(--color-warn-subtle)] px-4 py-3 text-sm leading-5 text-[color:var(--color-warn-ink)]"
+        >
+          <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold">{t("agency_settings.incomplete.title")}</p>
+            <p className="mt-1 opacity-90">{t("agency_settings.incomplete.body")}</p>
+          </div>
         </div>
       ) : null}
 
       <Card
-        className="mt-6"
-        header={
-          <div>
-            <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-              {t("agency_settings.card_title")}
-            </h2>
-            <p className="mt-0.5 text-xs text-[color:var(--color-muted)]">
-              {t("agency_settings.card_subtitle")}
-            </p>
-          </div>
-        }
+        className="mt-8"
+        elevation="raised"
+        header={<SectionHeading level={3} title={t("agency_settings.card_title")} description={t("agency_settings.card_subtitle")} />}
       >
         {owner ? (
           <AgencyIdentityForm
@@ -108,20 +88,20 @@ export default async function AgencyIdentityPage() {
           />
         ) : (
           <div className="flex flex-col gap-4">
-            <dl className="divide-y divide-[color:var(--color-line)]">
-              <Row label={t("agency_settings.form.legal_name.label")}>
+            <DetailList columns={1}>
+              <Detail label={t("agency_settings.form.legal_name.label")}>
                 {identity.legalName ?? t("agency_settings.not_set")}
-              </Row>
-              <Row label={t("agency_settings.form.privacy_email.label")}>
+              </Detail>
+              <Detail label={t("agency_settings.form.privacy_email.label")}>
                 {identity.privacyContactEmail ?? t("agency_settings.not_set")}
-              </Row>
-              <Row label={t("agency_settings.form.retention.label")}>
+              </Detail>
+              <Detail label={t("agency_settings.form.retention.label")}>
                 {identity.retentionMonths
                   ? t("agency_settings.retention_value", { months: identity.retentionMonths })
                   : t("agency_settings.not_set")}
-              </Row>
-            </dl>
-            <p className="text-sm text-[color:var(--color-muted)]">
+              </Detail>
+            </DetailList>
+            <p className="border-t border-[color:var(--color-line)] pt-4 text-sm text-[color:var(--color-muted)]">
               {t("agency_settings.readonly_notice")}
             </p>
           </div>

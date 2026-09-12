@@ -5,15 +5,22 @@ import { translatorFor, DEFAULT_LOCALE, type Locale, type TranslationKey } from 
 import {
   Badge,
   Card,
+  Detail,
+  DetailList,
   EmptyState,
+  Icon,
   PageHeader,
+  StatStrip,
+  StatTile,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeaderCell,
   TableRow,
+  buttonClassName,
 } from "@/components/ui";
+import type { StatTileTone } from "@/components/ui";
 import type {
   CampaignReport,
   FieldTotals,
@@ -82,18 +89,6 @@ type T = ReturnType<typeof translatorFor>;
 // Small presentational pieces
 // -------------------------------------------------------------------------------------------
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div>
-      <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-        {label}
-      </dt>
-      <dd className="mt-1 text-xl font-semibold text-[color:var(--color-ink)]">{value}</dd>
-      {hint ? <p className="mt-1 text-xs text-[color:var(--color-muted)]">{hint}</p> : null}
-    </div>
-  );
-}
-
 /** The sentence that says what a figure is a sum of. It is never optional. */
 function basisSentence(basis: ReportBasis, t: T): string {
   if (basis.reportsExpected === 0) return t("campaign_report.basis.none_expected");
@@ -154,31 +149,49 @@ function CoverageCard({
   locale: Locale;
   t: T;
 }) {
+  const filledTone: StatTileTone = coverage.filledSlots >= coverage.requiredSlots ? "ok" : "warn";
   return (
-    <Card header={<h2 className="text-base font-semibold">{t("campaign_report.coverage.title")}</h2>}>
-      <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <Stat label={t("campaign_report.coverage.shifts")} value={formatNumber(coverage.shifts, locale)} />
-        <Stat
+    <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.coverage.title")}</h2>}>
+      <StatStrip className="sm:grid-cols-3 xl:grid-cols-6">
+        <StatTile
+          label={t("campaign_report.coverage.shifts")}
+          value={formatNumber(coverage.shifts, locale)}
+          icon={<Icon name="calendar" size={18} />}
+        />
+        <StatTile
           label={t("campaign_report.coverage.filled")}
           value={t("campaign_report.of", {
             done: formatNumber(coverage.filledSlots, locale),
             total: formatNumber(coverage.requiredSlots, locale),
           })}
+          icon={<Icon name="users" size={18} />}
+          tone={filledTone}
         />
-        <Stat
+        <StatTile
           label={t("campaign_report.coverage.completion")}
           value={`${Math.round(coverage.completionRate * 100)}%`}
+          icon={<Icon name="trendUp" size={18} />}
+          tone={coverage.completionRate >= 1 ? "ok" : "neutral"}
         />
-        <Stat
+        <StatTile
           label={t("campaign_report.coverage.cancelled_shifts")}
           value={formatNumber(coverage.cancelledShifts, locale)}
+          icon={<Icon name="close" size={18} />}
+          tone={coverage.cancelledShifts > 0 ? "warn" : "neutral"}
         />
-        <Stat
+        <StatTile
           label={t("campaign_report.coverage.cancellations")}
           value={formatNumber(coverage.cancelledAssignments, locale)}
+          icon={<Icon name="close" size={18} />}
+          tone={coverage.cancelledAssignments > 0 ? "warn" : "neutral"}
         />
-        <Stat label={t("campaign_report.coverage.no_shows")} value={formatNumber(coverage.noShows, locale)} />
-      </dl>
+        <StatTile
+          label={t("campaign_report.coverage.no_shows")}
+          value={formatNumber(coverage.noShows, locale)}
+          icon={<Icon name="alert" size={18} />}
+          tone={coverage.noShows > 0 ? "bad" : "ok"}
+        />
+      </StatStrip>
       <p className="mt-4 text-xs leading-5 text-[color:var(--color-muted)]">
         {t("campaign_report.coverage.note")}
       </p>
@@ -196,37 +209,48 @@ function AttendanceCard({
   t: T;
 }) {
   return (
-    <Card header={<h2 className="text-base font-semibold">{t("campaign_report.attendance.title")}</h2>}>
-      <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <Stat
+    <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.attendance.title")}</h2>}>
+      <StatStrip className="sm:grid-cols-3 xl:grid-cols-6">
+        <StatTile
           label={t("campaign_report.attendance.checked_in")}
           value={t("campaign_report.of", {
             done: formatNumber(attendance.checkedIn, locale),
             total: formatNumber(attendance.expected, locale),
           })}
+          icon={<Icon name="mapPin" size={18} />}
+          tone={attendance.checkedIn >= attendance.expected ? "ok" : "warn"}
         />
-        <Stat
+        <StatTile
           label={t("campaign_report.attendance.within_geofence")}
           value={formatNumber(attendance.withinGeofence, locale)}
+          icon={<Icon name="mapPin" size={18} />}
+          tone="ok"
         />
-        <Stat
+        <StatTile
           label={t("campaign_report.attendance.outside_geofence")}
           value={formatNumber(attendance.outsideGeofence, locale)}
+          icon={<Icon name="mapPin" size={18} />}
+          tone={attendance.outsideGeofence > 0 ? "warn" : "neutral"}
         />
-        <Stat
+        <StatTile
           label={t("campaign_report.attendance.geofence_unknown")}
           value={formatNumber(attendance.geofenceUnknown, locale)}
+          icon={<Icon name="mapPin" size={18} />}
         />
-        <Stat
+        {/* Two axes over the same check-ins, and a manual override is not a fault — CLAUDE.md
+            §3 — so this tile stays neutral even when the count is high. */}
+        <StatTile
           label={t("campaign_report.attendance.manual_overrides")}
           value={formatNumber(attendance.manualOverrides, locale)}
+          icon={<Icon name="check" size={18} />}
         />
-        <Stat
+        <StatTile
           label={t("campaign_report.attendance.not_checked_in")}
           value={formatNumber(attendance.notCheckedIn, locale)}
+          icon={<Icon name="alert" size={18} />}
+          tone={attendance.notCheckedIn > 0 ? "bad" : "ok"}
         />
-      </dl>
-      {/* Two axes over the same check-ins, and a manual override is not a fault. CLAUDE.md §3. */}
+      </StatStrip>
       <p className="mt-4 text-xs leading-5 text-[color:var(--color-muted)]">
         {t("campaign_report.attendance.note")}
       </p>
@@ -267,89 +291,69 @@ export default async function CampaignReportPage({
     .join(" · ");
 
   const exportBase = `/campaigns/${id}/report/export`;
-  const exportLinkClass =
-    "inline-flex h-8 items-center rounded-lg border border-[color:var(--color-line)] " +
-    "bg-[color:var(--color-surface)] px-3 text-sm font-semibold text-[color:var(--color-ink)] " +
-    "hover:bg-[color:var(--color-canvas)]";
+  const exportLinkClass = buttonClassName({ variant: "secondary", size: "sm" });
 
   const hasShifts = report.shiftRows.length > 0;
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <Link
-        href={`/campaigns/${id}`}
-        className="text-sm text-[color:var(--color-accent)] hover:underline"
-      >
-        {t("campaign_report.back")}
-      </Link>
+    <main className="mx-auto max-w-5xl px-6 py-10 sm:py-12">
+      <div className="flex flex-col gap-8">
+        <PageHeader
+          eyebrow={
+            <Link
+              href={`/campaigns/${id}`}
+              className="inline-flex items-center gap-1 rounded-sm hover:text-[color:var(--color-ink)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            >
+              <Icon name="chevronLeft" size={14} />
+              {report.campaign.name}
+            </Link>
+          }
+          title={t("campaign_report.title", { campaign: report.campaign.name })}
+          subtitle={subtitle || undefined}
+          actions={
+            <>
+              {/* Plain anchors, not <Link>: these are file downloads, not client navigations.
+                  `buttonClassName()` keeps them pixel-identical to every real <Button> on the
+                  page — see its doc comment in components/ui/Button.tsx. */}
+              <a className={exportLinkClass} href={`${exportBase}?mode=shifts`}>
+                {t("campaign_report.export_shifts")}
+              </a>
+              <a className={exportLinkClass} href={`${exportBase}?mode=stores`}>
+                {t("campaign_report.export_stores")}
+              </a>
+            </>
+          }
+        />
 
-      <PageHeader
-        className="mt-4"
-        title={t("campaign_report.title", { campaign: report.campaign.name })}
-        subtitle={subtitle || undefined}
-        actions={
-          <>
-            {/* Plain anchors, not <Link>: these are file downloads, not client navigations. */}
-            <a className={exportLinkClass} href={`${exportBase}?mode=shifts`}>
-              {t("campaign_report.export_shifts")}
-            </a>
-            <a className={exportLinkClass} href={`${exportBase}?mode=stores`}>
-              {t("campaign_report.export_stores")}
-            </a>
-          </>
-        }
-      />
-
-      <div className="mt-8 flex flex-col gap-6">
         {truncated ? (
-          <Card className="border-[color:var(--color-warn)]">
-            <p className="text-sm font-semibold text-[color:var(--color-ink)]">
-              {t("campaign_report.truncated.title")}
-            </p>
-            <p className="mt-1 text-sm text-[color:var(--color-muted)]">
+          <p className="flex items-start gap-2 rounded-2xl border border-[color:var(--color-warn-line)] bg-[color:var(--color-warn-subtle)] px-4 py-3.5 text-sm text-[color:var(--color-warn-ink)]">
+            <Icon name="alert" size={18} className="mt-px shrink-0 text-[color:var(--color-warn)]" />
+            <span>
+              <span className="font-semibold">{t("campaign_report.truncated.title")}</span>{" "}
               {t("campaign_report.truncated.body")}
-            </p>
-          </Card>
+            </span>
+          </p>
         ) : null}
 
         {/* --- Identity of the report ---------------------------------------------------- */}
-        <Card header={<h2 className="text-base font-semibold">{t("campaign_report.overview.title")}</h2>}>
-          <dl className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaign_report.overview.client")}
-              </dt>
-              <dd className="mt-1 text-sm text-[color:var(--color-ink)]">
-                {report.campaign.clientName ?? "—"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaign_report.overview.period")}
-              </dt>
-              <dd className="mt-1 text-sm text-[color:var(--color-ink)]">
-                {report.period
-                  ? `${formatDateString(report.period.from)} → ${formatDateString(report.period.to)}`
-                  : `${formatDateString(report.campaign.startsOn)} → ${formatDateString(report.campaign.endsOn)}`}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaign_report.overview.stores", { count: report.storeCount })}
-              </dt>
-              <dd className="mt-1 text-sm text-[color:var(--color-ink)]">
-                {report.storeNames.length > 0 ? report.storeNames.join(" · ") : "—"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
-                {t("campaign_report.overview.promoters", { count: report.promoterCount })}
-              </dt>
-              <dd className="mt-1 text-sm text-[color:var(--color-ink)]">
-                {report.promoterNames.length > 0 ? report.promoterNames.join(" · ") : "—"}
-              </dd>
-            </div>
-          </dl>
+        <Card
+          elevation="raised"
+          header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.overview.title")}</h2>}
+        >
+          <DetailList columns={2}>
+            <Detail label={t("campaign_report.overview.client")}>{report.campaign.clientName ?? "—"}</Detail>
+            <Detail label={t("campaign_report.overview.period")}>
+              {report.period
+                ? `${formatDateString(report.period.from)} → ${formatDateString(report.period.to)}`
+                : `${formatDateString(report.campaign.startsOn)} → ${formatDateString(report.campaign.endsOn)}`}
+            </Detail>
+            <Detail label={t("campaign_report.overview.stores", { count: report.storeCount })}>
+              {report.storeNames.length > 0 ? report.storeNames.join(" · ") : "—"}
+            </Detail>
+            <Detail label={t("campaign_report.overview.promoters", { count: report.promoterCount })}>
+              {report.promoterNames.length > 0 ? report.promoterNames.join(" · ") : "—"}
+            </Detail>
+          </DetailList>
           <p className="mt-4 text-xs text-[color:var(--color-muted)]">
             {t("campaign_report.generated", { at: formatInstant(report.generatedAt, locale) })}
           </p>
@@ -359,14 +363,12 @@ export default async function CampaignReportPage({
           // Nothing is scheduled, so there is nothing to report on. Teaching the next step beats
           // a wall of zeroes (commercial-architecture.md §6: empty states teach, no dead ends).
           <EmptyState
+            icon={<Icon name="calendar" size={24} />}
             title={t("campaign_report.empty.no_shifts.title")}
             description={t("campaign_report.empty.no_shifts.body")}
             action={
-              <Link
-                href={`/campaigns/${id}/shifts/new`}
-                className="text-sm font-medium text-[color:var(--color-accent)] hover:underline"
-              >
-                {t("campaign_report.empty.no_shifts.cta")} →
+              <Link href={`/campaigns/${id}/shifts/new`} className={buttonClassName({ size: "sm" })}>
+                {t("campaign_report.empty.no_shifts.cta")}
               </Link>
             }
           />
@@ -379,6 +381,7 @@ export default async function CampaignReportPage({
               // come back from the field yet. That is a real answer and it is said plainly,
               // rather than dressed up as a page of confident zeroes.
               <EmptyState
+                icon={<Icon name="inbox" size={24} />}
                 title={t("campaign_report.empty.title")}
                 description={t("campaign_report.empty.body")}
                 action={
@@ -392,9 +395,10 @@ export default async function CampaignReportPage({
             ) : (
               <>
                 <Card
+                  elevation="raised"
                   header={
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h2 className="text-base font-semibold">{t("campaign_report.totals.title")}</h2>
+                      <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.totals.title")}</h2>
                       <span className="text-xs text-[color:var(--color-muted)]">
                         {basisSentence(report.totals.basis, t)}
                       </span>
@@ -429,9 +433,10 @@ export default async function CampaignReportPage({
 
             {/* --- Per store ------------------------------------------------------------- */}
             <Card
+              flush={report.stores.length > 0}
               header={
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-base font-semibold">{t("campaign_report.stores.title")}</h2>
+                  <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.stores.title")}</h2>
                   <span className="text-xs text-[color:var(--color-muted)]">
                     {t("campaign_report.stores.hint")}
                   </span>
@@ -441,39 +446,39 @@ export default async function CampaignReportPage({
               {report.stores.length === 0 ? (
                 <p className="text-sm text-[color:var(--color-muted)]">{t("campaign_report.stores.none")}</p>
               ) : (
-                <Table>
+                <Table bare label={t("campaign_report.stores.title")}>
                   <TableHead>
                     <TableRow>
                       <TableHeaderCell>{t("campaign_report.stores.col_store")}</TableHeaderCell>
-                      <TableHeaderCell>{t("campaign_report.stores.col_shifts")}</TableHeaderCell>
-                      <TableHeaderCell>{t("campaign_report.stores.col_coverage")}</TableHeaderCell>
-                      <TableHeaderCell>{t("campaign_report.stores.col_attendance")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("campaign_report.stores.col_shifts")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("campaign_report.stores.col_coverage")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("campaign_report.stores.col_attendance")}</TableHeaderCell>
                       <TableHeaderCell>{t("campaign_report.stores.col_reports")}</TableHeaderCell>
-                      <TableHeaderCell>{t("campaign_report.stores.col_units")}</TableHeaderCell>
-                      <TableHeaderCell>{t("campaign_report.stores.col_sales")}</TableHeaderCell>
-                      <TableHeaderCell>{t("campaign_report.stores.col_interactions")}</TableHeaderCell>
-                      <TableHeaderCell>{t("campaign_report.stores.col_photos")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("campaign_report.stores.col_units")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("campaign_report.stores.col_sales")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("campaign_report.stores.col_interactions")}</TableHeaderCell>
+                      <TableHeaderCell className="text-right">{t("campaign_report.stores.col_photos")}</TableHeaderCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {report.stores.map((store) => (
                       <TableRow key={store.storeId}>
                         <TableCell>
-                          <span className="font-medium">{store.storeName}</span>
+                          <span className="font-medium text-[color:var(--color-ink)]">{store.storeName}</span>
                           {store.chain ? (
                             <span className="block text-xs text-[color:var(--color-muted)]">
                               {store.chain}
                             </span>
                           ) : null}
                         </TableCell>
-                        <TableCell>{formatNumber(store.coverage.shifts, locale)}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-right tabular-nums">{formatNumber(store.coverage.shifts, locale)}</TableCell>
+                        <TableCell className="text-right tabular-nums">
                           {t("campaign_report.of", {
                             done: store.coverage.filledSlots,
                             total: store.coverage.requiredSlots,
                           })}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-right tabular-nums">
                           {t("campaign_report.of", {
                             done: store.attendance.checkedIn,
                             total: store.attendance.expected,
@@ -482,19 +487,19 @@ export default async function CampaignReportPage({
                         <TableCell>
                           <span className="whitespace-nowrap">{reportsLabel(store.totals, t)}</span>
                           {store.totals.basis.complete ? null : (
-                            <Badge variant="warn" className="ml-2">
+                            <Badge variant="warn" size="sm" className="ml-2">
                               {t("campaign_report.basis.incomplete")}
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-right tabular-nums">
                           {formatNumber(store.totals.unitsPromoted.value, locale)}
                         </TableCell>
-                        <TableCell>{formatNumber(store.totals.salesCount.value, locale)}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-right tabular-nums">{formatNumber(store.totals.salesCount.value, locale)}</TableCell>
+                        <TableCell className="text-right tabular-nums">
                           {formatNumber(store.totals.interactionsCount.value, locale)}
                         </TableCell>
-                        <TableCell>{formatNumber(store.photoCount, locale)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{formatNumber(store.photoCount, locale)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -506,7 +511,7 @@ export default async function CampaignReportPage({
             <Card
               header={
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-base font-semibold">{t("campaign_report.photos.title")}</h2>
+                  <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.photos.title")}</h2>
                   <span className="text-xs text-[color:var(--color-muted)]">
                     {t("campaign_report.photos.count", { count: report.photos.length })}
                   </span>
@@ -567,7 +572,7 @@ export default async function CampaignReportPage({
             </Card>
 
             {/* --- Notes and observations ------------------------------------------------ */}
-            <Card header={<h2 className="text-base font-semibold">{t("campaign_report.notes.title")}</h2>}>
+            <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.notes.title")}</h2>}>
               {report.notes.length === 0 ? (
                 <p className="text-sm text-[color:var(--color-muted)]">{t("campaign_report.notes.none")}</p>
               ) : (
@@ -608,18 +613,19 @@ export default async function CampaignReportPage({
 
             {/* --- Per shift -------------------------------------------------------------- */}
             <Card
-              header={<h2 className="text-base font-semibold">{t("campaign_report.shifts.title")}</h2>}
+              flush
+              header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaign_report.shifts.title")}</h2>}
             >
-              <Table>
+              <Table bare layout="fluid" label={t("campaign_report.shifts.title")}>
                 <TableHead>
                   <TableRow>
                     <TableHeaderCell>{t("campaign_report.shifts.col_date")}</TableHeaderCell>
                     <TableHeaderCell>{t("campaign_report.shifts.col_store")}</TableHeaderCell>
                     <TableHeaderCell>{t("campaign_report.shifts.col_promoters")}</TableHeaderCell>
-                    <TableHeaderCell>{t("campaign_report.shifts.col_coverage")}</TableHeaderCell>
+                    <TableHeaderCell className="text-right">{t("campaign_report.shifts.col_coverage")}</TableHeaderCell>
                     <TableHeaderCell>{t("campaign_report.shifts.col_reports")}</TableHeaderCell>
-                    <TableHeaderCell>{t("campaign_report.shifts.col_units")}</TableHeaderCell>
-                    <TableHeaderCell>{t("campaign_report.shifts.col_photos")}</TableHeaderCell>
+                    <TableHeaderCell className="text-right">{t("campaign_report.shifts.col_units")}</TableHeaderCell>
+                    <TableHeaderCell className="text-right">{t("campaign_report.shifts.col_photos")}</TableHeaderCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -628,7 +634,7 @@ export default async function CampaignReportPage({
                       <TableCell>
                         <Link
                           href={`/shifts/${row.shiftId}`}
-                          className="whitespace-nowrap text-[color:var(--color-accent)] hover:underline"
+                          className="whitespace-nowrap rounded-sm font-medium text-[color:var(--color-accent)] hover:underline focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
                         >
                           {formatDateString(row.onDate)} · {timeLabel(row.startTime)}–
                           {timeLabel(row.endTime)}
@@ -638,7 +644,7 @@ export default async function CampaignReportPage({
                       <TableCell>
                         {row.promoterNames.length > 0 ? row.promoterNames.join(", ") : "—"}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-right tabular-nums">
                         {t("campaign_report.of", {
                           done: row.filledSlots,
                           total: row.promotersRequired,
@@ -647,12 +653,12 @@ export default async function CampaignReportPage({
                       <TableCell>
                         <span className="whitespace-nowrap">{reportsLabel(row.totals, t)}</span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-right tabular-nums">
                         {row.totals.basis.reportsIn === 0
                           ? "—"
                           : formatNumber(row.totals.unitsPromoted.value, locale)}
                       </TableCell>
-                      <TableCell>{formatNumber(row.photoCount, locale)}</TableCell>
+                      <TableCell className="text-right tabular-nums">{formatNumber(row.photoCount, locale)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

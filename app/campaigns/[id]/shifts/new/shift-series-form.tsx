@@ -1,20 +1,56 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { SelectField, TextField, type SelectOption } from "@/components/ui";
-import type { TranslationKey } from "@/lib/i18n";
+import type { ReactNode } from "react";
+import { SelectField, TextField, Section, Icon, type SelectOption } from "@/components/ui";
+import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { SubmitButton } from "@/app/campaigns/submit-button";
 import { WEEKDAYS, WEEKDAY_KEY, expandSeriesDates } from "@/app/campaigns/_shared";
 import { createShifts, type ShiftFormState } from "./actions";
 
 const INITIAL_STATE: ShiftFormState = { status: "idle" };
 
+// Same fix as `app/campaigns/new/campaign-form.tsx`: a Server Component cannot pass a plain
+// function prop to a Client Component. `t` used to arrive that way from
+// `app/campaigns/[id]/shifts/new/page.tsx` and crashed every real request with "Functions cannot
+// be passed directly to Client Components" — invisible to `npm run build` because this route is
+// fully dynamic and Next never serializes its RSC payload at build time. Creating the translator
+// here instead matches every other client form in this codebase.
+const t = translatorFor(DEFAULT_LOCALE);
+
+/** Same shape as `app/promoters/promoter-form.tsx`'s `Banner` and `app/campaigns/new/campaign-form.tsx`'s
+ * `ErrorBanner` — kept local because `components/ui/**` is frozen. */
+function ErrorBanner({ children }: { children: ReactNode }) {
+  return (
+    <div
+      role="alert"
+      className="flex items-start gap-2.5 rounded-xl border border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] px-4 py-3 text-sm font-medium leading-5 text-[color:var(--color-bad-ink)]"
+    >
+      <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
+      <div>{children}</div>
+    </div>
+  );
+}
+
+function OptionChip({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <label
+      className={
+        "flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3.5 text-sm text-[color:var(--color-ink)] transition-colors duration-150 ease-[var(--ease-out-soft)] hover:border-[color:var(--color-line-strong)] hover:bg-[color:var(--color-surface-hover)] has-[:checked]:border-[color:var(--color-accent-line)] has-[:checked]:bg-[color:var(--color-accent-subtle)] has-[:checked]:text-[color:var(--color-accent-ink)] has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50 has-[:focus-visible]:shadow-[var(--focus-ring)] " +
+        (className ?? "flex-1")
+      }
+    >
+      {children}
+    </label>
+  );
+}
+
+const RADIO_CLASS = "size-4 shrink-0 accent-[color:var(--color-accent)] outline-none";
+
 export function ShiftSeriesForm({
-  t,
   campaignId,
   stores,
 }: {
-  t: (key: TranslationKey, params?: Record<string, string | number>) => string;
   campaignId: string;
   stores: SelectOption[];
 }) {
@@ -44,198 +80,195 @@ export function ShiftSeriesForm({
     state.fieldErrors?.[field] ? t(state.fieldErrors[field]!) : undefined;
 
   return (
-    <form action={formAction} className="flex flex-col gap-6">
+    <form action={formAction} className="flex flex-col gap-9">
       <input type="hidden" name="campaignId" value={campaignId} />
 
-      {state.formError ? (
-        <p
-          role="alert"
-          className="rounded-lg border border-[color:var(--color-bad)] bg-[color:var(--color-bad)]/10 px-4 py-3 text-sm font-medium text-[color:var(--color-bad)]"
-        >
-          {t(state.formError)}
-        </p>
-      ) : null}
+      {state.formError ? <ErrorBanner>{t(state.formError)}</ErrorBanner> : null}
 
-      <fieldset className="flex flex-col gap-3">
-        <legend className="text-sm font-semibold text-[color:var(--color-ink)]">
-          {t("campaigns.shifts_new.section_store")}
-        </legend>
+      <Section title={t("campaigns.shifts_new.section_store")}>
+        <div className="flex flex-col gap-4">
+          <fieldset className="flex flex-wrap gap-2">
+            <legend className="sr-only">{t("campaigns.shifts_new.section_store")}</legend>
+            <OptionChip>
+              <input
+                type="radio"
+                name="storeMode"
+                value="existing"
+                checked={storeMode === "existing"}
+                onChange={() => setStoreMode("existing")}
+                disabled={stores.length === 0}
+                className={RADIO_CLASS}
+              />
+              {t("campaigns.shifts_new.store_existing")}
+            </OptionChip>
+            <OptionChip>
+              <input
+                type="radio"
+                name="storeMode"
+                value="new"
+                checked={storeMode === "new"}
+                onChange={() => setStoreMode("new")}
+                className={RADIO_CLASS}
+              />
+              {t("campaigns.shifts_new.store_new")}
+            </OptionChip>
+          </fieldset>
 
-        <div className="flex flex-wrap gap-4 text-sm text-[color:var(--color-ink)]">
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="storeMode"
-              value="existing"
-              checked={storeMode === "existing"}
-              onChange={() => setStoreMode("existing")}
-              disabled={stores.length === 0}
+          {stores.length === 0 ? (
+            <p className="text-xs text-[color:var(--color-muted)]">{t("campaigns.shifts_new.no_stores_hint")}</p>
+          ) : null}
+
+          {storeMode === "existing" ? (
+            <SelectField
+              id="storeId"
+              name="storeId"
+              label={t("campaigns.shifts_new.store_select_label")}
+              placeholder={t("campaigns.shifts_new.store_select_placeholder")}
+              options={stores}
+              error={errorFor("storeId")}
+              required
             />
-            {t("campaigns.shifts_new.store_existing")}
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="storeMode"
-              value="new"
-              checked={storeMode === "new"}
-              onChange={() => setStoreMode("new")}
-            />
-            {t("campaigns.shifts_new.store_new")}
-          </label>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField
+                id="newStoreName"
+                name="newStoreName"
+                label={t("campaigns.shifts_new.new_store_name_label")}
+                error={errorFor("newStoreName")}
+                required
+                containerClassName="sm:col-span-2"
+              />
+              <TextField
+                id="newStoreAddress"
+                name="newStoreAddress"
+                label={t("campaigns.shifts_new.new_store_address_label")}
+                containerClassName="sm:col-span-2"
+              />
+              <TextField
+                id="newStoreLat"
+                name="newStoreLat"
+                inputMode="decimal"
+                label={t("campaigns.shifts_new.new_store_lat_label")}
+                hint={t("campaigns.shifts_new.new_store_coords_hint")}
+                error={errorFor("newStoreLat")}
+                required
+              />
+              <TextField
+                id="newStoreLng"
+                name="newStoreLng"
+                inputMode="decimal"
+                label={t("campaigns.shifts_new.new_store_lng_label")}
+                error={errorFor("newStoreLng")}
+                required
+              />
+            </div>
+          )}
         </div>
+      </Section>
 
-        {stores.length === 0 ? (
-          <p className="text-xs text-[color:var(--color-muted)]">{t("campaigns.shifts_new.no_stores_hint")}</p>
-        ) : null}
-
-        {storeMode === "existing" ? (
-          <SelectField
-            id="storeId"
-            name="storeId"
-            label={t("campaigns.shifts_new.store_select_label")}
-            placeholder={t("campaigns.shifts_new.store_select_placeholder")}
-            options={stores}
-            error={errorFor("storeId")}
-            required
-          />
-        ) : (
+      <Section title={t("campaigns.shifts_new.section_schedule")}>
+        <div className="flex flex-col gap-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField
-              id="newStoreName"
-              name="newStoreName"
-              label={t("campaigns.shifts_new.new_store_name_label")}
-              error={errorFor("newStoreName")}
-              required
-              containerClassName="sm:col-span-2"
-            />
-            <TextField
-              id="newStoreAddress"
-              name="newStoreAddress"
-              label={t("campaigns.shifts_new.new_store_address_label")}
-              containerClassName="sm:col-span-2"
-            />
-            <TextField
-              id="newStoreLat"
-              name="newStoreLat"
-              inputMode="decimal"
-              label={t("campaigns.shifts_new.new_store_lat_label")}
-              hint={t("campaigns.shifts_new.new_store_coords_hint")}
-              error={errorFor("newStoreLat")}
+              id="fromDate"
+              name="fromDate"
+              type="date"
+              label={t("campaigns.shifts_new.from_date_label")}
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              error={errorFor("fromDate")}
               required
             />
             <TextField
-              id="newStoreLng"
-              name="newStoreLng"
-              inputMode="decimal"
-              label={t("campaigns.shifts_new.new_store_lng_label")}
-              error={errorFor("newStoreLng")}
+              id="toDate"
+              name="toDate"
+              type="date"
+              label={t("campaigns.shifts_new.to_date_label")}
+              hint={t("campaigns.shifts_new.to_date_hint")}
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              error={errorFor("toDate")}
               required
             />
           </div>
-        )}
-      </fieldset>
 
-      <fieldset className="flex flex-col gap-3">
-        <legend className="text-sm font-semibold text-[color:var(--color-ink)]">
-          {t("campaigns.shifts_new.section_schedule")}
-        </legend>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField
-            id="fromDate"
-            name="fromDate"
-            type="date"
-            label={t("campaigns.shifts_new.from_date_label")}
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            error={errorFor("fromDate")}
-            required
-          />
-          <TextField
-            id="toDate"
-            name="toDate"
-            type="date"
-            label={t("campaigns.shifts_new.to_date_label")}
-            hint={t("campaigns.shifts_new.to_date_hint")}
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            error={errorFor("toDate")}
-            required
-          />
-        </div>
-
-        <div>
-          <p className="text-sm font-medium text-[color:var(--color-ink)]">{t("campaigns.shifts_new.weekdays_label")}</p>
-          <div className="mt-2 flex flex-wrap gap-3">
-            {WEEKDAYS.map((day) => (
-              <label key={day} className="flex items-center gap-1.5 text-sm text-[color:var(--color-ink)]">
-                <input
-                  type="checkbox"
-                  name="weekdays"
-                  value={day}
-                  checked={weekdays.has(day)}
-                  onChange={() => toggleWeekday(day)}
-                />
-                {t(WEEKDAY_KEY[day])}
-              </label>
-            ))}
-          </div>
-          {errorFor("weekdays") ? (
-            <p role="alert" className="mt-1 text-xs font-medium text-[color:var(--color-bad)]">
-              {errorFor("weekdays")}
+          <div className="flex flex-col gap-1.5">
+            <p className="text-sm font-medium leading-5 text-[color:var(--color-ink)]">
+              {t("campaigns.shifts_new.weekdays_label")}
             </p>
-          ) : null}
+            <fieldset className="flex flex-wrap gap-1.5">
+              <legend className="sr-only">{t("campaigns.shifts_new.weekdays_label")}</legend>
+              {WEEKDAYS.map((day) => (
+                <OptionChip key={day} className="min-w-14 flex-none justify-center px-2">
+                  <input
+                    type="checkbox"
+                    name="weekdays"
+                    value={day}
+                    checked={weekdays.has(day)}
+                    onChange={() => toggleWeekday(day)}
+                    className="sr-only"
+                  />
+                  {t(WEEKDAY_KEY[day])}
+                </OptionChip>
+              ))}
+            </fieldset>
+            {errorFor("weekdays") ? (
+              <p role="alert" className="text-xs font-medium leading-5 text-[color:var(--color-bad-ink)]">
+                {errorFor("weekdays")}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <TextField
+              id="startTime"
+              name="startTime"
+              type="time"
+              label={t("campaigns.shifts_new.start_time_label")}
+              error={errorFor("startTime")}
+              required
+            />
+            <TextField
+              id="endTime"
+              name="endTime"
+              type="time"
+              label={t("campaigns.shifts_new.end_time_label")}
+              error={errorFor("endTime")}
+              required
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <TextField
+              id="promotersRequired"
+              name="promotersRequired"
+              type="number"
+              min={1}
+              defaultValue={1}
+              label={t("campaigns.shifts_new.promoters_required_label")}
+              error={errorFor("promotersRequired")}
+              required
+            />
+            <TextField
+              id="rateOverrideEuros"
+              name="rateOverrideEuros"
+              inputMode="decimal"
+              label={t("campaigns.shifts_new.rate_override_label")}
+              hint={t("campaigns.shifts_new.rate_override_hint")}
+              error={errorFor("rateOverrideEuros")}
+            />
+          </div>
+
+          <p className="flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-ink)]">
+            <Icon name="calendar" size={16} className="shrink-0" />
+            {previewCount > 0
+              ? t("campaigns.shifts_new.preview_count", { count: previewCount })
+              : t("campaigns.shifts_new.preview_none")}
+          </p>
         </div>
+      </Section>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField
-            id="startTime"
-            name="startTime"
-            type="time"
-            label={t("campaigns.shifts_new.start_time_label")}
-            error={errorFor("startTime")}
-            required
-          />
-          <TextField
-            id="endTime"
-            name="endTime"
-            type="time"
-            label={t("campaigns.shifts_new.end_time_label")}
-            error={errorFor("endTime")}
-            required
-          />
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField
-            id="promotersRequired"
-            name="promotersRequired"
-            type="number"
-            min={1}
-            defaultValue={1}
-            label={t("campaigns.shifts_new.promoters_required_label")}
-            error={errorFor("promotersRequired")}
-            required
-          />
-          <TextField
-            id="rateOverrideEuros"
-            name="rateOverrideEuros"
-            inputMode="decimal"
-            label={t("campaigns.shifts_new.rate_override_label")}
-            hint={t("campaigns.shifts_new.rate_override_hint")}
-            error={errorFor("rateOverrideEuros")}
-          />
-        </div>
-
-        <p className="text-sm font-medium text-[color:var(--color-accent)]">
-          {previewCount > 0
-            ? t("campaigns.shifts_new.preview_count", { count: previewCount })
-            : t("campaigns.shifts_new.preview_none")}
-        </p>
-      </fieldset>
-
-      <div>
+      <div className="border-t border-[color:var(--color-line)] pt-6">
         <SubmitButton
           label={t("campaigns.shifts_new.submit")}
           pendingLabel={t("campaigns.shifts_new.submitting")}

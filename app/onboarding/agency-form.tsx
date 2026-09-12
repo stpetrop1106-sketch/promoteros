@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { TextField, SelectField, Button } from "@/components/ui";
+import { TextField, SelectField, Button, Icon } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { createAgency } from "./actions";
 import { CREATE_AGENCY_IDLE, TIMEZONES, type CreateAgencyState } from "./state";
@@ -32,12 +32,13 @@ export function AgencyForm({ suggestedName }: { suggestedName?: string }) {
   return (
     <form action={formAction} className="flex flex-col gap-5">
       {state.errors?.general ? (
-        <p
+        <div
           role="alert"
-          className="rounded-lg border border-[color:var(--color-bad)] bg-[color:var(--color-bad)]/10 px-4 py-3 text-sm text-[color:var(--color-ink)]"
+          className="flex items-start gap-2.5 rounded-xl border border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] px-4 py-3 text-sm font-medium leading-5 text-[color:var(--color-bad-ink)]"
         >
-          {state.errors.general}
-        </p>
+          <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
+          <span>{state.errors.general}</span>
+        </div>
       ) : null}
 
       <TextField
@@ -84,7 +85,7 @@ export function AgencyForm({ suggestedName }: { suggestedName?: string }) {
         autoComplete="name"
       />
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 border-t border-[color:var(--color-line)] pt-6">
         <SubmitButton />
         <p className="text-xs text-[color:var(--color-muted)]">{t("onboarding.create.trial_note")}</p>
       </div>

@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { PageHeader } from "@/components/ui";
+import { PageHeader, Card, LinkButton } from "@/components/ui";
 import { CampaignForm } from "./campaign-form";
 
 export const dynamic = "force-dynamic";
@@ -23,16 +22,20 @@ export default async function NewCampaignPage() {
   const clientOptions = (clients ?? []).map((c) => ({ value: c.id, label: c.name }));
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
-      <Link href="/campaigns" className="text-sm text-[color:var(--color-accent)] hover:underline">
-        {t("campaigns.detail.back")}
-      </Link>
+    <main className="mx-auto max-w-4xl px-6 py-12">
+      <PageHeader
+        title={t("campaigns.new.title")}
+        subtitle={t("campaigns.new.subtitle")}
+        actions={
+          <LinkButton href="/campaigns" variant="ghost" size="sm">
+            {t("campaigns.detail.back")}
+          </LinkButton>
+        }
+      />
 
-      <PageHeader className="mt-4" title={t("campaigns.new.title")} subtitle={t("campaigns.new.subtitle")} />
-
-      <div className="mt-8">
-        <CampaignForm t={t} clients={clientOptions} skills={skills ?? []} />
-      </div>
+      <Card className="mt-8" elevation="raised">
+        <CampaignForm clients={clientOptions} skills={skills ?? []} />
+      </Card>
     </main>
   );
 }

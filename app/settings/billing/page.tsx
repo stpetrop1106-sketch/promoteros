@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { ownerContext } from "@/lib/team";
 import { getEntitlement, type BillingNotice, type Entitlement } from "@/lib/billing/subscription";
@@ -16,7 +15,7 @@ import {
 } from "@/lib/billing/plans";
 import { isConfigured, stripeMode } from "@/lib/billing/stripe";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { PageHeader, Card, Badge, Button, EmptyState } from "@/components/ui";
+import { PageHeader, Card, Badge, LinkButton, EmptyState, SectionHeading, DetailList, Detail, Icon } from "@/components/ui";
 import { SubscribeButton, PortalButton } from "./billing-controls";
 
 /**
@@ -37,7 +36,7 @@ import { SubscribeButton, PortalButton } from "./billing-controls";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "PromoterOS" };
+export const metadata: Metadata = { title: translatorFor(DEFAULT_LOCALE)("page_title.settings_billing") };
 
 const t = translatorFor(DEFAULT_LOCALE);
 
@@ -82,15 +81,6 @@ function formatDate(value: string | null): string {
   return new Intl.DateTimeFormat("el-GR", { dateStyle: "long" }).format(date);
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-2 py-2">
-      <dt className="text-sm text-[color:var(--color-muted)]">{label}</dt>
-      <dd className="text-sm font-medium text-[color:var(--color-ink)]">{children}</dd>
-    </div>
-  );
-}
-
 function StatusBadge({ entitlement }: { entitlement: Entitlement }) {
   const variant =
     entitlement.access === "read_only" ? "bad" : entitlement.access === "grace" ? "warn" : "ok";
@@ -108,22 +98,19 @@ function NoticeBanner({ entitlement }: { entitlement: Entitlement }) {
 
   const severe = entitlement.access === "read_only";
   const days = entitlement.graceDaysRemaining ?? entitlement.trialDaysRemaining ?? 0;
+  const tone = severe
+    ? "border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] text-[color:var(--color-bad-ink)]"
+    : "border-[color:var(--color-warn-line)] bg-[color:var(--color-warn-subtle)] text-[color:var(--color-warn-ink)]";
 
   return (
-    <div
-      role="status"
-      className={
-        severe
-          ? "mt-6 rounded-xl border border-[color:var(--color-bad)] bg-[color:var(--color-bad)]/10 px-4 py-3"
-          : "mt-6 rounded-xl border border-[color:var(--color-warn)] bg-[color:var(--color-warn)]/10 px-4 py-3"
-      }
-    >
-      <p className="text-sm font-semibold text-[color:var(--color-ink)]">
-        {t(NOTICE_TITLE[entitlement.notice])}
-      </p>
-      <p className="mt-1 text-sm leading-6 text-[color:var(--color-muted)]">
-        {t(NOTICE_BODY[entitlement.notice], { days: Math.max(0, days) })}
-      </p>
+    <div role="status" className={`mt-8 flex items-start gap-2.5 rounded-xl border px-4 py-3 ${tone}`}>
+      <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
+      <div>
+        <p className="text-sm font-semibold">{t(NOTICE_TITLE[entitlement.notice])}</p>
+        <p className="mt-1 text-sm leading-6 opacity-90">
+          {t(NOTICE_BODY[entitlement.notice], { days: Math.max(0, days) })}
+        </p>
+      </div>
     </div>
   );
 }
@@ -140,16 +127,16 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   // Not an owner. A specific explanation and a route forward, never a blank refusal.
   if (!owner) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-12">
+      <main className="mx-auto max-w-3xl px-6 py-12">
         <PageHeader title={t("billing.title")} />
-        <div className="mt-6">
+        <div className="mt-8">
           <EmptyState
             title={t("billing.owner_only_title")}
             description={t("billing.owner_only_body")}
             action={
-              <Link href="/settings">
-                <Button variant="secondary">{t("billing.back_to_settings")}</Button>
-              </Link>
+              <LinkButton href="/settings" variant="secondary">
+                {t("billing.back_to_settings")}
+              </LinkButton>
             }
           />
         </div>
@@ -161,17 +148,13 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
   if (!entitlement) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-12">
+      <main className="mx-auto max-w-3xl px-6 py-12">
         <PageHeader title={t("billing.title")} />
-        <div className="mt-6">
+        <div className="mt-8">
           <EmptyState
             title={t("billing.no_agency_title")}
             description={t("billing.no_agency_body")}
-            action={
-              <Link href="/onboarding">
-                <Button>{t("billing.no_agency_cta")}</Button>
-              </Link>
-            }
+            action={<LinkButton href="/onboarding">{t("billing.no_agency_cta")}</LinkButton>}
           />
         </div>
       </main>
@@ -192,11 +175,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         title={t("billing.title")}
         subtitle={t("billing.subtitle", { agency: entitlement.agencyName })}
         actions={
-          <Link href="/settings">
-            <Button variant="ghost" size="sm">
-              {t("billing.back_to_settings")}
-            </Button>
-          </Link>
+          <LinkButton href="/settings" variant="ghost" size="sm">
+            {t("billing.back_to_settings")}
+          </LinkButton>
         }
       />
 
@@ -207,21 +188,20 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
       {checkout === "success" ? (
         <div
           role="status"
-          className="mt-6 rounded-xl border border-[color:var(--color-ok)] bg-[color:var(--color-ok)]/10 px-4 py-3"
+          className="mt-8 flex items-start gap-2.5 rounded-xl border border-[color:var(--color-ok-line)] bg-[color:var(--color-ok-subtle)] px-4 py-3 text-[color:var(--color-ok-ink)]"
         >
-          <p className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("billing.checkout.success_title")}
-          </p>
-          <p className="mt-1 text-sm leading-6 text-[color:var(--color-muted)]">
-            {t("billing.checkout.success_body")}
-          </p>
+          <Icon name="check" size={18} className="mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold">{t("billing.checkout.success_title")}</p>
+            <p className="mt-1 text-sm leading-6 opacity-90">{t("billing.checkout.success_body")}</p>
+          </div>
         </div>
       ) : null}
 
       {checkout === "cancelled" ? (
         <div
           role="status"
-          className="mt-6 rounded-xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-4 py-3"
+          className="mt-8 rounded-xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-4 py-3"
         >
           <p className="text-sm font-semibold text-[color:var(--color-ink)]">
             {t("billing.checkout.cancelled_title")}
@@ -233,7 +213,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
       ) : null}
 
       {!configured ? (
-        <Card className="mt-6">
+        <Card className="mt-8">
           <p className="text-sm font-semibold text-[color:var(--color-ink)]">
             {t("billing.not_configured_title")}
           </p>
@@ -244,38 +224,33 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
       ) : null}
 
       {mode === "test" ? (
-        <p className="mt-4 text-xs font-medium text-[color:var(--color-warn)]">
+        <p className="mt-4 flex items-center gap-1.5 text-xs font-medium text-[color:var(--color-warn-ink)]">
+          <Icon name="alert" size={14} />
           {t("billing.test_mode")}
         </p>
       ) : null}
 
-      <Card
-        className="mt-6"
-        header={
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("billing.current.title")}
-          </h2>
-        }
-      >
-        <dl className="divide-y divide-[color:var(--color-line)]">
-          <Row label={t("billing.current.plan")}>
+      <div className="mt-8 flex flex-col gap-6">
+      <Card header={<SectionHeading level={3} title={t("billing.current.title")} />}>
+        <DetailList columns={2}>
+          <Detail label={t("billing.current.plan")}>
             <Badge variant="info">{t(PLAN_NAME[entitlement.planId])}</Badge>
-          </Row>
-          <Row label={t("billing.current.status")}>
+          </Detail>
+          <Detail label={t("billing.current.status")}>
             <StatusBadge entitlement={entitlement} />
-          </Row>
+          </Detail>
           {entitlement.status === "trialing" ? (
-            <Row label={t("billing.current.trial_ends")}>
+            <Detail label={t("billing.current.trial_ends")}>
               {entitlement.trialEndsAt
                 ? t("billing.current.trial_days", {
                     date: formatDate(entitlement.trialEndsAt),
                     days: Math.max(0, entitlement.trialDaysRemaining ?? 0),
                   })
                 : "—"}
-            </Row>
+            </Detail>
           ) : null}
-          <Row label={t("billing.current.renews")}>{formatDate(entitlement.currentPeriodEnd)}</Row>
-          <Row label={t("billing.current.access")}>
+          <Detail label={t("billing.current.renews")}>{formatDate(entitlement.currentPeriodEnd)}</Detail>
+          <Detail label={t("billing.current.access")}>
             {t(
               entitlement.access === "read_only"
                 ? "billing.access.read_only"
@@ -283,106 +258,82 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                   ? "billing.access.grace"
                   : "billing.access.full",
             )}
-          </Row>
-        </dl>
+          </Detail>
+        </DetailList>
 
         {!entitlement.stripeSubscriptionId ? (
-          <p className="mt-3 text-xs text-[color:var(--color-muted)]">
+          <p className="mt-5 border-t border-[color:var(--color-line)] pt-4 text-xs text-[color:var(--color-muted)]">
             {t("billing.current.no_subscription")}
           </p>
         ) : null}
       </Card>
 
-      <Card
-        className="mt-6"
-        header={
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("billing.usage.title")}
-          </h2>
-        }
-      >
-        <dl className="divide-y divide-[color:var(--color-line)]">
-          <Row label={t("billing.usage.seats")}>
-            <span className="inline-flex items-center gap-2">
-              {t("billing.usage.of_limit", {
-                used: entitlement.seatsUsed,
-                limit: entitlement.seatLimit,
-              })}
-              {entitlement.overSeatLimit ? (
-                <Badge variant="warn">{t("billing.usage.at_limit")}</Badge>
-              ) : null}
+      <Card header={<SectionHeading level={3} title={t("billing.usage.title")} />}>
+        <DetailList columns={2}>
+          <Detail label={t("billing.usage.seats")}>
+            <span className="inline-flex flex-wrap items-center gap-2">
+              {t("billing.usage.of_limit", { used: entitlement.seatsUsed, limit: entitlement.seatLimit })}
+              {entitlement.overSeatLimit ? <Badge variant="warn">{t("billing.usage.at_limit")}</Badge> : null}
             </span>
-          </Row>
-          <Row label={t("billing.usage.promoters")}>
-            <span className="inline-flex items-center gap-2">
-              {t("billing.usage.of_limit", {
-                used: entitlement.promotersUsed,
-                limit: entitlement.promoterLimit,
-              })}
-              {entitlement.overPromoterLimit ? (
-                <Badge variant="warn">{t("billing.usage.at_limit")}</Badge>
-              ) : null}
+          </Detail>
+          <Detail label={t("billing.usage.promoters")}>
+            <span className="inline-flex flex-wrap items-center gap-2">
+              {t("billing.usage.of_limit", { used: entitlement.promotersUsed, limit: entitlement.promoterLimit })}
+              {entitlement.overPromoterLimit ? <Badge variant="warn">{t("billing.usage.at_limit")}</Badge> : null}
             </span>
-          </Row>
-        </dl>
-        <p className="mt-3 text-xs leading-5 text-[color:var(--color-muted)]">
+          </Detail>
+        </DetailList>
+        <p className="mt-5 border-t border-[color:var(--color-line)] pt-4 text-xs leading-5 text-[color:var(--color-muted)]">
           {t("billing.usage.note")}
         </p>
       </Card>
 
       <Card
-        className="mt-6"
         header={
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-              {t("billing.plans.title")}
-            </h2>
-            {/* A plain anchor, not <Link>: typed routes only know a route once it has been built,
-                and this page is new. The toggle is a full navigation either way. */}
-            <a
-              href={interval === "year" ? "/settings/billing" : "/settings/billing?interval=year"}
-              className="text-xs font-semibold text-[color:var(--color-accent)] underline underline-offset-2"
-            >
-              {interval === "year"
-                ? t("billing.interval.switch_to_monthly")
-                : t("billing.interval.switch_to_annual")}
-            </a>
-          </div>
+          <SectionHeading
+            level={3}
+            title={t("billing.plans.title")}
+            description={t("billing.plans.subtitle")}
+            actions={
+              // A plain anchor, not <Link>: typed routes only know a route once it has been built,
+              // and this page is new. The toggle is a full navigation either way.
+              <a
+                href={interval === "year" ? "/settings/billing" : "/settings/billing?interval=year"}
+                className="text-xs font-semibold text-[color:var(--color-accent)] underline underline-offset-2 hover:no-underline"
+              >
+                {interval === "year" ? t("billing.interval.switch_to_monthly") : t("billing.interval.switch_to_annual")}
+              </a>
+            }
+          />
         }
       >
-        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-          {t("billing.plans.subtitle")}
-        </p>
-
-        <ul className="mt-4 grid gap-4 sm:grid-cols-3">
+        <ul className="grid gap-4 sm:grid-cols-3">
           {PLAN_ORDER.map((planId) => {
             const plan = PLANS[planId];
-            const isCurrent =
-              entitlement.planId === planId && entitlement.status !== "canceled";
+            const isCurrent = entitlement.planId === planId && entitlement.status !== "canceled";
             const priceReady = priceIdFor(planId, interval) !== null;
 
             return (
               <li
                 key={planId}
-                className="flex flex-col gap-3 rounded-xl border border-[color:var(--color-line)] p-4"
+                className={
+                  "flex flex-col gap-3 rounded-xl border p-4 " +
+                  (isCurrent
+                    ? "border-[color:var(--color-accent-line)] bg-[color:var(--color-accent-subtle)]/40"
+                    : "border-[color:var(--color-line)]")
+                }
               >
                 <div>
-                  <p className="text-sm font-semibold text-[color:var(--color-ink)]">
-                    {t(PLAN_NAME[planId])}
-                  </p>
+                  <p className="text-sm font-semibold text-[color:var(--color-ink)]">{t(PLAN_NAME[planId])}</p>
                   <p className="mt-1 text-lg font-semibold text-[color:var(--color-ink)]">
                     {formatEur(priceCents(plan, interval))}
                     <span className="ml-1 text-xs font-normal text-[color:var(--color-muted)]">
-                      {interval === "year"
-                        ? t("billing.interval.per_year")
-                        : t("billing.interval.per_month")}
+                      {interval === "year" ? t("billing.interval.per_year") : t("billing.interval.per_month")}
                     </span>
                   </p>
                   {interval === "year" ? (
                     <p className="mt-1 text-xs text-[color:var(--color-muted)]">
-                      {t("billing.interval.annual_effective", {
-                        price: formatEur(effectiveMonthlyCents(plan, "year")),
-                      })}
+                      {t("billing.interval.annual_effective", { price: formatEur(effectiveMonthlyCents(plan, "year")) })}
                     </p>
                   ) : null}
                 </div>
@@ -398,27 +349,19 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
                 <div className="mt-auto">
                   {isCurrent && entitlement.stripeSubscriptionId ? (
-                    <Button variant="secondary" disabled>
-                      {t("billing.cta.current_plan")}
-                    </Button>
+                    <Badge variant="info">{t("billing.cta.current_plan")}</Badge>
                   ) : (
                     <SubscribeButton
                       planId={planId}
                       interval={interval}
-                      label={
-                        entitlement.stripeSubscriptionId
-                          ? t("billing.cta.change_plan")
-                          : t("billing.cta.subscribe")
-                      }
+                      label={entitlement.stripeSubscriptionId ? t("billing.cta.change_plan") : t("billing.cta.subscribe")}
                       variant={planId === "agency" ? "primary" : "secondary"}
                       disabled={!configured || !priceReady}
                     />
                   )}
 
                   {configured && !priceReady ? (
-                    <p className="mt-2 text-xs text-[color:var(--color-muted)]">
-                      {t("billing.plan.price_missing")}
-                    </p>
+                    <p className="mt-2 text-xs text-[color:var(--color-muted)]">{t("billing.plan.price_missing")}</p>
                   ) : null}
                 </div>
               </li>
@@ -427,33 +370,18 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         </ul>
       </Card>
 
-      <Card
-        className="mt-6"
-        header={
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("billing.portal.title")}
-          </h2>
-        }
-      >
-        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-          {t("billing.portal.body")}
-        </p>
+      <Card header={<SectionHeading level={3} title={t("billing.portal.title")} />}>
+        <p className="text-sm leading-6 text-[color:var(--color-muted)]">{t("billing.portal.body")}</p>
         <div className="mt-4">
-          <PortalButton
-            label={t("billing.portal.cta")}
-            disabled={!configured || !entitlement.stripeCustomerId}
-          />
+          <PortalButton label={t("billing.portal.cta")} disabled={!configured || !entitlement.stripeCustomerId} />
         </div>
         {!entitlement.stripeCustomerId ? (
-          <p className="mt-2 text-xs text-[color:var(--color-muted)]">
-            {t("billing.portal.unavailable")}
-          </p>
+          <p className="mt-2 text-xs text-[color:var(--color-muted)]">{t("billing.portal.unavailable")}</p>
         ) : null}
       </Card>
+      </div>
 
-      <p className="mt-6 text-xs leading-5 text-[color:var(--color-muted)]">
-        {t("billing.data_note")}
-      </p>
+      <p className="mt-8 text-xs leading-5 text-[color:var(--color-muted)]">{t("billing.data_note")}</p>
       <p className="mt-2 text-xs leading-5 text-[color:var(--color-muted)]">
         {t("billing.contact_note", { email: user.email })}
       </p>

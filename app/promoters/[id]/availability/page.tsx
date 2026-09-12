@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ATHENS_TZ,
@@ -8,8 +9,7 @@ import {
   type DayState,
 } from "@/lib/availability-links";
 import { translatorFor, DEFAULT_LOCALE, type Locale, type TranslationKey } from "@/lib/i18n";
-import { Badge, PageHeader, type BadgeVariant } from "@/components/ui";
-import { LinkButton } from "../../link-button";
+import { Badge, Icon, PageHeader, type BadgeVariant } from "@/components/ui";
 import { loadCoordinatorAvailability, type PromoterStatus } from "./data";
 import { AvailabilityGrid } from "./availability-grid";
 import type { BulkLabels, GridDay, GridLabels, SaveFailure } from "./state";
@@ -166,31 +166,39 @@ export default async function CoordinatorAvailabilityPage({ params }: { params: 
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <PageHeader
-        title={t("promoters.availability.title", { name: promoter.fullName })}
-        subtitle={t("promoters.availability.subtitle", { tz: ATHENS_TZ })}
-        actions={
-          <LinkButton href={`/promoters/${promoter.id}`} variant="secondary">
-            {t("promoters.availability.back_to_profile")}
-          </LinkButton>
-        }
-      />
+    <main className="mx-auto max-w-3xl px-6 py-10 sm:py-12">
+      <div className="flex flex-col gap-6">
+        <PageHeader
+          eyebrow={
+            <Link
+              href={`/promoters/${promoter.id}`}
+              className="inline-flex items-center gap-1 rounded-sm hover:text-[color:var(--color-ink)] focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
+            >
+              <Icon name="chevronLeft" size={14} />
+              {promoter.fullName}
+            </Link>
+          }
+          icon={<Icon name="calendar" size={20} />}
+          title={t("promoters.availability.title", { name: promoter.fullName })}
+          subtitle={t("promoters.availability.subtitle", { tz: ATHENS_TZ })}
+          actions={
+            promoter.status !== "active" ? (
+              <Badge variant={STATUS_BADGE[promoter.status]} dot>
+                {t(`promoters.status.${promoter.status}`)}
+              </Badge>
+            ) : undefined
+          }
+        />
 
-      {promoter.status !== "active" ? (
-        <div className="mt-3">
-          <Badge variant={STATUS_BADGE[promoter.status]}>{t(`promoters.status.${promoter.status}`)}</Badge>
-        </div>
-      ) : null}
-
-      <AvailabilityGrid
-        promoterId={promoter.id}
-        days={days}
-        labels={labels}
-        bulkLabels={bulkLabels}
-        startTimes={[...START_TIMES]}
-        endTimes={[...END_TIMES]}
-      />
+        <AvailabilityGrid
+          promoterId={promoter.id}
+          days={days}
+          labels={labels}
+          bulkLabels={bulkLabels}
+          startTimes={[...START_TIMES]}
+          endTimes={[...END_TIMES]}
+        />
+      </div>
     </main>
   );
 }

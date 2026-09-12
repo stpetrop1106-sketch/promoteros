@@ -62,7 +62,7 @@ export function MarkNoShowButton({
       <input type="hidden" name="assignmentId" value={assignmentId} />
       <Submit label={label} />
       {state.status === "error" ? (
-        <span role="alert" className="text-xs text-[color:var(--color-bad)]">
+        <span role="alert" className="text-xs font-medium text-[color:var(--color-bad-ink)]">
           {errorMessage(state.reason)}
         </span>
       ) : null}

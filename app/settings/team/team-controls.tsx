@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button, SelectField, TextField } from "@/components/ui";
+import { Button, SelectField, TextField, Icon } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { ASSIGNABLE_ROLES, type TeamRole } from "@/lib/team-shared";
 import type { TeamErrorCode } from "@/lib/team";
@@ -68,32 +68,35 @@ const ROLE_LABEL: Record<TeamRole, TranslationKey> = {
  * unconditionally, so this is the only branch point; nothing else in the file needs to know
  * about billing blocks specifically.
  */
+/** A field-adjacent note, not a full banner — several of these render one per row in a dense
+ * member list, where a banner's padding and border would overwhelm the row it belongs to. */
 function ErrorNote({ code, message }: { code: TeamErrorCode; message?: string }) {
   if (message) {
     const at = message.indexOf(BILLING_WORD);
     return (
-      <p role="alert" className="text-xs font-medium text-[color:var(--color-bad)]">
-        {at === -1 ? (
-          message
-        ) : (
-          <>
-            {message.slice(0, at)}
-            <Link
-              href="/settings/billing"
-              className="font-medium text-[color:var(--color-accent)] underline hover:no-underline"
-            >
-              {BILLING_WORD}
-            </Link>
-            {message.slice(at + BILLING_WORD.length)}
-          </>
-        )}
+      <p role="alert" className="flex items-start gap-1.5 text-xs font-medium leading-5 text-[color:var(--color-bad-ink)]">
+        <span aria-hidden="true" className="mt-1 size-1.5 shrink-0 rounded-full bg-[color:var(--color-bad)]" />
+        <span>
+          {at === -1 ? (
+            message
+          ) : (
+            <>
+              {message.slice(0, at)}
+              <Link href="/settings/billing" className="font-semibold underline hover:no-underline">
+                {BILLING_WORD}
+              </Link>
+              {message.slice(at + BILLING_WORD.length)}
+            </>
+          )}
+        </span>
       </p>
     );
   }
 
   return (
-    <p role="alert" className="text-xs font-medium text-[color:var(--color-bad)]">
-      {t(ERROR_KEYS[code] ?? "team.errors.unknown")}
+    <p role="alert" className="flex items-start gap-1.5 text-xs font-medium leading-5 text-[color:var(--color-bad-ink)]">
+      <span aria-hidden="true" className="mt-1 size-1.5 shrink-0 rounded-full bg-[color:var(--color-bad)]" />
+      <span>{t(ERROR_KEYS[code] ?? "team.errors.unknown")}</span>
     </p>
   );
 }
@@ -124,9 +127,15 @@ export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
 
   if (seatsRemaining <= 0 && state.status !== "sent") {
     return (
-      <div className="rounded-lg border border-[color:var(--color-warn)] bg-[color:var(--color-warn)]/10 px-4 py-3 text-sm text-[color:var(--color-ink)]">
-        <p className="font-medium">{t("team.invite.no_seats_title")}</p>
-        <p className="mt-1 text-[color:var(--color-muted)]">{t("team.invite.no_seats_body")}</p>
+      <div
+        role="status"
+        className="flex items-start gap-2.5 rounded-xl border border-[color:var(--color-warn-line)] bg-[color:var(--color-warn-subtle)] px-4 py-3 text-sm leading-5 text-[color:var(--color-warn-ink)]"
+      >
+        <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
+        <div>
+          <p className="font-semibold">{t("team.invite.no_seats_title")}</p>
+          <p className="mt-1 opacity-90">{t("team.invite.no_seats_body")}</p>
+        </div>
       </div>
     );
   }
@@ -170,15 +179,18 @@ export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
       </form>
 
       {state.status === "sent" && state.url ? (
-        <div className="rounded-lg border border-[color:var(--color-ok)] bg-[color:var(--color-ok)]/10 px-4 py-3 text-sm">
-          <p className="font-medium text-[color:var(--color-ink)]">
-            {t("team.invite.sent_title", { email: state.email ?? "" })}
-          </p>
-          <p className="mt-1 text-[color:var(--color-muted)]">{t("team.invite.sent_body")}</p>
-          <p className="mt-2 break-all rounded border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-2 py-1 font-mono text-xs text-[color:var(--color-ink)]">
-            {state.url}
-          </p>
-          <div className="mt-2">
+        <div
+          role="status"
+          className="flex items-start gap-2.5 rounded-xl border border-[color:var(--color-ok-line)] bg-[color:var(--color-ok-subtle)] px-4 py-3 text-sm leading-5 text-[color:var(--color-ok-ink)]"
+        >
+          <Icon name="check" size={18} className="mt-0.5 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold">{t("team.invite.sent_title", { email: state.email ?? "" })}</p>
+            <p className="mt-1 opacity-90">{t("team.invite.sent_body")}</p>
+            <p className="mt-2 break-all rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-2 py-1 font-mono text-xs text-[color:var(--color-ink)]">
+              {state.url}
+            </p>
+            <div className="mt-2">
             <Button
               size="sm"
               variant="secondary"
@@ -191,6 +203,7 @@ export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
             >
               {copied ? t("team.invite.copied") : t("team.invite.copy_link")}
             </Button>
+            </div>
           </div>
         </div>
       ) : null}
@@ -277,11 +290,11 @@ export function RemoveControl({
   }
 
   return (
-    <div className="rounded-lg border border-[color:var(--color-bad)] bg-[color:var(--color-bad)]/5 p-3">
-      <p className="text-sm font-medium text-[color:var(--color-ink)]">
+    <div className="rounded-xl border border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] p-4">
+      <p className="text-sm font-semibold text-[color:var(--color-bad-ink)]">
         {t("team.remove.confirm_title", { name })}
       </p>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[color:var(--color-muted)]">
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-xs leading-5 text-[color:var(--color-ink-soft)]">
         <li>{t("team.remove.consequence_access")}</li>
         <li>{t("team.remove.consequence_history")}</li>
         <li>{t("team.remove.consequence_seat")}</li>

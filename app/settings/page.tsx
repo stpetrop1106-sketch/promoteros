@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { loadTeamSnapshot } from "@/lib/team";
 import { loadOnboardingProgress } from "@/lib/onboarding";
 import { getEntitlement } from "@/lib/billing/subscription";
 import { loadAgencyIdentity, identityComplete } from "@/lib/agency-settings";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { PageHeader, Card, Badge, Button, EmptyState } from "@/components/ui";
+import { PageHeader, Card, Badge, LinkButton, EmptyState, SectionHeading, DetailList, Detail } from "@/components/ui";
 import { BillingBanner } from "@/components/billing-banner";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "PromoterOS" };
+export const metadata: Metadata = { title: translatorFor(DEFAULT_LOCALE)("page_title.settings") };
 
 const t = translatorFor(DEFAULT_LOCALE);
 
@@ -33,31 +32,18 @@ function formatDate(value: string | null): string {
   return new Intl.DateTimeFormat("el-GR", { dateStyle: "long" }).format(new Date(value));
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-2 py-2">
-      <dt className="text-sm text-[color:var(--color-muted)]">{label}</dt>
-      <dd className="text-sm font-medium text-[color:var(--color-ink)]">{children}</dd>
-    </div>
-  );
-}
-
 export default async function SettingsPage() {
   const snapshot = await loadTeamSnapshot();
 
   if (!snapshot) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-12">
+      <main className="mx-auto max-w-3xl px-6 py-12">
         <PageHeader title={t("settings.title")} />
-        <div className="mt-6">
+        <div className="mt-8">
           <EmptyState
             title={t("team.no_agency_title")}
             description={t("team.no_agency_body")}
-            action={
-              <Link href="/onboarding">
-                <Button>{t("team.no_agency_cta")}</Button>
-              </Link>
-            }
+            action={<LinkButton href="/onboarding">{t("team.no_agency_cta")}</LinkButton>}
           />
         </div>
       </main>
@@ -76,11 +62,11 @@ export default async function SettingsPage() {
   const statusKey = STATUS_LABEL[agency.subscriptionStatus] ?? "settings.subscription.trialing";
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-3xl px-6 py-12">
       <PageHeader title={t("settings.title")} subtitle={t("settings.subtitle")} />
 
       {entitlement ? (
-        <div className="mt-6">
+        <div className="mt-8">
           <BillingBanner
             notice={entitlement.notice}
             access={entitlement.access}
@@ -90,122 +76,74 @@ export default async function SettingsPage() {
         </div>
       ) : null}
 
-      <Card
-        className="mt-6"
-        header={
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("settings.agency.title")}
-          </h2>
-        }
-      >
-        <dl className="divide-y divide-[color:var(--color-line)]">
-          <Row label={t("settings.agency.name")}>{agency.name}</Row>
-          <Row label={t("settings.agency.city")}>{agency.city ?? "—"}</Row>
-          <Row label={t("settings.agency.timezone")}>{agency.timezone}</Row>
-          <Row label={t("settings.agency.plan")}>
-            <Badge variant="info">{t(planKey)}</Badge>
-          </Row>
-          <Row label={t("settings.agency.status")}>
-            <Badge variant={agency.subscriptionStatus === "past_due" ? "warn" : "neutral"}>
-              {t(statusKey)}
-            </Badge>
-          </Row>
-          <Row label={t("settings.agency.trial_ends")}>{formatDate(agency.trialEndsAt)}</Row>
-          <Row label={t("settings.agency.seats")}>
-            {t("team.seats", { used: seatsUsed, limit: agency.seatLimit })}
-          </Row>
-          <Row label={t("settings.agency.promoter_limit")}>
-            {t("settings.agency.promoter_usage", {
-              used: progress.promoterCount,
-              limit: agency.promoterLimit,
-            })}
-          </Row>
-        </dl>
-        <p className="mt-3 text-xs text-[color:var(--color-muted)]">
-          {t("enforcement.settings.agency_note")}
-        </p>
-      </Card>
-
-      <Card
-        className="mt-6"
-        header={
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("enforcement.settings.billing_title")}
-          </h2>
-        }
-      >
-        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-          {viewer.isOwner
-            ? t("enforcement.settings.billing_body_owner")
-            : t("enforcement.settings.billing_body_staff")}
-        </p>
-        <div className="mt-4">
-          <Link href="/settings/billing">
-            <Button variant="secondary">{t("enforcement.settings.billing_cta")}</Button>
-          </Link>
-        </div>
-      </Card>
-
-      <Card
-        className="mt-6"
-        header={
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("settings.card.team_title")}
-          </h2>
-        }
-      >
-        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-          {viewer.isOwner ? t("settings.card.team_body_owner") : t("settings.card.team_body_staff")}
-        </p>
-        <div className="mt-4">
-          <Link href="/settings/team">
-            <Button variant="secondary">{t("settings.card.team_cta")}</Button>
-          </Link>
-        </div>
-      </Card>
-
-      <Card
-        className="mt-6"
-        header={
-          <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-            {t("settings.card.identity_title")}
-          </h2>
-        }
-      >
-        <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-          {t("settings.card.identity_body")}
-        </p>
-        {identityMissing ? (
-          <p className="mt-2 text-sm font-medium text-[color:var(--color-warn)]">
-            {t("settings.card.identity_missing")}
+      <div className="mt-8 flex flex-col gap-6">
+        <Card header={<SectionHeading level={3} title={t("settings.agency.title")} />}>
+          <DetailList columns={2}>
+            <Detail label={t("settings.agency.name")}>{agency.name}</Detail>
+            <Detail label={t("settings.agency.city")}>{agency.city ?? "—"}</Detail>
+            <Detail label={t("settings.agency.timezone")}>{agency.timezone}</Detail>
+            <Detail label={t("settings.agency.plan")}>
+              <Badge variant="info">{t(planKey)}</Badge>
+            </Detail>
+            <Detail label={t("settings.agency.status")}>
+              <Badge variant={agency.subscriptionStatus === "past_due" ? "warn" : "neutral"}>{t(statusKey)}</Badge>
+            </Detail>
+            <Detail label={t("settings.agency.trial_ends")}>{formatDate(agency.trialEndsAt)}</Detail>
+            <Detail label={t("settings.agency.seats")}>{t("team.seats", { used: seatsUsed, limit: agency.seatLimit })}</Detail>
+            <Detail label={t("settings.agency.promoter_limit")}>
+              {t("settings.agency.promoter_usage", { used: progress.promoterCount, limit: agency.promoterLimit })}
+            </Detail>
+          </DetailList>
+          <p className="mt-5 border-t border-[color:var(--color-line)] pt-4 text-xs leading-5 text-[color:var(--color-muted)]">
+            {t("enforcement.settings.agency_note")}
           </p>
-        ) : null}
-        <div className="mt-4">
-          <Link href="/settings/agency">
-            <Button variant="secondary">{t("settings.card.identity_cta")}</Button>
-          </Link>
-        </div>
-      </Card>
+        </Card>
 
-      {!progress.coreComplete ? (
-        <Card
-          className="mt-6"
-          header={
-            <h2 className="text-sm font-semibold text-[color:var(--color-ink)]">
-              {t("settings.card.onboarding_title")}
-            </h2>
-          }
-        >
+        <Card header={<SectionHeading level={3} title={t("enforcement.settings.billing_title")} />}>
           <p className="text-sm leading-6 text-[color:var(--color-muted)]">
-            {t("settings.card.onboarding_body")}
+            {viewer.isOwner ? t("enforcement.settings.billing_body_owner") : t("enforcement.settings.billing_body_staff")}
           </p>
           <div className="mt-4">
-            <Link href="/onboarding">
-              <Button>{t("settings.card.onboarding_cta")}</Button>
-            </Link>
+            <LinkButton href="/settings/billing" variant="secondary">
+              {t("enforcement.settings.billing_cta")}
+            </LinkButton>
           </div>
         </Card>
-      ) : null}
+
+        <Card header={<SectionHeading level={3} title={t("settings.card.team_title")} />}>
+          <p className="text-sm leading-6 text-[color:var(--color-muted)]">
+            {viewer.isOwner ? t("settings.card.team_body_owner") : t("settings.card.team_body_staff")}
+          </p>
+          <div className="mt-4">
+            <LinkButton href="/settings/team" variant="secondary">
+              {t("settings.card.team_cta")}
+            </LinkButton>
+          </div>
+        </Card>
+
+        <Card header={<SectionHeading level={3} title={t("settings.card.identity_title")} />}>
+          <p className="text-sm leading-6 text-[color:var(--color-muted)]">{t("settings.card.identity_body")}</p>
+          {identityMissing ? (
+            <Badge variant="warn" dot className="mt-2">
+              {t("settings.card.identity_missing")}
+            </Badge>
+          ) : null}
+          <div className="mt-4">
+            <LinkButton href="/settings/agency" variant="secondary">
+              {t("settings.card.identity_cta")}
+            </LinkButton>
+          </div>
+        </Card>
+
+        {!progress.coreComplete ? (
+          <Card header={<SectionHeading level={3} title={t("settings.card.onboarding_title")} />}>
+            <p className="text-sm leading-6 text-[color:var(--color-muted)]">{t("settings.card.onboarding_body")}</p>
+            <div className="mt-4">
+              <LinkButton href="/onboarding">{t("settings.card.onboarding_cta")}</LinkButton>
+            </div>
+          </Card>
+        ) : null}
+      </div>
     </main>
   );
 }

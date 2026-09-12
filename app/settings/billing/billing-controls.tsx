@@ -31,8 +31,9 @@ function ErrorNote({ state }: { state: BillingActionState }) {
   if (state.status !== "error") return null;
 
   return (
-    <p role="alert" className="mt-2 text-xs font-medium text-[color:var(--color-bad)]">
-      {t(ERROR_KEYS[state.code ?? "unknown"])}
+    <p role="alert" className="mt-2 flex items-start gap-1.5 text-xs font-medium leading-5 text-[color:var(--color-bad-ink)]">
+      <span aria-hidden="true" className="mt-1 size-1.5 shrink-0 rounded-full bg-[color:var(--color-bad)]" />
+      <span>{t(ERROR_KEYS[state.code ?? "unknown"])}</span>
     </p>
   );
 }

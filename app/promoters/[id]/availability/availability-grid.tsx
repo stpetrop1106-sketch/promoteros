@@ -140,8 +140,8 @@ export function AvailabilityGrid({
   const bulkBusy = busyBulk !== null;
 
   return (
-    <div className="mt-6 flex flex-col gap-4">
-      <Card header={<h2 className="text-sm font-semibold">{bulkLabels.title}</h2>}>
+    <div className="flex flex-col gap-4">
+      <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{bulkLabels.title}</h2>}>
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
@@ -180,7 +180,7 @@ export function AvailabilityGrid({
           ) : null}
         </div>
         {clearArmed ? (
-          <p role="alert" className="mt-3 text-sm text-[color:var(--color-bad)]">
+          <p role="alert" className="mt-3 text-sm font-medium text-[color:var(--color-bad-ink)]">
             {promoterSetSomeDay ? bulkLabels.clearAllWarningSelf : bulkLabels.clearAllWarning}
           </p>
         ) : null}
@@ -188,7 +188,7 @@ export function AvailabilityGrid({
           <p className="mt-3 text-sm text-[color:var(--color-ok-ink)]">{bulkLabels.done[bulkState.kind]}</p>
         ) : null}
         {bulkState.status === "error" ? (
-          <p role="alert" className="mt-3 text-sm text-[color:var(--color-bad)]">
+          <p role="alert" className="mt-3 text-sm font-medium text-[color:var(--color-bad-ink)]">
             {bulkLabels.errors[bulkState.reason]}
           </p>
         ) : null}
@@ -237,7 +237,7 @@ export function AvailabilityGrid({
                 </div>
 
                 {day.contradictory ? (
-                  <p className="mt-2 text-xs text-[color:var(--color-warn)]">{labels.contradiction}</p>
+                  <p className="mt-2 text-xs font-medium text-[color:var(--color-warn-ink)]">{labels.contradiction}</p>
                 ) : null}
 
                 <div className="mt-3 flex gap-2">
@@ -312,7 +312,7 @@ export function AvailabilityGrid({
                 ) : null}
 
                 {error ? (
-                  <p role="alert" className="mt-2 text-xs text-[color:var(--color-bad)]">
+                  <p role="alert" className="mt-2 text-xs font-medium text-[color:var(--color-bad-ink)]">
                     {labels.errors[error]}
                   </p>
                 ) : null}

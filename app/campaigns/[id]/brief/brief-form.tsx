@@ -2,9 +2,11 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button, TextArea, TextField } from "@/components/ui";
-import type { TranslationKey } from "@/lib/i18n";
+import { Button, Icon, TextArea, TextField } from "@/components/ui";
+import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { saveBrief, type BriefFormState } from "./actions";
+
+const t = translatorFor(DEFAULT_LOCALE);
 
 const INITIAL_STATE: BriefFormState = { status: "idle" };
 
@@ -31,12 +33,10 @@ function Actions({
 }
 
 export function BriefForm({
-  t,
   campaignId,
   initialTitle,
   initialBody,
 }: {
-  t: (key: TranslationKey, params?: Record<string, string | number>) => string;
   campaignId: string;
   initialTitle: string;
   initialBody: string;
@@ -53,8 +53,9 @@ export function BriefForm({
       {state.formError ? (
         <p
           role="alert"
-          className="rounded-lg border border-[color:var(--color-bad)] bg-[color:var(--color-bad)]/10 px-4 py-3 text-sm font-medium text-[color:var(--color-bad)]"
+          className="flex items-start gap-2 rounded-xl border border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] px-4 py-3 text-sm font-medium text-[color:var(--color-bad-ink)]"
         >
+          <Icon name="alert" size={16} className="mt-px shrink-0" />
           {t(state.formError)}
         </p>
       ) : null}

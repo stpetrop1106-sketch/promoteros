@@ -76,11 +76,11 @@ export function CancelAssignmentButton({
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder={reasonPlaceholder}
-        className="h-8 w-40 rounded border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-2 text-xs"
+        className="h-9 w-40 min-w-0 rounded-lg border border-[color:var(--color-line-strong)] bg-[color:var(--color-canvas-sunken)]/50 px-2.5 text-xs text-[color:var(--color-ink)] outline-none placeholder:text-[color:var(--color-muted-soft)] focus-visible:border-[color:var(--color-accent)] focus-visible:bg-[color:var(--color-surface)] focus-visible:shadow-[var(--focus-ring)]"
       />
       <Submit label={label} />
       {state.status === "error" ? (
-        <span role="alert" className="text-xs text-[color:var(--color-bad)]">
+        <span role="alert" className="text-xs font-medium text-[color:var(--color-bad-ink)]">
           {errorMessage(state.reason)}
         </span>
       ) : null}
