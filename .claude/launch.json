@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "promoteros",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "-p", "3200"],
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set NEXT_PUBLIC_APP_URL=http://localhost:3200&& npm run dev -- -p 3200"],
       "port": 3200
     }
   ]

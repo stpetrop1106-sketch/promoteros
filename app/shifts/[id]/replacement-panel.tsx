@@ -113,6 +113,7 @@ export function ReplacementPanel({
                   promoterId={c.promoterId}
                   label={t("shifts.replacements.reinvite")}
                   copyLabel={t("common.copy")}
+                  phone={c.phone}
                 />
               </div>
             </li>

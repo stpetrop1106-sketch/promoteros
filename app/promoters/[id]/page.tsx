@@ -252,7 +252,7 @@ export default async function PromoterProfilePage({ params }: { params: Promise<
 
         {/* P30 mounted: the coordinator sends the promoter their own availability link.
             Minting writes nothing — it is an HMAC over the promoter id — so this is safe to reopen. */}
-        <AvailabilityLink promoterId={p.id} promoterName={p.full_name} />
+        <AvailabilityLink promoterId={p.id} promoterName={p.full_name} promoterPhone={p.phone} />
 
         <Card
           flush

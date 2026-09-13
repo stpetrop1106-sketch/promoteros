@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button, SelectField, TextField, Icon } from "@/components/ui";
+import { Button, CopyButton, SelectField, TextField, Icon } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { ASSIGNABLE_ROLES, type TeamRole } from "@/lib/team-shared";
 import type { TeamErrorCode } from "@/lib/team";
@@ -123,7 +123,6 @@ function roleOptions() {
 
 export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
   const [state, formAction] = useActionState<InviteState, FormData>(inviteTeamMember, INVITE_IDLE);
-  const [copied, setCopied] = useState(false);
 
   if (seatsRemaining <= 0 && state.status !== "sent") {
     return (
@@ -191,18 +190,11 @@ export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
               {state.url}
             </p>
             <div className="mt-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => {
-                navigator.clipboard?.writeText(state.url ?? "").then(
-                  () => setCopied(true),
-                  () => setCopied(false),
-                );
-              }}
-            >
-              {copied ? t("team.invite.copied") : t("team.invite.copy_link")}
-            </Button>
+            <CopyButton
+              text={state.url}
+              label={t("team.invite.copy_link")}
+              copiedLabel={t("team.invite.copied")}
+            />
             </div>
           </div>
         </div>

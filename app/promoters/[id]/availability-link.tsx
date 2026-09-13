@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { Button, Card, Icon } from "@/components/ui";
+import { Button, Card, Icon, CopyButton, WhatsAppButton } from "@/components/ui";
 import {
   createAvailabilityLink,
   type MintLinkState,
@@ -30,16 +30,17 @@ const t = translatorFor(DEFAULT_LOCALE);
 export function AvailabilityLink({
   promoterId,
   promoterName,
+  promoterPhone,
 }: {
   promoterId: string;
   promoterName?: string;
+  /** Enables "open in WhatsApp" with the message prefilled — no clipboard involved. */
+  promoterPhone?: string | null;
 }) {
   const [state, setState] = useState<MintLinkState>({ status: "idle" });
-  const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function create() {
-    setCopied(false);
     startTransition(async () => {
       setState(await createAvailabilityLink(promoterId));
     });
@@ -81,20 +82,8 @@ export function AvailabilityLink({
             className="mt-1.5 w-full rounded-lg border border-[color:var(--color-line-strong)] bg-[color:var(--color-canvas-sunken)]/50 p-2.5 text-xs leading-5 text-[color:var(--color-ink-soft)]"
           />
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              iconLeft={copied ? <Icon name="check" size={14} /> : undefined}
-              onClick={() => {
-                void navigator.clipboard.writeText(message).then(
-                  () => setCopied(true),
-                  () => setCopied(false),
-                );
-              }}
-            >
-              {copied ? t("availability_link.copied") : t("common.copy")}
-            </Button>
+            <CopyButton text={message} selectTargetId="availability-link-message" />
+            <WhatsAppButton phone={promoterPhone} text={message} />
             <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={create}>
               {t("availability_link.regenerate")}
             </Button>

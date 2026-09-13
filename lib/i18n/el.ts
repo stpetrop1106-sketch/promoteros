@@ -1495,4 +1495,11 @@ export const el = {
   "page_title.settings_billing": "Συνδρομή",
   "page_title.onboarding": "Καλωσόρισες",
   "page_title.onboarding_join": "Πρόσκληση",
+
+  "copy.copied": "Αντιγράφηκε",
+  "copy.blocked":
+    "Ο browser δεν επέτρεψε την αντιγραφή. Άνοιξε τη σελίδα σε Chrome ή Safari και δοκίμασε ξανά.",
+  "copy.blocked_selected":
+    "Ο browser δεν επέτρεψε την αντιγραφή. Το κείμενο επιλέχτηκε — πάτα Ctrl+C, ή κράτα το δάχτυλο πάνω του στο κινητό.",
+  "whatsapp.open": "Άνοιγμα στο WhatsApp",
 } as const;

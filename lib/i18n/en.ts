@@ -1466,4 +1466,11 @@ export const en: Record<TranslationKey, string> = {
   "page_title.settings_billing": "Subscription",
   "page_title.onboarding": "Welcome",
   "page_title.onboarding_join": "Invitation",
+
+  "copy.copied": "Copied",
+  "copy.blocked":
+    "Your browser did not allow copying. Open the page in Chrome or Safari and try again.",
+  "copy.blocked_selected":
+    "Your browser did not allow copying. The text is selected — press Ctrl+C, or long-press it on a phone.",
+  "whatsapp.open": "Open in WhatsApp",
 };

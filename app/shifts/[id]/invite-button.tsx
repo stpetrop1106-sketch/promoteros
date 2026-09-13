@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button, Icon } from "@/components/ui";
+import { Button, CopyButton, Icon, WhatsAppButton } from "@/components/ui";
 import { invite, type InviteState } from "./actions";
 
 function Submit({ label }: { label: string }) {
@@ -19,11 +19,14 @@ export function InviteButton({
   promoterId,
   label,
   copyLabel,
+  phone,
 }: {
   shiftId: string;
   promoterId: string;
   label: string;
   copyLabel: string;
+  /** The promoter's phone, for "open in WhatsApp". Optional so existing callers keep working. */
+  phone?: string | null;
 }) {
   const [state, formAction] = useActionState<InviteState, FormData>(invite, {
     status: "idle",
@@ -35,21 +38,21 @@ export function InviteButton({
     return (
       <div className="w-64 text-left">
         <textarea
+          id={`invite-message-${promoterId}`}
           readOnly
           value={state.manualBody}
           rows={5}
           className="w-full rounded-lg border border-[color:var(--color-line-strong)] bg-[color:var(--color-surface)] p-2.5 text-xs leading-5 text-[color:var(--color-ink-soft)] shadow-[var(--shadow-2xs)]"
         />
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mt-1.5"
-          iconLeft={<Icon name="check" size={14} />}
-          onClick={() => navigator.clipboard.writeText(state.manualBody ?? "")}
-        >
-          {copyLabel}
-        </Button>
+        <div className="mt-1.5 flex flex-wrap items-start gap-2">
+          <CopyButton
+            text={state.manualBody}
+            label={copyLabel}
+            variant="ghost"
+            selectTargetId={`invite-message-${promoterId}`}
+          />
+          <WhatsAppButton phone={phone} text={state.manualBody} variant="ghost" />
+        </div>
       </div>
     );
   }

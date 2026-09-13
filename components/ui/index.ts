@@ -63,3 +63,7 @@ export type {
   DetailProps,
   DetailListProps,
 } from "./Section";
+
+/* --- Added in P36. Nothing above this line changed shape. --- */
+
+export { CopyButton, WhatsAppButton } from "./CopyButton";
