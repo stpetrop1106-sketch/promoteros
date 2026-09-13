@@ -1458,7 +1458,7 @@ export const el = {
   /* --- P31: brief acknowledgement --- */
   "invitation.brief.title": "Brief",
   "invitation.brief.confirm": "Το διάβασα",
-  "invitation.brief.acknowledged_on": "Το διάβασες στις {date}.",
+  "invitation.brief.acknowledged_on": "Το διάβασες: {date}",
   "invitation.brief.error": "Δεν μπορέσαμε να το καταγράψουμε. Δοκίμασε ξανά.",
 
   "campaigns.brief.roster.title": "Ποιοι έχουν διαβάσει το brief",
@@ -1588,7 +1588,7 @@ export const el = {
   "invite_panel.empty_no_shifts":
     "Δεν υπάρχουν επερχόμενες βάρδιες που να χρειάζονται άτομα αυτή τη στιγμή.",
   "invite_panel.empty_filtered": "Καμία βάρδια δεν ταιριάζει με αυτά τα φίλτρα.",
-  "invite_panel.slots_needed": "{count} θέσεις προς κάλυψη",
+  "invite_panel.slots_needed": "Θέσεις προς κάλυψη: {count}",
   "invite_panel.send.button": "Αποστολή πρόσκλησης",
   "invite_panel.send.sent": "Στάλθηκε",
   "invite_panel.send.error.missing_ids": "Λείπουν στοιχεία στη φόρμα. Φόρτωσε ξανά τη σελίδα.",
@@ -1941,4 +1941,7 @@ export const el = {
   "shifts.import.done.open_section": "Άνοιγμα της ενότητας",
   // P37c — Excel import, follow-up
   "shifts.import.done.recover_retry": "Δεν δημιουργήθηκε τίποτα. Μπορείς να ξαναδοκιμάσεις με το ίδιο αρχείο.",
+
+  "invitation.dress_code": "Ενδυμασία",
+  "invitation.rate": "Αμοιβή",
 } as const;

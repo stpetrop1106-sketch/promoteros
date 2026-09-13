@@ -1429,7 +1429,7 @@ export const en: Record<TranslationKey, string> = {
   /* --- P31: brief acknowledgement --- */
   "invitation.brief.title": "Brief",
   "invitation.brief.confirm": "I've read it",
-  "invitation.brief.acknowledged_on": "You read this on {date}.",
+  "invitation.brief.acknowledged_on": "You read it: {date}",
   "invitation.brief.error": "We could not record that. Try again.",
 
   "campaigns.brief.roster.title": "Who has read the brief",
@@ -1654,7 +1654,7 @@ export const en: Record<TranslationKey, string> = {
   "invite_panel.filter.clear": "Clear filters",
   "invite_panel.empty_no_shifts": "There are no upcoming shifts that need people right now.",
   "invite_panel.empty_filtered": "No shift matches these filters.",
-  "invite_panel.slots_needed": "{count} spots open",
+  "invite_panel.slots_needed": "Places to fill: {count}",
   "invite_panel.send.button": "Send invitation",
   "invite_panel.send.sent": "Sent",
   "invite_panel.send.error.missing_ids": "Missing information in the form. Reload the page.",
@@ -1906,4 +1906,7 @@ export const en: Record<TranslationKey, string> = {
   "shifts.import.done.open_section": "Open the section",
   // P37c — Excel import, follow-up
   "shifts.import.done.recover_retry": "Nothing was created. You can try again with the same file.",
+
+  "invitation.dress_code": "Dress code",
+  "invitation.rate": "Pay",
 };

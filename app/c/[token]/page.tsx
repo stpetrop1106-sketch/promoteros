@@ -3,6 +3,7 @@ import { loadCheckin } from "@/lib/checkins";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { Markdown } from "@/components/ui";
 import { CheckinForm } from "./checkin-form";
+import { formatShiftWhen } from "@/lib/shift-format";
 
 export const dynamic = "force-dynamic";
 
@@ -80,7 +81,7 @@ export default async function CheckinPage({
         <div>
           <dt className="text-[color:var(--color-muted)]">{t("shifts.date")}</dt>
           <dd className="font-medium">
-            {v.onDate} · {v.startTime}–{v.endTime}
+            {formatShiftWhen(v.onDate, v.startTime, v.endTime)}
           </dd>
         </div>
         {v.briefSummary && (

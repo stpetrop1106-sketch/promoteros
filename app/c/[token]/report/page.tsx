@@ -3,6 +3,7 @@ import { loadCheckin } from "@/lib/checkins";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { ReportForm } from "./report-form";
 import { submitReport } from "./actions";
+import { formatShiftWhen } from "@/lib/shift-format";
 
 export const dynamic = "force-dynamic";
 
@@ -78,7 +79,7 @@ export default async function ReportPage({
           {v.campaignName} · {v.storeName}
         </div>
         <div>
-          {v.onDate} · {v.startTime}–{v.endTime}
+          {formatShiftWhen(v.onDate, v.startTime, v.endTime)}
         </div>
       </dl>
 

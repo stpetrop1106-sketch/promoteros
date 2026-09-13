@@ -6,6 +6,7 @@ import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { Markdown } from "@/components/ui";
 import { RespondForm } from "./respond-form";
 import { AcknowledgeBriefForm } from "./acknowledge-brief-form";
+import { formatEuroCents, formatShiftWhen } from "@/lib/shift-format";
 
 export const dynamic = "force-dynamic";
 
@@ -63,19 +64,19 @@ export default async function InvitationPage({
         <div>
           <dt className="text-[color:var(--color-muted)]">{t("shifts.date")}</dt>
           <dd className="font-medium">
-            {v.onDate} · {v.startTime}–{v.endTime}
+            {formatShiftWhen(v.onDate, v.startTime, v.endTime)}
           </dd>
         </div>
         {v.dressCode && (
           <div>
-            <dt className="text-[color:var(--color-muted)]">Dress code</dt>
+            <dt className="text-[color:var(--color-muted)]">{t("invitation.dress_code")}</dt>
             <dd className="font-medium">{v.dressCode}</dd>
           </div>
         )}
         {v.rateCents > 0 && (
           <div>
-            <dt className="text-[color:var(--color-muted)]">€</dt>
-            <dd className="font-medium">{(v.rateCents / 100).toFixed(2)}</dd>
+            <dt className="text-[color:var(--color-muted)]">{t("invitation.rate")}</dt>
+            <dd className="font-medium">{formatEuroCents(v.rateCents)}</dd>
           </div>
         )}
       </dl>

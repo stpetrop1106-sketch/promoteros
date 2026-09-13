@@ -39,6 +39,11 @@ function badgeVariant(row: BoardRow): BadgeVariant {
   if (row.tier === 0) return "bad";
   if (row.tier === 1) return "warn";
   if (row.tier === 3) return "neutral";
+  // Arrived, but the phone put them far from the store. Still a check-in — location never decides
+  // whether someone is paid (CLAUDE.md §3) — yet it must not wear the same green as an arrival
+  // five metres from the door. The dashboard raises it as `checked_in_outside_geofence`; this
+  // makes the shift page agree with it.
+  if (row.state === "checked_in" && row.withinGeofence === false) return "warn";
   return row.state === "checked_in" || row.state === "confirmed" ? "ok" : "neutral";
 }
 
