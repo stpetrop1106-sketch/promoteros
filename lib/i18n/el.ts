@@ -1723,4 +1723,7 @@ export const el = {
   "messaging.errors.write_not_permitted":
     "Η βάση δεν επέτρεψε την αλλαγή. Αν είσαι ιδιοκτήτης, η ενημέρωση 0017 μάλλον δεν έχει εφαρμοστεί.",
   "messaging.errors.unknown": "Δεν ήταν δυνατή η ενέργεια. Ανανέωσε τη σελίδα και δοκίμασε ξανά.",
+
+  "shifts.invite.delivered": "Στάλθηκε με email",
+  "shifts.invite.failed": "Η πρόσκληση δεν στάλθηκε. Δοκίμασε ξανά σε λίγο.",
 } as const;

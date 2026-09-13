@@ -3,7 +3,9 @@
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
+import { sendWelcomeAvailabilityLink } from "@/lib/dispatch/run";
 import { requireUser } from "@/lib/auth";
 import { getGeocoder, type GeocodeResult } from "@/lib/geocoding";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
@@ -305,6 +307,18 @@ export async function createPromoter(
       .from("promoter_skills")
       .insert(skills.map((s) => ({ promoter_id: promoterId, skill_id: s.id, level: s.level })));
   }
+
+  // P39 — the first availability link goes out by itself. `after()` runs once the response (the
+  // redirect below) is on its way, so email can be slow, retrying or down and the coordinator
+  // still sees their saved promoter immediately. `sendWelcomeAvailabilityLink` never throws, and
+  // the extra catch is for the one thing it cannot guard: failing to load at all.
+  after(async () => {
+    try {
+      await sendWelcomeAvailabilityLink(promoterId);
+    } catch {
+      // Nothing to tell anyone: the promoter appears in /settings/messaging's manual list.
+    }
+  });
 
   revalidatePath("/promoters");
   redirect(`/promoters/${promoterId}`);

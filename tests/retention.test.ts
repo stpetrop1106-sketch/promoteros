@@ -338,6 +338,7 @@ describe("ERASURE_PLAN", () => {
     "brief_ack",
     "blocklist",
     "invitations",
+    "message_dispatches", // 0017
     "assignments",
     "check_ins",
     "field_reports",
@@ -387,6 +388,7 @@ describe("ERASURE_PLAN", () => {
     expect(action("blocklist")).toBe("delete");
     expect(action("invitations")).toBe("delete");
     expect(action("brief_ack")).toBe("delete");
+    expect(action("message_dispatches")).toBe("delete");
 
     // The promoter row is a tombstone, never a deletion — deleting it would cascade the
     // history away.

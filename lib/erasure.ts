@@ -36,6 +36,8 @@ export type SubjectAccessRecord = {
   briefAcknowledgements: Record<string, unknown>[];
   blocklistEntries: Record<string, unknown>[];
   invitations: Record<string, unknown>[];
+  /** When automatic messages were sent to them and whether they arrived (0017). */
+  messageDispatches: Record<string, unknown>[];
   assignments: Record<string, unknown>[];
   checkIns: Record<string, unknown>[];
   fieldReports: Record<string, unknown>[];
@@ -106,6 +108,7 @@ export async function collectSubjectAccess(
     briefAcknowledgements,
     blocklistEntries,
     invitations,
+    messageDispatches,
   ] = await Promise.all([
     rows(db, "promoter_areas", "promoter_id", promoterId),
     rows(db, "promoter_skills", "promoter_id", promoterId),
@@ -114,6 +117,7 @@ export async function collectSubjectAccess(
     rows(db, "brief_ack", "promoter_id", promoterId),
     rows(db, "blocklist", "promoter_id", promoterId),
     rows(db, "invitations", "promoter_id", promoterId),
+    rows(db, "message_dispatches", "promoter_id", promoterId),
   ]);
 
   const checkIns = assignmentIds.length
@@ -138,6 +142,7 @@ export async function collectSubjectAccess(
     briefAcknowledgements,
     blocklistEntries,
     invitations,
+    messageDispatches,
     assignments,
     checkIns,
     fieldReports,

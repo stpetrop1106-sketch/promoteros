@@ -1688,4 +1688,7 @@ export const en: Record<TranslationKey, string> = {
   "shifts.board.checkin_link_action": "Check-in link",
   "shifts.board.checkin_link.message.greeting": "Hi {name}!",
   "shifts.board.checkin_link.message.body": "Check in when you arrive at the store:",
+
+  "shifts.invite.delivered": "Sent by email",
+  "shifts.invite.failed": "The invitation was not sent. Try again in a moment.",
 };

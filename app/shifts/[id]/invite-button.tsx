@@ -3,7 +3,10 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button, CopyButton, Icon, WhatsAppButton } from "@/components/ui";
+import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { invite, type InviteState } from "./actions";
+
+const t = translatorFor(DEFAULT_LOCALE);
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -57,16 +60,25 @@ export function InviteButton({
     );
   }
 
+  // Delivered by the adapter (email, since P39). A bare check mark left the coordinator guessing
+  // whether anything had actually gone out.
   if (state.status === "sent") {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--color-ok-ink)]">
+      <span role="status" className="inline-flex items-center gap-1 text-xs font-medium text-[color:var(--color-ok-ink)]">
         <Icon name="check" size={14} />
+        {t("shifts.invite.delivered")}
       </span>
     );
   }
 
+  // Never the raw error message — the action used to hand back `Error#message` ("Shift not found",
+  // a Postgres error), which is not a sentence a coordinator should have to read.
   if (state.status === "error") {
-    return <p className="text-xs text-[color:var(--color-bad-ink)]">{state.reason}</p>;
+    return (
+      <p role="alert" className="text-xs text-[color:var(--color-bad-ink)]">
+        {t("shifts.invite.failed")}
+      </p>
+    );
   }
 
   return (

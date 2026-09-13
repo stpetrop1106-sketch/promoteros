@@ -117,6 +117,12 @@ export const ERASURE_PLAN: readonly ErasureRule[] = [
     why: "An invitation is an offer, not a booking. It carries `token_hash` (a live credential for a page that shows the promoter's shift), `match_breakdown` (why we ranked this specific person where we did) and `decline_reason` (their words). None of that is the agency's record of work performed; the coverage outcome lives in `assignments`.",
   },
   {
+    table: "message_dispatches",
+    action: "delete",
+    reachedBy: "promoter_id",
+    why: "The log of automatic messages sent to this person (0017) — when their availability or check-in link was emailed, and whether it bounced. It holds no address and no body, but it is still a record of contact with a named individual, and it has no business value once they are gone. Erasure tombstones the promoter row rather than deleting it, so the `on delete cascade` on this table never fires on its own: it has to be listed here.",
+  },
+  {
     table: "assignments",
     action: "anonymise",
     reachedBy: "promoter_id",

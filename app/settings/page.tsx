@@ -135,6 +135,15 @@ export default async function SettingsPage() {
           </div>
         </Card>
 
+        <Card header={<SectionHeading level={3} title={t("settings.card.messaging_title")} />}>
+          <p className="text-sm leading-6 text-[color:var(--color-muted)]">{t("settings.card.messaging_body")}</p>
+          <div className="mt-4">
+            <LinkButton href="/settings/messaging" variant="secondary">
+              {t("settings.card.messaging_cta")}
+            </LinkButton>
+          </div>
+        </Card>
+
         {!progress.coreComplete ? (
           <Card header={<SectionHeading level={3} title={t("settings.card.onboarding_title")} />}>
             <p className="text-sm leading-6 text-[color:var(--color-muted)]">{t("settings.card.onboarding_body")}</p>

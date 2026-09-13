@@ -1,7 +1,7 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { matchPromoters, type Candidate } from "@/lib/matching";
-import { getAdapter } from "@/lib/messaging";
+import { getAdapter, getAdapterFor } from "@/lib/messaging";
 import { mintToken, hashToken, verifyToken, linkFor } from "@/lib/tokens";
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
@@ -57,7 +57,7 @@ export async function createInvitation(
 
   const { data: promoter, error: promoterErr } = await db
     .from("promoters")
-    .select("id, full_name, phone")
+    .select("id, full_name, phone, email")
     .eq("id", promoterId)
     .single();
   if (promoterErr || !promoter) throw new Error("Promoter not found");
@@ -101,11 +101,23 @@ export async function createInvitation(
     .filter(Boolean)
     .join("\n");
 
-  const result = await getAdapter().send({
-    to: { name: promoter.full_name, phone: promoter.phone },
+  // P39: emailed when Resend is configured and the promoter has a usable address; otherwise the
+  // manual result, exactly as before. The adapter decides — no channel branching here.
+  const result = await getAdapterFor().send({
+    to: { name: promoter.full_name, phone: promoter.phone, email: promoter.email },
     body,
     url,
+    subject: t("messaging.email.invitation.subject"),
+    actionLabel: t("messaging.email.invitation.action"),
+    idempotencyKey: `promoteros-invitation-${invitation.id}`,
   });
+
+  // The row was inserted with the manual channel (the one that is always valid for the
+  // `invitation_channel` enum). Record the channel it really went out on. Best effort: until
+  // 0017 adds 'email' to that enum this update fails, and the invitation is unaffected.
+  if (result.delivered && result.channel !== getAdapter().channel) {
+    await db.from("invitations").update({ channel: result.channel }).eq("id", invitation.id);
+  }
 
   return {
     url,

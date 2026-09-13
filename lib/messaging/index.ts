@@ -6,19 +6,52 @@
  * Feature code calls `getAdapter().sendInvitation(...)` and never touches a provider SDK.
  *
  * Add adapters, not conditionals. See decisions.md D3.
+ *
+ * P39 added `EmailAdapter` (`./email.ts`, Resend over plain `fetch`) and `getAdapterFor()`, the one
+ * place that decides between email and the manual channel.
  */
 
+import { EmailAdapter, emailConfigFrom, type EmailAdapterOptions } from "./email";
+
 export type OutboundMessage = {
-  to: { name: string; phone: string };
+  /** `email` was added in P39. Channels that do not address by email ignore it. */
+  to: { name: string; phone: string; email?: string | null };
   body: string;
   url: string;
+  /** P39, email only: the subject line. Other channels ignore it. */
+  subject?: string;
+  /** P39, email only: the button label for `url`. Other channels ignore it. */
+  actionLabel?: string;
+  /**
+   * P39: a stable key for provider-side de-duplication (Resend's `Idempotency-Key`). The
+   * dispatcher derives it from its dispatch row, so a retried request is never a second message.
+   */
+  idempotencyKey?: string;
 };
 
-export type SendResult =
-  | { delivered: true; channel: Channel }
-  | { delivered: false; channel: Channel; manualBody: string };
+/**
+ * Why a message was not delivered. Optional, so every adapter written before P39 still satisfies
+ * the type; an automated sender records it, an interactive one can ignore it.
+ */
+export type UndeliveredReason =
+  | "no_address"
+  | "invalid_address"
+  | "reserved_domain"
+  | "rate_limited"
+  | "provider_error";
 
-export type Channel = "clipboard" | "telegram" | "whatsapp" | "viber" | "sms";
+export type SendResult =
+  | { delivered: true; channel: Channel; providerMessageId?: string | null }
+  | {
+      delivered: false;
+      channel: Channel;
+      manualBody: string;
+      reason?: UndeliveredReason;
+      /** A short provider error code. Never an address, never a raw response body. */
+      error?: string;
+    };
+
+export type Channel = "clipboard" | "telegram" | "whatsapp" | "viber" | "sms" | "email";
 
 export interface MessagingAdapter {
   readonly channel: Channel;
@@ -88,6 +121,33 @@ class TelegramAdapter implements MessagingAdapter {
 
     return { delivered: true, channel: this.channel };
   }
+}
+
+/**
+ * The adapter for sending to one specific person — P39.
+ *
+ * Email when Resend is configured (`RESEND_API_KEY` and `EMAIL_FROM`); the `EmailAdapter` itself
+ * refuses a missing, malformed or reserved-domain address and hands back `getAdapter()`'s manual
+ * result with a `reason`. With email unconfigured this is exactly `getAdapter()` — today's
+ * behaviour, unchanged. The choice lives here so feature code never branches on a channel.
+ *
+ * `options.beforeRequest` lets a bulk sender pace every provider request (Resend's rate limit).
+ */
+export function getAdapterFor(
+  options: EmailAdapterOptions = {},
+  env: Record<string, string | undefined> = process.env,
+): MessagingAdapter {
+  const fallback = getAdapter();
+  const config = emailConfigFrom(env);
+  if (!config) return fallback;
+  return new EmailAdapter(config, fallback, options);
+}
+
+/** True when automatic (unattended) delivery is possible at all. */
+export function automaticDeliveryConfigured(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return emailConfigFrom(env) !== null;
 }
 
 export function getAdapter(): MessagingAdapter {
