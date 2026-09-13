@@ -1473,4 +1473,219 @@ export const en: Record<TranslationKey, string> = {
   "copy.blocked_selected":
     "Your browser did not allow copying. The text is selected — press Ctrl+C, or long-press it on a phone.",
   "whatsapp.open": "Open in WhatsApp",
+
+  /* --- P37a: shift sections on /shifts --- */
+  "shifts.sections.new_button": "New section",
+  "shifts.sections.new.title": "New section",
+  "shifts.sections.new.name_label": "Section name",
+  "shifts.sections.new.campaign_label": "Campaign",
+  "shifts.sections.new.campaign_placeholder": "Choose a campaign",
+  "shifts.sections.new.no_campaigns_hint": "There is no campaign yet — create one first.",
+  "shifts.sections.new.submit": "Create",
+  "shifts.sections.new.submitting": "Creating…",
+  "shifts.sections.new.cancel": "Cancel",
+  "shifts.sections.validation.campaign_required": "Choose a campaign.",
+  "shifts.sections.validation.name_invalid": "Give it a name of up to 120 characters.",
+  "shifts.sections.error.save_failed": "That did not save. Please try again.",
+  "shifts.sections.error.blocked_read_only":
+    "This account is read-only right now, so sections cannot be changed.",
+
+  "shifts.sections.rename_button": "Rename",
+  "shifts.sections.rename.name_label": "Section name",
+  "shifts.sections.rename.save": "Save",
+  "shifts.sections.rename.cancel": "Cancel",
+
+  "shifts.sections.archive_button": "Archive",
+  "shifts.sections.unarchive_button": "Unarchive",
+  "shifts.sections.archived_badge": "Archived",
+
+  "shifts.sections.import_badge": "Excel: {filename}",
+  "shifts.sections.date_range": "{from} – {to}",
+  "shifts.sections.date_range_none": "No dates set yet",
+  "shifts.sections.next_shift": "Next: {date}",
+  "shifts.sections.next_shift_none": "No upcoming shift",
+  "shifts.sections.needs_people_one": "{count} shift still needs people",
+  "shifts.sections.needs_people_many": "{count} shifts still need people",
+  "shifts.sections.needs_people_none": "Fully staffed",
+  "shifts.sections.add_shifts": "Add shifts",
+  "shifts.sections.shifts_toggle_one": "Shift ({count})",
+  "shifts.sections.shifts_toggle_many": "Shifts ({count})",
+  "shifts.sections.shifts_empty": "No shifts in this section yet.",
+
+  "shifts.sections.unsectioned_title": "No section",
+  "shifts.sections.unsectioned_description": "Shifts created outside the sections above.",
+
+  "shifts.sections.filters.client_label": "Client",
+  "shifts.sections.filters.client_all": "All clients",
+  "shifts.sections.filters.campaign_label": "Campaign",
+  "shifts.sections.filters.campaign_all": "All campaigns",
+  "shifts.sections.filters.when_label": "Time range",
+  "shifts.sections.filters.when_all": "All",
+  "shifts.sections.filters.when_upcoming": "Upcoming",
+  "shifts.sections.filters.when_past": "Past",
+  "shifts.sections.filters.show_archived": "Show archived",
+
+  "shifts.sections.empty.title": "No sections yet",
+  "shifts.sections.empty.body":
+    "Create the first shift section by hand, or drop a client's Excel file onto this page to build it automatically.",
+  "shifts.sections.empty.cta": "New section",
+  "shifts.sections.filtered_empty.title": "No section matches these filters",
+  "shifts.sections.filtered_empty.body": "Try different filters, or clear them.",
+  "shifts.sections.filtered_empty.cta": "Clear filters",
+
+  "campaigns.shifts_new.section_programme": "Section",
+  "campaigns.shifts_new.programme_existing": "Existing section",
+  "campaigns.shifts_new.programme_new": "New section",
+  "campaigns.shifts_new.programme_select_label": "Section",
+  "campaigns.shifts_new.programme_select_placeholder": "Choose a section",
+  "campaigns.shifts_new.new_programme_name_label": "New section name",
+  "campaigns.shifts_new.no_programmes_hint":
+    "There is no section yet for this campaign — create the first one below.",
+  "campaigns.validation.programme_required": "Choose a section.",
+  "campaigns.validation.new_programme_name": "Give it a name of up to 120 characters.",
+  "campaigns.shifts_new.error.programme_save_failed": "We could not save the new section. Please try again.",
+  /* --- P39: automatic messaging — email adapter, dispatch, /settings/messaging --- */
+  "page_title.settings_messaging": "Automatic messages",
+  "settings.card.messaging_title": "Automatic messages",
+  "settings.card.messaging_body":
+    "The availability link goes out by email on its own: when you add a promoter, and to everyone on the 1st and the 15th of the month.",
+  "settings.card.messaging_cta": "Sending settings",
+
+  "messaging.email.default_subject": "A message from your agency",
+  "messaging.email.default_action": "Open",
+  "messaging.email.link_fallback": "If the button does not open, tap or copy this link:",
+  "messaging.email.automated_note":
+    "This email was sent automatically — please do not reply to it. For any change, talk to your coordinator.",
+  "messaging.email.availability.subject_welcome": "Welcome — tell us when you can work",
+  "messaging.email.availability.subject_periodic": "Update your availability",
+  "messaging.email.availability.action": "Set my availability",
+  "messaging.email.checkin.subject": "Your shift today at {start}",
+  "messaging.email.checkin.action": "Check in",
+  "messaging.email.invitation.subject": "A new shift for you",
+  "messaging.email.invitation.action": "See the shift",
+
+  "messaging.availability.welcome_intro": "{agency} has added you to its promoters.",
+  "messaging.availability.welcome_intro_no_agency": "You have been added to the agency's promoters.",
+  "messaging.availability.periodic_intro": "It is time to tell {agency} when you are available.",
+  "messaging.availability.periodic_intro_no_agency": "It is time to update your availability.",
+  "messaging.checkin.today": "You have a shift today: {where}, {start}–{end}.",
+  "messaging.checkin.instruction": "When you arrive at the store, open this link to check in:",
+
+  "messaging.title": "Automatic messages",
+  "messaging.subtitle":
+    "What goes out to promoters on its own, how the last send went, and who you still need to message yourself.",
+  "messaging.back_to_settings": "← Settings",
+
+  "messaging.migration_missing.title": "Automatic sending is not enabled in the database yet",
+  "messaging.migration_missing.body":
+    "The database update (0017) is missing. Until it is applied, nothing is sent or recorded automatically.",
+  "messaging.not_configured.title": "Email is not configured",
+  "messaging.not_configured.body":
+    "Without email nothing can be sent automatically, so every promoter is in the list below to message by hand. Missing: {vars}.",
+
+  "messaging.auto.title": "Availability link",
+  "messaging.auto.description":
+    "Emailed to every new promoter as soon as you add them, and again to every active promoter on the 1st and the 15th of each month.",
+  "messaging.auto.state_on": "Automatic sending is on",
+  "messaging.auto.state_off": "Automatic sending is off",
+  "messaging.auto.turn_on": "Turn on",
+  "messaging.auto.turn_off": "Turn off",
+  "messaging.auto.owner_only": "Only the account owner can change this.",
+  "messaging.auto.next_run": "Next automatic send: {date}.",
+  "messaging.auto.next_run_off": "Nothing will be sent automatically until you turn it back on.",
+
+  "messaging.last_run.title": "Last send",
+  "messaging.last_run.scheduled": "scheduled",
+  "messaging.last_run.manual": "manual",
+  "messaging.last_run.sent": "Sent",
+  "messaging.last_run.no_email": "No email",
+  "messaging.last_run.reserved_domain": "Test email address",
+  "messaging.last_run.failed": "Failed",
+  "messaging.last_run.pending": "{count} still in progress — refresh the page in a moment.",
+  "messaging.last_run.none": "Nothing has been sent yet.",
+
+  "messaging.send_now.button": "Send to everyone now",
+  "messaging.send_now.confirm_title": "An email will go to {count} promoters.",
+  "messaging.send_now.confirm_already": "{count} already got it today and will not get it again.",
+  "messaging.send_now.confirm_unreachable":
+    "{count} have no email address we can send to — they are in the list below.",
+  "messaging.send_now.confirm_once": "Whatever happens, nobody gets the same email twice today.",
+  "messaging.send_now.confirm": "Send to {count}",
+  "messaging.send_now.started":
+    "Sending to {count} promoters has started. It takes about half a second per email — refresh the page shortly for the results.",
+  "messaging.send_now.nobody": "No active promoter has an email address we can send to.",
+  "messaging.send_now.all_sent_today": "Everyone with an email address already got it today.",
+  "messaging.send_now.owner_only": "Only the account owner can send to everyone.",
+  "messaging.send_now.needs_email": "Sending to everyone becomes available once email is configured.",
+  "messaging.send_now.needs_migration": "Sending to everyone becomes available once the database is updated.",
+
+  "messaging.unreachable.title": "Send these yourself",
+  "messaging.unreachable.description":
+    "Email cannot reach these promoters. Their link is ready — send it on WhatsApp or copy it.",
+  "messaging.unreachable.description_no_email":
+    "With no email configured, every promoter needs the link from you. It is ready for each of them.",
+  "messaging.unreachable.none": "Every active promoter can receive the link automatically.",
+  "messaging.unreachable.no_promoters": "There are no active promoters yet.",
+  "messaging.unreachable.link_label": "Availability link for {name}",
+  "messaging.unreachable.fix_email": "Fix email",
+
+  "messaging.reason.email_not_configured": "No sending email",
+  "messaging.reason.no_email": "No email",
+  "messaging.reason.invalid_email": "Invalid email",
+  "messaging.reason.reserved_domain": "Test email — not sent",
+  "messaging.reason.last_send_failed": "Last send failed",
+
+  "messaging.errors.not_owner": "Only the account owner can do this.",
+  "messaging.errors.migration_missing":
+    "The database has not been updated for automatic sending yet (0017). Nothing was sent.",
+  "messaging.errors.email_not_configured": "Email is not configured, so nothing was sent.",
+  "messaging.errors.write_not_permitted":
+    "The database did not allow the change. If you are the owner, update 0017 has probably not been applied.",
+  "messaging.errors.unknown": "That did not work. Refresh the page and try again.",
+
+  /* --- P38: "Send invitation" from a promoter's own card, to any shift --- */
+  "promoters.profile.invite_button": "Send invitation",
+
+  "invite_panel.title": "Send invitation",
+  "invite_panel.subtitle": "Choose a shift for {name}.",
+  "invite_panel.filter.campaign_label": "Campaign",
+  "invite_panel.filter.campaign_all": "All campaigns",
+  "invite_panel.filter.date_label": "Date",
+  "invite_panel.filter.clear": "Clear filters",
+  "invite_panel.empty_no_shifts": "There are no upcoming shifts that need people right now.",
+  "invite_panel.empty_filtered": "No shift matches these filters.",
+  "invite_panel.slots_needed": "{count} spots open",
+  "invite_panel.send.button": "Send invitation",
+  "invite_panel.send.sent": "Sent",
+  "invite_panel.send.error.missing_ids": "Missing information in the form. Reload the page.",
+  "invite_panel.send.error.not_found": "Not found.",
+  "invite_panel.send.error.blocked_read_only":
+    "This account is read-only right now, so you can't send new invitations. Go to Billing in Settings to continue.",
+  "invite_panel.send.error.unknown": "Something went wrong. Try again.",
+
+  /* The same reasons the matching engine applies as hard filters or folds into the score —
+     stated explicitly here, so the coordinator overrides the engine knowingly. */
+  "invite_eligibility.blocking.archived": "This promoter is archived.",
+  "invite_eligibility.blocking.blocklisted": "This promoter is blocklisted.",
+  "invite_eligibility.blocking.already_confirmed": "Already confirmed on this shift.",
+  "invite_eligibility.blocking.pending_invitation": "Already holds an open invitation for this shift.",
+  "invite_eligibility.blocking.overlapping_confirmed_shift":
+    "Already confirmed on another shift that overlaps in time.",
+  "invite_eligibility.blocking.shift_unavailable": "This shift no longer needs anyone.",
+  "invite_eligibility.warning.no_availability_declared": "No availability declared for this day.",
+  "invite_eligibility.warning.declared_unavailable":
+    "Has declared unavailability covering all or part of this shift.",
+  "invite_eligibility.warning.outside_travel_radius": "Outside the usual travel radius.",
+  "invite_eligibility.warning.brief_not_read": "Has not read the campaign brief yet.",
+
+  /* --- P38: the check-in link finally reaches the promoter --- */
+  "invitation.next_steps.title": "What happens next",
+  "invitation.next_steps.body":
+    "On the day of the shift, when you arrive at the store, open this link to check in. You can come back to this page any time to find it again.",
+  "invitation.next_steps.open_checkin": "Open the arrival page",
+  "invitation.next_steps.error": "We could not prepare the check-in link right now. Try again later.",
+
+  "shifts.board.checkin_link_action": "Check-in link",
+  "shifts.board.checkin_link.message.greeting": "Hi {name}!",
+  "shifts.board.checkin_link.message.body": "Check in when you arrive at the store:",
 };

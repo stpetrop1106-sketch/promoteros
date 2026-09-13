@@ -2,8 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createInvitation, refreshShiftStatus } from "@/lib/invitations";
+import { createCheckinLink, checkinLinkTtlHours } from "@/lib/checkins";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
+import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+
+const t = translatorFor(DEFAULT_LOCALE);
 
 export type InviteState = {
   status: "idle" | "sent" | "manual" | "error";
@@ -144,4 +148,74 @@ export async function markNoShow(
   await refreshShiftStatus(shiftId);
   revalidatePath(`/shifts/${shiftId}`);
   return { status: "done" };
+}
+
+export type MintCheckinLinkState =
+  | { status: "idle" }
+  | { status: "ready"; url: string; message: string }
+  | { status: "error"; reason: string };
+
+/**
+ * P38 — "Σύνδεσμος check-in" on a confirmed row of the shift board. Closes the gap the manager
+ * found: `createCheckinLink` (`lib/checkins.ts`) had no caller anywhere in the product before
+ * this. RLS-only, same shape as `cancelAssignment`/`markNoShow` above — no admin client reachable
+ * here, both ids belong to an ordinary signed-in coordinator action.
+ *
+ * The TTL is computed from the shift's own end time (`checkinLinkTtlHours`) rather than left at
+ * `createCheckinLink`'s default: a coordinator can mint this the moment a shift is confirmed,
+ * days or weeks before it happens, and the link must still work on the day.
+ */
+export async function mintCheckinLink(
+  _prev: MintCheckinLinkState,
+  formData: FormData,
+): Promise<MintCheckinLinkState> {
+  const shiftId = String(formData.get("shiftId") ?? "");
+  const assignmentId = String(formData.get("assignmentId") ?? "");
+  if (!shiftId || !assignmentId) return { status: "error", reason: "missing_ids" };
+
+  await requireUser();
+  const db = await createServerSupabase();
+
+  const { data: assignment } = await db
+    .from("assignments")
+    .select("id, shift_id, status, promoters(full_name, phone)")
+    .eq("id", assignmentId)
+    .maybeSingle();
+
+  if (!assignment || assignment.shift_id !== shiftId) {
+    return { status: "error", reason: "not_found" };
+  }
+  if (assignment.status !== "confirmed") {
+    return { status: "error", reason: "not_confirmed" };
+  }
+
+  const { data: shift } = await db
+    .from("shifts")
+    .select("on_date, start_time, end_time, campaigns(name), stores(name)")
+    .eq("id", shiftId)
+    .maybeSingle();
+  if (!shift) return { status: "error", reason: "not_found" };
+
+  const startTime = String(shift.start_time).slice(0, 5);
+  const endTime = String(shift.end_time).slice(0, 5);
+  const ttlHours = checkinLinkTtlHours(shift.on_date, endTime);
+  const { url } = await createCheckinLink(assignmentId, ttlHours);
+
+  const promoter = assignment.promoters as unknown as { full_name: string; phone: string } | null;
+  const campaign = shift.campaigns as unknown as { name: string } | null;
+  const store = shift.stores as unknown as { name: string } | null;
+
+  const message = [
+    promoter?.full_name
+      ? t("shifts.board.checkin_link.message.greeting", { name: promoter.full_name })
+      : null,
+    t("shifts.board.checkin_link.message.body"),
+    [campaign?.name, store?.name].filter(Boolean).join(" · "),
+    `${shift.on_date} · ${startTime}–${endTime}`,
+    url,
+  ]
+    .filter((line): line is string => Boolean(line))
+    .join("\n");
+
+  return { status: "ready", url, message };
 }

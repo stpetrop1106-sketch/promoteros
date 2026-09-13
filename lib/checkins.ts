@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { mintToken, verifyToken, linkFor } from "@/lib/tokens";
+import { mintToken, verifyToken, linkFor, hashToken } from "@/lib/tokens";
 import { distanceMetres, type Coordinates } from "@/lib/geo";
 
 /**
@@ -78,6 +78,115 @@ export async function createCheckinLink(
 
   const { token } = mintToken("checkin", assignment.id, ttlHours * 3600);
   return { url: linkFor(token, "checkin") };
+}
+
+// ---------------------------------------------------------------------------------------------
+// P38 additions — nothing above this line changed shape or signature.
+//
+// `createCheckinLink` above has one caller anywhere in the product before P38: nobody. A
+// promoter who accepted an invitation reached a dead end, and this working page had no link
+// pointing at it. The two helpers below are how a check-in link actually reaches someone:
+// `createCheckinLinkForInvitation` for the promoter's own accepted-invitation page
+// (`app/i/[token]/page.tsx`), and `checkinLinkTtlHours` for the coordinator's shift board
+// (`app/shifts/[id]/actions.ts`), which mints one on demand for a confirmed assignment.
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Europe/Athens wall-clock arithmetic, in the same "as if UTC" representation
+ * `app/shifts/[id]/time.ts` and `lib/exceptions.ts` each keep their own copy of — this file
+ * cannot import across either ownership line, and both of those file comments explain why a
+ * fourth copy here is the right call rather than a shared import: `new Date("2026-09-10")`
+ * parses as UTC midnight, which is the wrong Athens instant, so `on_date` + a time-of-day string
+ * are never handed to the `Date` constructor directly. Only used below to compute a TTL — never
+ * to gate or reject anything, so a wrong guess here can only make a link's expiry too generous or
+ * too short, never break check-in itself.
+ */
+const ATHENS_TZ = "Europe/Athens";
+
+function athensNowMs(now: Date): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: ATHENS_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value ?? 0);
+  return Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+}
+
+function athensWallClockMs(onDate: string, timeOfDay: string): number {
+  const [y, mo, d] = onDate.split("-").map(Number);
+  const [h, mi] = timeOfDay.split(":").map(Number);
+  return Date.UTC(y ?? 0, (mo ?? 1) - 1, d ?? 1, h ?? 0, mi ?? 0, 0);
+}
+
+/** However long past the shift's own end a minted link should keep working — a promoter running
+ *  late, or filing the field report a little after closing, must not find a dead link. */
+const CHECKIN_LINK_TAIL_HOURS = 12;
+
+/**
+ * A check-in link's TTL, computed so it is still valid at the end of the shift day even when
+ * minted the moment an invitation is accepted — which can be days or weeks before the shift
+ * itself. `createCheckinLink`'s own `DEFAULT_TTL_HOURS` (72h) assumes it is minted close to the
+ * shift, which is true for the coordinator pressing a button that morning but not for a promoter
+ * accepting an invitation for a shift three weeks out — so this is computed from the shift's own
+ * end time instead of ever changing that default.
+ *
+ * Never shorter than `DEFAULT_TTL_HOURS`: a same-day accept must get at least the same working
+ * window `createCheckinLink` always gave a coordinator-minted link.
+ */
+export function checkinLinkTtlHours(onDate: string, endTime: string, now: Date = new Date()): number {
+  const coveredUntilMs = athensWallClockMs(onDate, endTime) + CHECKIN_LINK_TAIL_HOURS * 3_600_000;
+  const hoursUntilCovered = Math.ceil((coveredUntilMs - athensNowMs(now)) / 3_600_000);
+  return Math.max(hoursUntilCovered, DEFAULT_TTL_HOURS);
+}
+
+/**
+ * The promoter's own check-in link, derived from their already-accepted invitation token — never
+ * from an id in the URL, so this page can never be pointed at anyone else's assignment.
+ *
+ * Stateless and safe to call every time the promoter (re)opens `/i/[token]`, exactly like
+ * `AvailabilityLink`'s own minting (`app/promoters/[id]/availability-link.tsx`): `createCheckinLink`
+ * writes nothing to the database, so issuing a fresh one on every page view costs nothing and
+ * simply extends how long the link the promoter is looking at keeps working.
+ */
+export async function createCheckinLinkForInvitation(
+  token: string,
+): Promise<{ ok: true; url: string } | { ok: false; reason: string }> {
+  const verified = verifyToken(token, "invitation");
+  if (!verified.ok) return { ok: false, reason: verified.reason };
+
+  const db = createAdminClient();
+  const { data: invitation, error } = await db
+    .from("invitations")
+    .select("id, status, token_hash, shift_id, promoter_id, shifts(on_date, end_time)")
+    .eq("id", verified.recordId)
+    .single();
+  if (error || !invitation) return { ok: false, reason: "not_found" };
+  // Defence in depth, same as `lib/invitations.ts`'s `loadInvitation`: a valid signature must
+  // also match the stored hash.
+  if (invitation.token_hash !== hashToken(token)) return { ok: false, reason: "bad_signature" };
+  if (invitation.status !== "accepted") return { ok: false, reason: "not_accepted" };
+
+  const shift = invitation.shifts as unknown as { on_date: string; end_time: string } | null;
+  if (!shift) return { ok: false, reason: "not_found" };
+
+  const { data: assignment, error: assignmentErr } = await db
+    .from("assignments")
+    .select("id, status")
+    .eq("shift_id", invitation.shift_id)
+    .eq("promoter_id", invitation.promoter_id)
+    .maybeSingle();
+  if (assignmentErr || !assignment) return { ok: false, reason: "not_found" };
+  if (assignment.status === "cancelled") return { ok: false, reason: "cancelled" };
+
+  const ttlHours = checkinLinkTtlHours(shift.on_date, String(shift.end_time).slice(0, 5));
+  const { url } = await createCheckinLink(assignment.id, ttlHours);
+  return { ok: true, url };
 }
 
 /** Read a check-in from its raw token, for the promoter-facing page. */

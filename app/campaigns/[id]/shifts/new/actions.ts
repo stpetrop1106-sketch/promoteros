@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
+import { createProgramme } from "@/lib/programmes";
 import {
   expandSeriesDates,
   fieldErrorsFromZodError,
@@ -21,6 +22,8 @@ type ShiftField =
   | "newStoreAddress"
   | "newStoreLat"
   | "newStoreLng"
+  | "programmeId"
+  | "newProgrammeName"
   | "fromDate"
   | "toDate"
   | "weekdays"
@@ -50,6 +53,9 @@ const schema = z
     newStoreAddress: z.string().max(500, "campaigns.validation.too_long").optional(),
     newStoreLat: z.string().optional(),
     newStoreLng: z.string().optional(),
+    programmeMode: z.enum(["existing", "new"]),
+    programmeId: z.string().optional(),
+    newProgrammeName: z.string().max(120, "campaigns.validation.too_long").optional(),
     fromDate: z.string().regex(DATE_RE, "campaigns.validation.date_invalid"),
     toDate: z.string().regex(DATE_RE, "campaigns.validation.date_invalid"),
     weekdays: z.array(z.string()).min(1, "campaigns.validation.weekdays_none"),
@@ -78,6 +84,14 @@ const schema = z
     message: "campaigns.validation.coords_invalid",
     path: ["newStoreLng"],
   })
+  .refine((v) => v.programmeMode !== "existing" || Boolean(v.programmeId), {
+    message: "campaigns.validation.programme_required",
+    path: ["programmeId"],
+  })
+  .refine((v) => v.programmeMode !== "new" || (v.newProgrammeName?.trim().length ?? 0) >= 1, {
+    message: "campaigns.validation.new_programme_name",
+    path: ["newProgrammeName"],
+  })
   .refine((v) => !v.rateOverrideEuros || parseEurosToCents(v.rateOverrideEuros) !== null, {
     message: "campaigns.validation.rate_invalid",
     path: ["rateOverrideEuros"],
@@ -105,6 +119,9 @@ export async function createShifts(_prev: ShiftFormState, formData: FormData): P
     newStoreAddress: optionalText(formData.get("newStoreAddress")),
     newStoreLat: optionalText(formData.get("newStoreLat")),
     newStoreLng: optionalText(formData.get("newStoreLng")),
+    programmeMode: requiredText(formData.get("programmeMode")) || "existing",
+    programmeId: optionalText(formData.get("programmeId")),
+    newProgrammeName: optionalText(formData.get("newProgrammeName")),
     fromDate: requiredText(formData.get("fromDate")),
     toDate: requiredText(formData.get("toDate")),
     weekdays: formData.getAll("weekdays").map(String),
@@ -163,6 +180,37 @@ export async function createShifts(_prev: ShiftFormState, formData: FormData): P
     storeId = store.id;
   }
 
+  let programmeId: string;
+
+  if (data.programmeMode === "new") {
+    const result = await createProgramme(db, {
+      agencyId: user.agencyId,
+      campaignId: data.campaignId,
+      name: data.newProgrammeName!,
+    });
+    if (!result.ok) {
+      return { status: "error", formError: "campaigns.shifts_new.error.programme_save_failed" };
+    }
+    programmeId = result.id;
+  } else {
+    // Re-verified through RLS, and against this campaign specifically — the composite FK in
+    // 0016_shift_programmes.sql only forbids the mismatch at the database level, this is the
+    // earlier, friendlier check that turns it into a field error instead of a 500.
+    const { data: prog } = await db
+      .from("shift_programmes")
+      .select("id")
+      .eq("id", data.programmeId!)
+      .eq("campaign_id", data.campaignId)
+      .maybeSingle();
+    if (!prog) {
+      return {
+        status: "error",
+        fieldErrors: { programmeId: "campaigns.validation.programme_required" },
+      };
+    }
+    programmeId = prog.id;
+  }
+
   const weekdaySet = new Set(data.weekdays.map(Number));
   const dates = expandSeriesDates(data.fromDate, data.toDate, weekdaySet);
 
@@ -178,6 +226,7 @@ export async function createShifts(_prev: ShiftFormState, formData: FormData): P
       agency_id: user.agencyId,
       campaign_id: data.campaignId,
       store_id: storeId,
+      programme_id: programmeId,
       on_date: onDate,
       start_time: data.startTime,
       end_time: data.endTime,
@@ -192,5 +241,6 @@ export async function createShifts(_prev: ShiftFormState, formData: FormData): P
 
   revalidatePath(`/campaigns/${data.campaignId}`);
   revalidatePath("/campaigns");
+  revalidatePath("/shifts");
   redirect(`/campaigns/${data.campaignId}`);
 }

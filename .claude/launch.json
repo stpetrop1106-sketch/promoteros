@@ -6,6 +6,15 @@
       "runtimeExecutable": "cmd",
       "runtimeArgs": ["/c", "set NEXT_PUBLIC_APP_URL=http://localhost:3200&& npm run dev -- -p 3200"],
       "port": 3200
+    },
+    {
+      "name": "P37a",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": [
+        "/c",
+        "set NEXT_DIST_DIR=.next-P37a&& set NEXT_PUBLIC_APP_URL=http://localhost:3301&& npx next dev -p 3301"
+      ],
+      "port": 3301
     }
   ]
 }

@@ -102,6 +102,30 @@ every customer's data. Seeding is a single manual `insert` in the SQL editor, do
 of `0013_admin.sql`. Until it runs, `/admin` returns 404 to everyone — the correct default for a
 console with nobody in it.
 
+### D18 — Spreadsheet parsing with SheetJS 0.20.3 from the vendor's CDN · 2026-09-13
+The Excel import (round 2, item 5) needs .xlsx, legacy .xls and Greek CSV. SheetJS is the only
+library that reads all three. Its npm registry copy is frozen at 0.18.5 with CVE-2023-30533
+(prototype pollution) and CVE-2024-22363 (ReDoS); the vendor now publishes maintained releases only
+from `cdn.sheetjs.com`, which is where the dependency points. `exceljs` was the alternative and does
+not read .xls. SheetJS is loaded only by `readWorkbook`, in the browser, when a file is dropped — the
+server-side re-validation path never imports it.
+
+### D19 — Automatic promoter messages go by email first · 2026-09-13
+The owner asked for availability links to reach promoters without a coordinator sending them.
+WhatsApp Business needs Meta verification outside our control, Viber in Greece carries a €150/month
+minimum, and promoters do not have Telegram chat ids. Email through Resend is the one channel we can
+automate today, so it is the first automated adapter — behind the adapter interface, like every
+channel. A promoter with no email is not silently skipped: the coordinator gets a list of exactly
+who could not be reached, with the link ready to send by WhatsApp. This keeps D3 (adapters, not
+conditionals) and revisits Q5 once real promoters show which channel they open.
+
+### D20 — Sections of shifts are programmes inside a campaign · 2026-09-13
+The owner asked for "as many sections of shifts as the agency wants", because clients send separate
+programmes. A section could have been a free-form tag. It is instead a `shift_programmes` row owned by
+exactly one campaign, because a shift already cannot exist without a campaign, and because the Excel
+import needs a campaign to attach shifts to anyway. A composite foreign key makes it impossible in
+the database to file a shift under another campaign's section or another agency's.
+
 ---
 
 ## Open questions

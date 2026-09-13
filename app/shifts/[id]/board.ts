@@ -11,6 +11,9 @@ export type RawAssignment = {
   id: string;
   promoterId: string;
   fullName: string;
+  /** P38 — carried through to the board row so the check-in link control can offer
+   *  "open in WhatsApp" without a second query. */
+  phone: string | null;
   status: "confirmed" | "cancelled" | "no_show" | "completed";
   confirmedAt: string;
   cancelledAt: string | null;
@@ -49,6 +52,9 @@ export type BoardRowState =
 export type BoardRow = {
   promoterId: string;
   fullName: string;
+  /** P38 — only present on rows that came from an assignment; used to offer "open in WhatsApp"
+   *  next to a freshly minted check-in link. */
+  phone?: string | null;
   state: BoardRowState;
   /** 0 = most urgent, sorts first. */
   tier: 0 | 1 | 2 | 3;
@@ -68,6 +74,11 @@ export type BoardRow = {
   cancellable: boolean;
   /** Can this row's assignment be marked a no-show right now? */
   markableNoShow: boolean;
+  /** P38 — can the coordinator mint this row a check-in link right now? True exactly when the
+   *  underlying assignment is `confirmed` (checked in or not) — the same condition `cancellable`
+   *  happens to test, kept as its own field so the two controls can never silently drift apart if
+   *  one of their conditions ever changes for an unrelated reason. */
+  checkinLinkAvailable: boolean;
 };
 
 export type CoverageSummary = {
@@ -118,6 +129,7 @@ export function buildBoard(
       rows.push({
         promoterId: a.promoterId,
         fullName: a.fullName,
+        phone: a.phone,
         state: "cancelled",
         tier: TIER.cancelled,
         minutesUntilStart: minsUntilStart,
@@ -126,6 +138,7 @@ export function buildBoard(
         cancelReason: a.cancelReason,
         cancellable: false,
         markableNoShow: false,
+        checkinLinkAvailable: false,
       });
       continue;
     }
@@ -136,6 +149,7 @@ export function buildBoard(
       rows.push({
         promoterId: a.promoterId,
         fullName: a.fullName,
+        phone: a.phone,
         state: "no_show",
         tier: TIER.no_show,
         minutesUntilStart: minsUntilStart,
@@ -143,6 +157,7 @@ export function buildBoard(
         confirmedAt: a.confirmedAt,
         cancellable: false,
         markableNoShow: false,
+        checkinLinkAvailable: false,
       });
       continue;
     }
@@ -151,6 +166,7 @@ export function buildBoard(
       rows.push({
         promoterId: a.promoterId,
         fullName: a.fullName,
+        phone: a.phone,
         state: checkIn ? "checked_in" : "confirmed",
         tier: 2,
         minutesUntilStart: minsUntilStart,
@@ -161,16 +177,18 @@ export function buildBoard(
         withinGeofence: checkIn?.withinGeofence,
         cancellable: false,
         markableNoShow: false,
+        checkinLinkAvailable: false,
       });
       continue;
     }
 
-    // status === "confirmed"
+    // status === "confirmed" — the one status P38's "Σύνδεσμος check-in" control appears for.
     if (checkIn) {
       const manual = checkIn.method === "manual_override";
       rows.push({
         promoterId: a.promoterId,
         fullName: a.fullName,
+        phone: a.phone,
         state: manual ? "checked_in_manual" : "checked_in",
         tier: manual ? TIER.checked_in_manual : TIER.checked_in,
         minutesUntilStart: minsUntilStart,
@@ -181,6 +199,7 @@ export function buildBoard(
         withinGeofence: checkIn.withinGeofence,
         cancellable: true,
         markableNoShow: false,
+        checkinLinkAvailable: true,
       });
       continue;
     }
@@ -189,6 +208,7 @@ export function buildBoard(
     rows.push({
       promoterId: a.promoterId,
       fullName: a.fullName,
+      phone: a.phone,
       state: "confirmed",
       tier: started ? 0 : TIER.confirmed,
       minutesUntilStart: minsUntilStart,
@@ -196,6 +216,7 @@ export function buildBoard(
       confirmedAt: a.confirmedAt,
       cancellable: true,
       markableNoShow: started,
+      checkinLinkAvailable: true,
     });
   }
 
@@ -222,6 +243,7 @@ export function buildBoard(
         declineReason: inv.declineReason,
         cancellable: false,
         markableNoShow: false,
+        checkinLinkAvailable: false,
       });
       continue;
     }
@@ -238,6 +260,7 @@ export function buildBoard(
         expiresAt: inv.expiresAt,
         cancellable: false,
         markableNoShow: false,
+        checkinLinkAvailable: false,
       });
       continue;
     }
@@ -254,6 +277,7 @@ export function buildBoard(
       expiresAt: inv.expiresAt,
       cancellable: false,
       markableNoShow: false,
+      checkinLinkAvailable: false,
     });
   }
 

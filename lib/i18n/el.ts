@@ -1502,4 +1502,225 @@ export const el = {
   "copy.blocked_selected":
     "Ο browser δεν επέτρεψε την αντιγραφή. Το κείμενο επιλέχτηκε — πάτα Ctrl+C, ή κράτα το δάχτυλο πάνω του στο κινητό.",
   "whatsapp.open": "Άνοιγμα στο WhatsApp",
+
+  /* --- P37a: shift sections ("ενότητες") on /shifts --- */
+  "shifts.sections.new_button": "Νέα ενότητα",
+  "shifts.sections.new.title": "Νέα ενότητα",
+  "shifts.sections.new.name_label": "Όνομα ενότητας",
+  "shifts.sections.new.campaign_label": "Καμπάνια",
+  "shifts.sections.new.campaign_placeholder": "Επίλεξε καμπάνια",
+  "shifts.sections.new.no_campaigns_hint": "Δεν υπάρχει ακόμα καμία καμπάνια — φτιάξε πρώτα μία.",
+  "shifts.sections.new.submit": "Δημιουργία",
+  "shifts.sections.new.submitting": "Δημιουργία…",
+  "shifts.sections.new.cancel": "Άκυρο",
+  "shifts.sections.validation.campaign_required": "Επίλεξε καμπάνια.",
+  "shifts.sections.validation.name_invalid": "Δώσε ένα όνομα έως 120 χαρακτήρες.",
+  "shifts.sections.error.save_failed": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά.",
+  "shifts.sections.error.blocked_read_only":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να αλλάξεις ενότητες.",
+
+  "shifts.sections.rename_button": "Μετονομασία",
+  "shifts.sections.rename.name_label": "Όνομα ενότητας",
+  "shifts.sections.rename.save": "Αποθήκευση",
+  "shifts.sections.rename.cancel": "Άκυρο",
+
+  "shifts.sections.archive_button": "Αρχειοθέτηση",
+  "shifts.sections.unarchive_button": "Επαναφορά",
+  "shifts.sections.archived_badge": "Αρχειοθετημένη",
+
+  "shifts.sections.import_badge": "Excel: {filename}",
+  "shifts.sections.date_range": "{from} – {to}",
+  "shifts.sections.date_range_none": "Δεν έχουν οριστεί ημερομηνίες ακόμα",
+  "shifts.sections.next_shift": "Επόμενη: {date}",
+  "shifts.sections.next_shift_none": "Καμία προσεχής βάρδια",
+  "shifts.sections.needs_people_one": "{count} βάρδια χρειάζεται ακόμα άτομα",
+  "shifts.sections.needs_people_many": "{count} βάρδιες χρειάζονται ακόμα άτομα",
+  "shifts.sections.needs_people_none": "Πλήρως στελεχωμένη",
+  "shifts.sections.add_shifts": "Προσθήκη βαρδιών",
+  "shifts.sections.shifts_toggle_one": "Βάρδια ({count})",
+  "shifts.sections.shifts_toggle_many": "Βάρδιες ({count})",
+  "shifts.sections.shifts_empty": "Καμία βάρδια σε αυτή την ενότητα ακόμα.",
+
+  "shifts.sections.unsectioned_title": "Χωρίς ενότητα",
+  "shifts.sections.unsectioned_description":
+    "Βάρδιες που δημιουργήθηκαν εκτός των παραπάνω ενοτήτων.",
+
+  "shifts.sections.filters.client_label": "Πελάτης",
+  "shifts.sections.filters.client_all": "Όλοι οι πελάτες",
+  "shifts.sections.filters.campaign_label": "Καμπάνια",
+  "shifts.sections.filters.campaign_all": "Όλες οι καμπάνιες",
+  "shifts.sections.filters.when_label": "Χρονικό διάστημα",
+  "shifts.sections.filters.when_all": "Όλες",
+  "shifts.sections.filters.when_upcoming": "Προσεχείς",
+  "shifts.sections.filters.when_past": "Παρελθοντικές",
+  "shifts.sections.filters.show_archived": "Εμφάνιση αρχειοθετημένων",
+
+  "shifts.sections.empty.title": "Καμία ενότητα ακόμα",
+  "shifts.sections.empty.body":
+    "Φτιάξε την πρώτη ενότητα βαρδιών με το χέρι, ή άφησε το αρχείο Excel ενός πελάτη πάνω στη σελίδα για να δημιουργηθούν αυτόματα.",
+  "shifts.sections.empty.cta": "Νέα ενότητα",
+  "shifts.sections.filtered_empty.title": "Καμία ενότητα δεν ταιριάζει με τα φίλτρα",
+  "shifts.sections.filtered_empty.body": "Δοκίμασε διαφορετικά φίλτρα, ή καθάρισέ τα.",
+  "shifts.sections.filtered_empty.cta": "Καθαρισμός φίλτρων",
+
+  "campaigns.shifts_new.section_programme": "Ενότητα",
+  "campaigns.shifts_new.programme_existing": "Υπάρχουσα ενότητα",
+  "campaigns.shifts_new.programme_new": "Νέα ενότητα",
+  "campaigns.shifts_new.programme_select_label": "Ενότητα",
+  "campaigns.shifts_new.programme_select_placeholder": "Επίλεξε ενότητα",
+  "campaigns.shifts_new.new_programme_name_label": "Όνομα νέας ενότητας",
+  "campaigns.shifts_new.no_programmes_hint":
+    "Δεν υπάρχει ακόμα καμία ενότητα σε αυτή την καμπάνια — φτιάξε την πρώτη παρακάτω.",
+  "campaigns.validation.programme_required": "Επίλεξε ενότητα.",
+  "campaigns.validation.new_programme_name": "Δώσε ένα όνομα έως 120 χαρακτήρες.",
+  "campaigns.shifts_new.error.programme_save_failed":
+    "Δεν μπορέσαμε να αποθηκεύσουμε τη νέα ενότητα. Δοκίμασε ξανά.",
+
+  /* --- P38: "Στείλε πρόσκληση" από την καρτέλα promoter, σε οποιαδήποτε βάρδια --- */
+  "promoters.profile.invite_button": "Στείλε πρόσκληση",
+
+  "invite_panel.title": "Στείλε πρόσκληση",
+  "invite_panel.subtitle": "Διάλεξε μια βάρδια για την {name}.",
+  "invite_panel.filter.campaign_label": "Καμπάνια",
+  "invite_panel.filter.campaign_all": "Όλες οι καμπάνιες",
+  "invite_panel.filter.date_label": "Ημερομηνία",
+  "invite_panel.filter.clear": "Καθαρισμός φίλτρων",
+  "invite_panel.empty_no_shifts":
+    "Δεν υπάρχουν επερχόμενες βάρδιες που να χρειάζονται άτομα αυτή τη στιγμή.",
+  "invite_panel.empty_filtered": "Καμία βάρδια δεν ταιριάζει με αυτά τα φίλτρα.",
+  "invite_panel.slots_needed": "{count} θέσεις προς κάλυψη",
+  "invite_panel.send.button": "Αποστολή πρόσκλησης",
+  "invite_panel.send.sent": "Στάλθηκε",
+  "invite_panel.send.error.missing_ids": "Λείπουν στοιχεία στη φόρμα. Φόρτωσε ξανά τη σελίδα.",
+  "invite_panel.send.error.not_found": "Δεν βρέθηκε.",
+  "invite_panel.send.error.blocked_read_only":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να στείλεις νέες προσκλήσεις. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
+  "invite_panel.send.error.unknown": "Κάτι πήγε στραβά. Δοκίμασε ξανά.",
+
+  /* Οι ίδιοι λόγοι που ο κινητήρας αντιστοίχισης εφαρμόζει ως σκληρά φίλτρα ή προσαρμόζει τη
+     βαθμολογία — εδώ ρητά δηλωμένοι, ώστε η coordinator να παρακάμπτει τη μηχανή εν γνώσει της. */
+  "invite_eligibility.blocking.archived": "Η promoter είναι αρχειοθετημένη.",
+  "invite_eligibility.blocking.blocklisted": "Η promoter είναι αποκλεισμένη.",
+  "invite_eligibility.blocking.already_confirmed": "Είναι ήδη επιβεβαιωμένη σε αυτή τη βάρδια.",
+  "invite_eligibility.blocking.pending_invitation":
+    "Έχει ήδη ανοιχτή πρόσκληση για αυτή τη βάρδια.",
+  "invite_eligibility.blocking.overlapping_confirmed_shift":
+    "Είναι ήδη επιβεβαιωμένη σε άλλη βάρδια που συμπίπτει χρονικά.",
+  "invite_eligibility.blocking.shift_unavailable": "Η βάρδια δεν χρειάζεται πλέον άτομα.",
+  "invite_eligibility.warning.no_availability_declared":
+    "Δεν έχει δηλώσει διαθεσιμότητα για αυτή την ημέρα.",
+  "invite_eligibility.warning.declared_unavailable":
+    "Έχει δηλώσει μη διαθεσιμότητα που καλύπτει (μέρος ή όλη) αυτή τη βάρδια.",
+  "invite_eligibility.warning.outside_travel_radius": "Είναι εκτός της συνήθους ακτίνας μετακίνησης.",
+  "invite_eligibility.warning.brief_not_read": "Δεν έχει διαβάσει ακόμα το brief της καμπάνιας.",
+
+  /* --- P38: ο σύνδεσμος check-in φτάνει τελικά στην promoter --- */
+  "invitation.next_steps.title": "Τι ακολουθεί",
+  "invitation.next_steps.body":
+    "Την ημέρα της βάρδιας, όταν φτάσεις στο κατάστημα, άνοιξε αυτόν τον σύνδεσμο για να δηλώσεις άφιξη. Μπορείς να ξαναβρείς αυτή τη σελίδα όποτε θέλεις.",
+  "invitation.next_steps.open_checkin": "Άνοιγμα σελίδας άφιξης",
+  "invitation.next_steps.error":
+    "Δεν μπορέσαμε να ετοιμάσουμε τον σύνδεσμο άφιξης αυτή τη στιγμή. Δοκίμασε ξανά αργότερα.",
+
+  "shifts.board.checkin_link_action": "Σύνδεσμος check-in",
+  "shifts.board.checkin_link.message.greeting": "Γεια σου {name}!",
+  "shifts.board.checkin_link.message.body": "Δήλωσε άφιξη όταν φτάσεις στο κατάστημα:",
+  /* --- P39: automatic messaging — email adapter, dispatch, /settings/messaging --- */
+  "page_title.settings_messaging": "Αυτόματα μηνύματα",
+  "settings.card.messaging_title": "Αυτόματα μηνύματα",
+  "settings.card.messaging_body":
+    "Ο σύνδεσμος διαθεσιμότητας φεύγει μόνος του με email: όταν προσθέτεις promoter, και σε όλες την 1η και τη 15η του μήνα.",
+  "settings.card.messaging_cta": "Ρυθμίσεις αποστολής",
+
+  "messaging.email.default_subject": "Μήνυμα από το γραφείο σου",
+  "messaging.email.default_action": "Άνοιγμα",
+  "messaging.email.link_fallback": "Αν το κουμπί δεν ανοίγει, πάτα ή αντέγραψε αυτόν τον σύνδεσμο:",
+  "messaging.email.automated_note":
+    "Αυτό το email στάλθηκε αυτόματα — μην απαντήσεις εδώ. Για οποιαδήποτε αλλαγή, μίλησε με τον συντονιστή σου.",
+  "messaging.email.availability.subject_welcome": "Καλώς ήρθες — δήλωσε πότε μπορείς να δουλέψεις",
+  "messaging.email.availability.subject_periodic": "Ενημέρωσε τη διαθεσιμότητά σου",
+  "messaging.email.availability.action": "Δήλωση διαθεσιμότητας",
+  "messaging.email.checkin.subject": "Η βάρδιά σου σήμερα στις {start}",
+  "messaging.email.checkin.action": "Check-in",
+  "messaging.email.invitation.subject": "Νέα βάρδια για σένα",
+  "messaging.email.invitation.action": "Δες τη βάρδια",
+
+  "messaging.availability.welcome_intro": "Το {agency} σε πρόσθεσε στους promoters του.",
+  "messaging.availability.welcome_intro_no_agency": "Σε προσθέσαμε στους promoters του γραφείου.",
+  "messaging.availability.periodic_intro": "Ήρθε η ώρα να ενημερώσεις το {agency} για τη διαθεσιμότητά σου.",
+  "messaging.availability.periodic_intro_no_agency": "Ήρθε η ώρα να ενημερώσεις τη διαθεσιμότητά σου.",
+  "messaging.checkin.today": "Σήμερα έχεις βάρδια: {where}, {start}–{end}.",
+  "messaging.checkin.instruction": "Όταν φτάσεις στο κατάστημα, άνοιξε αυτόν τον σύνδεσμο για check-in:",
+
+  "messaging.title": "Αυτόματα μηνύματα",
+  "messaging.subtitle":
+    "Τι στέλνεται μόνο του στις promoters, πώς πήγε η τελευταία αποστολή, και ποιες πρέπει να ειδοποιήσεις εσύ.",
+  "messaging.back_to_settings": "← Ρυθμίσεις",
+
+  "messaging.migration_missing.title": "Η αυτόματη αποστολή δεν έχει ενεργοποιηθεί ακόμα στη βάση",
+  "messaging.migration_missing.body":
+    "Λείπει η ενημέρωση της βάσης δεδομένων (0017). Μέχρι να γίνει, δεν στέλνεται και δεν καταγράφεται τίποτα αυτόματα.",
+  "messaging.not_configured.title": "Το email δεν έχει ρυθμιστεί",
+  "messaging.not_configured.body":
+    "Χωρίς email δεν μπορεί να σταλεί τίποτα αυτόματα, οπότε όλες οι promoters είναι στη λίστα παρακάτω για αποστολή με το χέρι. Λείπουν: {vars}.",
+
+  "messaging.auto.title": "Σύνδεσμος διαθεσιμότητας",
+  "messaging.auto.description":
+    "Στέλνεται με email σε κάθε νέα promoter μόλις την προσθέσεις, και ξανά σε όλες τις ενεργές την 1η και τη 15η κάθε μήνα.",
+  "messaging.auto.state_on": "Η αυτόματη αποστολή είναι ανοιχτή",
+  "messaging.auto.state_off": "Η αυτόματη αποστολή είναι κλειστή",
+  "messaging.auto.turn_on": "Ενεργοποίηση",
+  "messaging.auto.turn_off": "Απενεργοποίηση",
+  "messaging.auto.owner_only": "Μόνο ο ιδιοκτήτης του λογαριασμού μπορεί να την αλλάξει.",
+  "messaging.auto.next_run": "Επόμενη αυτόματη αποστολή: {date}.",
+  "messaging.auto.next_run_off": "Δεν θα σταλεί τίποτα αυτόματα μέχρι να την ενεργοποιήσεις ξανά.",
+
+  "messaging.last_run.title": "Τελευταία αποστολή",
+  "messaging.last_run.scheduled": "προγραμματισμένη",
+  "messaging.last_run.manual": "χειροκίνητη",
+  "messaging.last_run.sent": "Στάλθηκαν",
+  "messaging.last_run.no_email": "Χωρίς email",
+  "messaging.last_run.reserved_domain": "Δοκιμαστικό email",
+  "messaging.last_run.failed": "Απέτυχαν",
+  "messaging.last_run.pending": "{count} ακόμα σε εξέλιξη — ανανέωσε τη σελίδα σε λίγο.",
+  "messaging.last_run.none": "Δεν έχει γίνει ακόμα καμία αποστολή.",
+
+  "messaging.send_now.button": "Στείλε τώρα σε όλους",
+  "messaging.send_now.confirm_title": "Θα σταλεί email σε {count} promoters.",
+  "messaging.send_now.confirm_already": "{count} το πήραν ήδη σήμερα και δεν θα το ξαναπάρουν.",
+  "messaging.send_now.confirm_unreachable":
+    "{count} δεν έχουν email που να μπορεί να σταλεί — είναι στη λίστα παρακάτω.",
+  "messaging.send_now.confirm_once": "Ό,τι κι αν γίνει, καμία δεν θα πάρει το ίδιο email δύο φορές σήμερα.",
+  "messaging.send_now.confirm": "Αποστολή σε {count}",
+  "messaging.send_now.started":
+    "Η αποστολή σε {count} promoters ξεκίνησε. Θέλει περίπου μισό δευτερόλεπτο ανά email — ανανέωσε τη σελίδα σε λίγο για τα αποτελέσματα.",
+  "messaging.send_now.nobody": "Καμία ενεργή promoter δεν έχει email που να μπορεί να σταλεί.",
+  "messaging.send_now.all_sent_today": "Όλες όσες έχουν email το πήραν ήδη σήμερα.",
+  "messaging.send_now.owner_only": "Την αποστολή σε όλους μπορεί να την κάνει μόνο ο ιδιοκτήτης του λογαριασμού.",
+  "messaging.send_now.needs_email": "Η αποστολή σε όλους γίνεται μόλις ρυθμιστεί το email.",
+  "messaging.send_now.needs_migration": "Η αποστολή σε όλους γίνεται μόλις ενημερωθεί η βάση δεδομένων.",
+
+  "messaging.unreachable.title": "Στείλε τα εσύ",
+  "messaging.unreachable.description":
+    "Σε αυτές το email δεν μπορεί να φτάσει. Ο σύνδεσμός τους είναι έτοιμος — στείλε τον στο WhatsApp ή αντέγραψέ τον.",
+  "messaging.unreachable.description_no_email":
+    "Χωρίς ρυθμισμένο email, κάθε promoter χρειάζεται τον σύνδεσμο από εσένα. Είναι έτοιμος για την καθεμία.",
+  "messaging.unreachable.none": "Όλες οι ενεργές promoters μπορούν να λάβουν τον σύνδεσμο αυτόματα.",
+  "messaging.unreachable.no_promoters": "Δεν υπάρχουν ακόμα ενεργές promoters.",
+  "messaging.unreachable.link_label": "Σύνδεσμος διαθεσιμότητας για {name}",
+  "messaging.unreachable.fix_email": "Διόρθωση email",
+
+  "messaging.reason.email_not_configured": "Χωρίς email αποστολής",
+  "messaging.reason.no_email": "Δεν έχει email",
+  "messaging.reason.invalid_email": "Λάθος email",
+  "messaging.reason.reserved_domain": "Δοκιμαστικό email — δεν στέλνεται",
+  "messaging.reason.last_send_failed": "Η τελευταία αποστολή απέτυχε",
+
+  "messaging.errors.not_owner": "Μόνο ο ιδιοκτήτης του λογαριασμού μπορεί να το κάνει αυτό.",
+  "messaging.errors.migration_missing":
+    "Η βάση δεδομένων δεν έχει ενημερωθεί ακόμα για την αυτόματη αποστολή (0017). Δεν στάλθηκε τίποτα.",
+  "messaging.errors.email_not_configured": "Το email δεν έχει ρυθμιστεί, οπότε δεν στάλθηκε τίποτα.",
+  "messaging.errors.write_not_permitted":
+    "Η βάση δεν επέτρεψε την αλλαγή. Αν είσαι ιδιοκτήτης, η ενημέρωση 0017 μάλλον δεν έχει εφαρμοστεί.",
+  "messaging.errors.unknown": "Δεν ήταν δυνατή η ενέργεια. Ανανέωσε τη σελίδα και δοκίμασε ξανά.",
 } as const;

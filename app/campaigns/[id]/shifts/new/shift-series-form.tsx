@@ -50,12 +50,23 @@ const RADIO_CLASS = "size-4 shrink-0 accent-[color:var(--color-accent)] outline-
 export function ShiftSeriesForm({
   campaignId,
   stores,
+  programmes,
+  defaultProgrammeId,
 }: {
   campaignId: string;
   stores: SelectOption[];
+  /** This campaign's own, non-archived sections — the picker skips an archived one on purpose:
+   * `docs/round-2-plan.md` P37a treats an archived section as hidden, not gone. */
+  programmes: SelectOption[];
+  /** `?programme=` from the URL when it named a real section, else the campaign's most recent
+   * one. Undefined when the campaign has no section yet, which pins the mode to "new". */
+  defaultProgrammeId?: string;
 }) {
   const [state, formAction] = useActionState(createShifts, INITIAL_STATE);
   const [storeMode, setStoreMode] = useState<"existing" | "new">(stores.length > 0 ? "existing" : "new");
+  const [programmeMode, setProgrammeMode] = useState<"existing" | "new">(
+    programmes.length > 0 ? "existing" : "new",
+  );
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   // Every day checked by default — the common case is "these three specific dates", not "every
@@ -162,6 +173,62 @@ export function ShiftSeriesForm({
                 required
               />
             </div>
+          )}
+        </div>
+      </Section>
+
+      <Section title={t("campaigns.shifts_new.section_programme")}>
+        <div className="flex flex-col gap-4">
+          <fieldset className="flex flex-wrap gap-2">
+            <legend className="sr-only">{t("campaigns.shifts_new.section_programme")}</legend>
+            <OptionChip>
+              <input
+                type="radio"
+                name="programmeMode"
+                value="existing"
+                checked={programmeMode === "existing"}
+                onChange={() => setProgrammeMode("existing")}
+                disabled={programmes.length === 0}
+                className={RADIO_CLASS}
+              />
+              {t("campaigns.shifts_new.programme_existing")}
+            </OptionChip>
+            <OptionChip>
+              <input
+                type="radio"
+                name="programmeMode"
+                value="new"
+                checked={programmeMode === "new"}
+                onChange={() => setProgrammeMode("new")}
+                className={RADIO_CLASS}
+              />
+              {t("campaigns.shifts_new.programme_new")}
+            </OptionChip>
+          </fieldset>
+
+          {programmes.length === 0 ? (
+            <p className="text-xs text-[color:var(--color-muted)]">{t("campaigns.shifts_new.no_programmes_hint")}</p>
+          ) : null}
+
+          {programmeMode === "existing" ? (
+            <SelectField
+              id="programmeId"
+              name="programmeId"
+              label={t("campaigns.shifts_new.programme_select_label")}
+              placeholder={t("campaigns.shifts_new.programme_select_placeholder")}
+              options={programmes}
+              defaultValue={defaultProgrammeId}
+              error={errorFor("programmeId")}
+              required
+            />
+          ) : (
+            <TextField
+              id="newProgrammeName"
+              name="newProgrammeName"
+              label={t("campaigns.shifts_new.new_programme_name_label")}
+              error={errorFor("newProgrammeName")}
+              required
+            />
           )}
         </div>
       </Section>

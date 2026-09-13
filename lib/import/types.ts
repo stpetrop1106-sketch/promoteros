@@ -115,6 +115,12 @@ export type StoreMatch = {
   city: string | null;
   chain: string | null;
   rowCount: number;
+  /**
+   * The `sourceRow` of every row that belongs to this store. ADDED after review (additive): join rows
+   * to their store with this, never by recomputing `normaliseStoreKey` per row — a blank-address
+   * row's store depends on the other rows of the file, so no per-row key can decide it.
+   */
+  sourceRows: number[];
   /** Best existing store, if any. */
   match: { storeId: string; storeName: string; score: number } | null;
   /** `exact` ≥ 0.95 is auto-accepted; `likely` is pre-selected but shown; `none` needs a decision. */

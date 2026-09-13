@@ -11,7 +11,7 @@ import { ReplacementPanel } from "./replacement-panel";
 
 export const dynamic = "force-dynamic";
 
-type PromoterRef = { full_name: string } | null;
+type PromoterRef = { full_name: string; phone?: string } | null;
 
 /**
  * "YYYY-MM-DD" → "09/09/2026", rebuilt from its own parts — same reasoning as `app/shifts/page.tsx`
@@ -56,7 +56,7 @@ export default async function ShiftDetailPage({
   const [{ data: assignmentsData }, { data: invitationsData }] = await Promise.all([
     db
       .from("assignments")
-      .select("id, promoter_id, status, confirmed_at, cancelled_at, cancel_reason, promoters(full_name)")
+      .select("id, promoter_id, status, confirmed_at, cancelled_at, cancel_reason, promoters(full_name, phone)")
       .eq("shift_id", id),
     db
       .from("invitations")
@@ -80,6 +80,7 @@ export default async function ShiftDetailPage({
     id: a.id,
     promoterId: a.promoter_id,
     fullName: (a.promoters as unknown as PromoterRef)?.full_name ?? "—",
+    phone: (a.promoters as unknown as PromoterRef)?.phone ?? null,
     status: a.status,
     confirmedAt: a.confirmed_at,
     cancelledAt: a.cancelled_at,

@@ -155,6 +155,12 @@ export default async function PromoterProfilePage({ params }: { params: Promise<
               <LinkButton href={`/promoters/${p.id}/availability`} variant="secondary">
                 {t("promoters.profile.availability_button")}
               </LinkButton>
+              {/* P38 — the coordinator can invite this promoter to any upcoming shift that still
+                  needs people, not only the ones the matching engine suggested. Primary because
+                  it is the action this whole page exists to lead to. */}
+              <LinkButton href={`/promoters/${p.id}/invite`} iconLeft={<Icon name="megaphone" size={16} />}>
+                {t("promoters.profile.invite_button")}
+              </LinkButton>
             </>
           }
         />

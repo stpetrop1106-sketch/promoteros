@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { loadInvitation } from "@/lib/invitations";
 import { loadBriefForInvitation } from "@/lib/briefs";
+import { createCheckinLinkForInvitation } from "@/lib/checkins";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { Markdown } from "@/components/ui";
 import { RespondForm } from "./respond-form";
@@ -39,6 +40,12 @@ export default async function InvitationPage({
   // shift details or the accept/decline flow that already succeeded.
   const briefResult = await loadBriefForInvitation(token);
   const brief = briefResult.ok ? briefResult.view : null;
+
+  // P38 — the gap the manager found: nothing in the product ever handed a promoter their
+  // check-in link. Minted fresh on every view (stateless — see `createCheckinLinkForInvitation`'s
+  // own comment), so this renders identically the moment the promoter accepts AND every time they
+  // reopen this same link on the day of the shift, which is exactly when they come looking for it.
+  const checkinResult = v.status === "accepted" ? await createCheckinLinkForInvitation(token) : null;
 
   return (
     <main className="mx-auto max-w-md px-6 py-12">
@@ -91,7 +98,30 @@ export default async function InvitationPage({
         <p className="mt-6 text-sm text-[color:var(--color-muted)]">
           {v.status === "accepted" ? t("invitation.accepted") : t("invitation.declined")}
         </p>
-      ) : (
+      ) : null}
+
+      {v.status === "accepted" ? (
+        <div className="mt-6 rounded-lg border border-[color:var(--color-line)] bg-white p-5">
+          <h2 className="text-sm font-semibold">{t("invitation.next_steps.title")}</h2>
+          <p className="mt-2 text-sm text-[color:var(--color-ink-soft)]">
+            {t("invitation.next_steps.body")}
+          </p>
+          {checkinResult?.ok ? (
+            <a
+              href={checkinResult.url}
+              className="mt-4 inline-block w-full rounded-lg bg-[color:var(--color-action)] px-4 py-3 text-center font-medium text-white"
+            >
+              {t("invitation.next_steps.open_checkin")}
+            </a>
+          ) : (
+            <p className="mt-4 text-sm text-[color:var(--color-bad)]">
+              {t("invitation.next_steps.error")}
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      {!answered ? (
         <>
           <p className="mt-6 text-center text-sm">{t("invitation.question")}</p>
           <RespondForm
@@ -102,7 +132,7 @@ export default async function InvitationPage({
             declinedLabel={t("invitation.declined")}
           />
         </>
-      )}
+      ) : null}
 
       {/* P32 · Gate 1. The promoter must be able to reach the privacy notice from the first
           page they ever see from us, without logging in and without asking anyone. */}

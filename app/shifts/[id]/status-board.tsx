@@ -16,6 +16,7 @@ import { formatAthens } from "./time";
 import type { BoardRow, BoardRowState } from "./board";
 import { CancelAssignmentButton } from "./cancel-assignment-button";
 import { MarkNoShowButton } from "./mark-no-show-button";
+import { CheckinLinkButton } from "./checkin-link-button";
 
 type T = (key: TranslationKey, params?: Record<string, string | number>) => string;
 
@@ -113,6 +114,14 @@ export function StatusBoard({ shiftId, rows, t }: { shiftId: string; rows: Board
             </TableCell>
             <TableCell className="text-right">
               <div className="flex flex-col items-end gap-2">
+                {row.checkinLinkAvailable && row.assignmentId ? (
+                  <CheckinLinkButton
+                    shiftId={shiftId}
+                    assignmentId={row.assignmentId}
+                    phone={row.phone}
+                    label={t("shifts.board.checkin_link_action")}
+                  />
+                ) : null}
                 {row.markableNoShow && row.assignmentId ? (
                   <MarkNoShowButton
                     shiftId={shiftId}
