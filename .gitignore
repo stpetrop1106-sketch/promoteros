@@ -24,3 +24,6 @@ coverage/
 *.csv
 *.xlsx
 /data/
+
+# Per-agent build output (see next.config.ts)
+/.next-*/
