@@ -37,23 +37,24 @@ not accepted on the agent's word. No agent ever set its own status to `done`.
 | **P32** | Gate 1 — GDPR | Privacy notice, retention window, erasure path, audit trail |
 | **P33** | Agency controller identity | Closed with `0015`: a column-scoped grant, not `grant update on agencies` |
 
-## In flight — Round 2 (see `docs/round-2-plan.md`)
+## Round 2 — state on 2026-09-13 (see `docs/round-2-plan.md`)
 
-| Parcel | Title | Model | State |
+All built, verified and committed on `develop` (pushed). **Not in production**: 0016 and 0017 must be
+applied first, or /shifts breaks for every agency.
+
+| Parcel | Title | State | Commit |
 |---|---|---|---|
-| **P36** | Copy buttons that never fail silently + open in WhatsApp | manager | **done** `b9937d6`, verified with real clicks |
-| **P37a** | Shift sections | Sonnet | in flight |
-| **P37b** | Excel import engine | Sonnet | in flight |
-| **P37c** | Excel import UI | Opus | queued — starts after P37a + P37b |
-| **P38** | Invite from the promoter card; check-in links that reach the promoter | Sonnet | in flight |
-| **P39** | Automatic messaging: email adapter, availability links on create and on the 1st/15th, daily cron | Opus | in flight |
-| **P40** | Login: third-person path | manager | blocked on Supabase token |
-| **P41** | Promoter-side walkthrough for the owner | manager | after P38 |
+| **P36** | Copy that never fails silently + open in WhatsApp | done, verified with real clicks | `b9937d6` |
+| **P37a** | Shift sections | in_review, reviewed | `237b0e4` |
+| **P37b** | Excel import engine | in_review; 3 duplicate-store bugs fixed by the manager | `237b0e4` |
+| **P37c** | Excel import UI | in_review, reviewed; successful commit never run against the DB (0016) | `b238934` |
+| **P38** | Invite from the card; check-in links that reach the promoter | in_review, reviewed | `237b0e4` |
+| **P39** | Automatic messaging | in_review, reviewed; erasure gap fixed by the manager | `d45d499` |
+| **P40** | Login for a third person | diagnosed — see R2-3 and `docs/guide-login-third-person.md` | — |
+| **P41** | Promoter-side walkthrough | done — emulated phone, every step checked in the DB; published for the owner | `514049d` |
 
-Four agents at once, against the lesson of I3, because the owner asked for as many as needed and
-the file sets are disjoint. Mitigations: each builds into its own `NEXT_DIST_DIR`, each runs its
-own port, status files are updated as they go so a killed run resumes, and every commit is the
-manager's with explicit paths.
+All five agents were killed at once by the session limit mid-round (I9). Every one was resumed from
+its own transcript and status file; nothing was lost or rebuilt. Concurrency went back to two.
 
 ## Queued
 
@@ -151,6 +152,11 @@ fetch had ever succeeded against this clone. **An absent local ref says nothing 
 the push itself reported `bc6d060..1acfa5a`, which is what settled it. Same family of error as I6:
 reading a conclusion off a signal that could not carry it.
 
+**I9 — five agents, one session limit, again.** The manager ran five concurrent agents on the owner's
+"as many as you need" and hit the account limit, exactly as in I3. The mitigations held — disjoint
+file sets, status files kept current, resumable transcripts — so no work was lost, but the lesson of
+I3 was known and set aside. Two concurrent agents is the ceiling on this account.
+
 ---
 
 ## Round 2 findings
@@ -176,6 +182,15 @@ one late. Until then: third-person tests use a manager-minted link sent by Whats
 **R2-4 — Pre-existing audit finding.** `npm audit` reports `postcss` (high) via `next`. Build-time
 only, processing our own CSS; not introduced this round. Upgrade `next` in a quiet moment, not
 while four agents build.
+
+**R2-5 — Walking the promoter side found what building it had not.** Raw ISO dates and "€ 38.00" on the
+promoter's screens, "μ.μ.." and "1 θέσεις", and an arrival 2,126 m from the store wearing the same green
+badge as one 5 m away. Fixed in `514049d`. Headless Chrome also misreported a phone layout as
+overflowing (it will not size a window below 500 px); verified false in a real 375 px viewport before
+anything was changed, then screenshots were taken through CDP device emulation instead.
+
+**R2-6 — A real brand in the seed.** "Kritikos Foods", a real Greek retail chain, under a comment calling
+the brands invented. Renamed to Kerasia in the script and the seeded rows (`b238934`). Found by P37c.
 
 ## Waiting on the owner
 
