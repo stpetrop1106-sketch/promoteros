@@ -164,11 +164,14 @@ The acceptance test's step 7 had been verified by a script calling the function 
 proves the page works and says nothing about whether a promoter can reach it. Same family as I6
 and I7: a verification that could not see the failure it was meant to catch. P38 fixes it.
 
-**R2-3 — Login emails to a third person.** Probed with Resend's sink address (`delivered@resend.dev`,
-auth user removed afterwards): Supabase accepted the send, so custom SMTP is configured — the
-default service would have refused a non-team address. Whether Resend delivers to arbitrary
-recipients depends on a verified sending domain, which needs the Supabase and Resend tokens to
-confirm. No second person has ever signed in: the project has exactly one auth user.
+**R2-3 — Login emails do not reach a third person. Corrected.** A first probe with Resend's sink
+address (`delivered@resend.dev`) succeeded, and was read as "custom SMTP works for anyone". It does
+not: the SMTP sender configured earlier is `onboarding@resend.dev`, which without a verified domain
+delivers only to the Resend account owner. The sink address is exempt from that rule, so the probe
+could not see the failure it was meant to test — the I6 mistake again, a third time. Second finding:
+only the magic-link template was translated; a NEW user's first sign-in gets the confirmation
+template, still Supabase's English "Confirm your signup". The owner has no domain yet and will buy
+one late. Until then: third-person tests use a manager-minted link sent by WhatsApp.
 
 **R2-4 — Pre-existing audit finding.** `npm audit` reports `postcss` (high) via `next`. Build-time
 only, processing our own CSS; not introduced this round. Upgrade `next` in a quiet moment, not
@@ -176,7 +179,11 @@ while four agents build.
 
 ## Waiting on the owner
 
-- Supabase access token — apply 0016 and 0017, inspect auth email configuration
-- Vercel token — set RESEND_API_KEY, EMAIL_FROM, CRON_SECRET
-- Resend API key
-- A domain with DNS access — without it Resend delivers only to the account owner
+- ~~Vercel token~~ received 2026-09-13. Fluid compute is on (the 300 s cron is fine). CRON_SECRET set.
+  **No RESEND_API_KEY in production — waitlist confirmations have never been sent.**
+- **Supabase access token** — the owner gave one earlier, valid until the 17th, but it was passed
+  inline to scripts and never stored; it exists only in the compacted conversation, and recovering
+  credentials from the transcript was refused (correctly). Needs to be pasted again.
+- **Resend API key** — same situation.
+- **Domain** — deferred by the owner to the end. Everything is built to degrade: without it, email
+  reaches only the owner, failed sends land in the coordinator's manual WhatsApp list.

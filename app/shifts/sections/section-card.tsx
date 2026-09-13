@@ -17,6 +17,9 @@ export function SectionCard({ section }: { section: ProgrammeSummary }) {
   const t = translatorFor(DEFAULT_LOCALE);
 
   return (
+    // `id` + scroll margin: the Excel import's done screen links to `#section-<id>`, and the
+    // sticky mobile top bar would otherwise cover the section heading it lands on.
+    <div id={`section-${section.id}`} className="scroll-mt-20">
     <Card
       elevation="card"
       header={
@@ -35,6 +38,7 @@ export function SectionCard({ section }: { section: ProgrammeSummary }) {
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {section.archived ? null : (
             <LinkButton
               href={`/campaigns/${section.campaignId}/shifts/new?programme=${section.id}`}
               variant="secondary"
@@ -43,9 +47,12 @@ export function SectionCard({ section }: { section: ProgrammeSummary }) {
             >
               {t("shifts.sections.add_shifts")}
             </LinkButton>
-            <ImportShifts
-              target={{ programmeId: section.id, programmeName: section.name, campaignId: section.campaignId }}
-            />
+            )}
+            {section.archived ? null : (
+              <ImportShifts
+                target={{ programmeId: section.id, programmeName: section.name, campaignId: section.campaignId }}
+              />
+            )}
             <RenameSectionForm programmeId={section.id} currentName={section.name} />
             <form action={setSectionArchived.bind(null, section.id, !section.archived)}>
               <Button type="submit" variant="ghost" size="sm">
@@ -98,5 +105,6 @@ export function SectionCard({ section }: { section: ProgrammeSummary }) {
         )}
       </div>
     </Card>
+    </div>
   );
 }
