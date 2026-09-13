@@ -95,10 +95,14 @@ export function getEmailAdapter(): EmailAdapter {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return new NullEmailAdapter();
 
-  const fromAddress = process.env.RESEND_FROM_ADDRESS ?? process.env.NEXT_PUBLIC_PRIVACY_EMAIL;
+  // EMAIL_FROM is the one sender every email path reads (P39's promoter messages use it too).
+  // RESEND_FROM_ADDRESS is this file's original name, kept so an existing setup does not break.
+  // The privacy address is no longer a fallback: it is typically a personal mailbox on a domain
+  // Resend has not verified, so using it as the sender makes every send fail.
+  const fromAddress = process.env.EMAIL_FROM ?? process.env.RESEND_FROM_ADDRESS;
   if (!fromAddress) {
     console.warn(
-      "RESEND_API_KEY is set but RESEND_FROM_ADDRESS (and NEXT_PUBLIC_PRIVACY_EMAIL) are both unset; using NullEmailAdapter",
+      "RESEND_API_KEY is set but EMAIL_FROM (and RESEND_FROM_ADDRESS) are both unset; using NullEmailAdapter",
     );
     return new NullEmailAdapter();
   }
