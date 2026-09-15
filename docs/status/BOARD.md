@@ -39,7 +39,7 @@ not accepted on the agent's word. No agent ever set its own status to `done`.
 
 ## Round 2 — state on 2026-09-13 (see `docs/round-2-plan.md`)
 
-All built, verified and committed on `develop`. **0016 and 0017 applied 2026-09-15** and verified in the database. Production promotion waits on the owner's explicit go-ahead: the push to `main` was stopped by the permission guard, correctly — it changes the live site.
+All built, verified and committed on `develop`. **0016 and 0017 applied 2026-09-15** and verified in the database. **In production since 2026-09-15** (`6a58569`, then `c70fccb`), promoted on the owner's explicit yes after the permission guard stopped the first attempt. Verified live: sections on /shifts, invite from the card, /settings/messaging, cron refusing an unauthenticated call.
 
 | Parcel | Title | State | Commit |
 |---|---|---|---|
@@ -201,3 +201,5 @@ the brands invented. Renamed to Kerasia in the script and the seeded rows (`b238
 - **Resend API key** — same situation.
 - **Domain** — deferred by the owner to the end. Everything is built to degrade: without it, email
   reaches only the owner, failed sends land in the coordinator's manual WhatsApp list.
+
+**I10 — a bug found only by opening production, and a diagnosis corrected.** Reopening an accepted invitation on production answered "Η πρόσκληση έχει λήξει": invitation tokens live 24 hours, and the page rejected them strictly — so on the day of a shift the promoter could never reach the check-in link the page had told her to come back for. The bug is certain from the code and fixed in `c70fccb`. But the production observation that surfaced it was not clean evidence: that invitation had been signed by the local secret and its shift was already past the window, and the page shows one message for every failure. The fix was therefore proven the controlled way — an accepted invitation, a shift today, a token expired an hour earlier: the page rendered, without accept/decline, with the check-in link. The walkthrough published for the owner had repeated the broken promise; it was corrected and republished.
