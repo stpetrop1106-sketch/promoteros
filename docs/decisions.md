@@ -126,6 +126,9 @@ exactly one campaign, because a shift already cannot exist without a campaign, a
 import needs a campaign to attach shifts to anyway. A composite foreign key makes it impossible in
 the database to file a shift under another campaign's section or another agency's.
 
+### D21 — Email to third parties waits; manual links in the meantime · 2026-09-15
+Decided by Stella. Sign-in and automatic promoter email go out through Resend's test sender, which delivers only to the Resend account owner. Two ways out were offered: verify a domain (recommended), or a free Brevo account with her Gmail as a verified sender. She chose to leave it as it is for now. Consequences, accepted: a third person cannot receive a sign-in email, so the manager mints a sign-in link on request to be sent by WhatsApp; automatic availability links stay off and every promoter appears on /settings/messaging for manual WhatsApp sending. Nothing in the code has to change when this is revisited — a verified sender and RESEND_API_KEY/EMAIL_FROM switch everything on.
+
 ---
 
 ## Open questions
