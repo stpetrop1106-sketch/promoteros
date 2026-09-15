@@ -51,8 +51,8 @@ the check-in page — which works — is unreachable from the product. P38 fixes
 | # | File | Owner | State |
 |---|---|---|---|
 | 0001–0015 | — | — | Applied |
-| **0016** | `0016_shift_programmes.sql` | manager (for P37a/P37c) | **Written, not applied** — needs the Supabase token |
-| **0017** | `0017_message_dispatches.sql` | P39 | Reserved |
+| **0016** | `0016_shift_programmes.sql` | manager (for P37a/P37c) | **Applied 2026-09-15** — 4 sections backfilled, 25/25 shifts filed, composite FK refused a cross-campaign filing |
+| **0017** | `0017_message_dispatches.sql` | P39 | **Applied 2026-09-15** — RLS forced, authenticated SELECT only, owner can update only the four intended agency columns |
 | 0018 | — | — | Spare, ask first |
 
 Until 0016 is applied, the cloud database has no `shift_programmes` table. P37a builds against the

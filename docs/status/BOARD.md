@@ -39,8 +39,7 @@ not accepted on the agent's word. No agent ever set its own status to `done`.
 
 ## Round 2 — state on 2026-09-13 (see `docs/round-2-plan.md`)
 
-All built, verified and committed on `develop` (pushed). **Not in production**: 0016 and 0017 must be
-applied first, or /shifts breaks for every agency.
+All built, verified and committed on `develop`. **0016 and 0017 applied 2026-09-15** and verified in the database. Production promotion waits on the owner's explicit go-ahead: the push to `main` was stopped by the permission guard, correctly — it changes the live site.
 
 | Parcel | Title | State | Commit |
 |---|---|---|---|
@@ -75,7 +74,7 @@ git had the correct version.
 
 | # | File | State |
 |---|---|---|
-| 0001–0007, 0009–0015 | schema, RLS, matching, waitlist, auth, accounts, billing, admin, retention, agency identity | **Applied** |
+| 0001–0007, 0009–0017 | schema, RLS, matching, waitlist, auth, accounts, billing, admin, retention, agency identity | **Applied** |
 
 0008 was reserved for a token-hardening parcel that was never built; the number stays unused rather
 than being recycled, so the registry keeps matching the files on disk.
