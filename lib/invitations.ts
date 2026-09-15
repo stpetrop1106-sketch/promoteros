@@ -2,9 +2,17 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { matchPromoters, type Candidate } from "@/lib/matching";
 import { getAdapter, getAdapterFor } from "@/lib/messaging";
-import { mintToken, hashToken, verifyToken, linkFor } from "@/lib/tokens";
+import {
+  mintToken,
+  hashToken,
+  verifyToken,
+  verifyTokenSignature,
+  acceptedInvitationStillReadable,
+  linkFor,
+} from "@/lib/tokens";
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { formatShiftWhen } from "@/lib/shift-format";
 
 const DEFAULT_TTL_HOURS = 24;
 const t = translatorFor(DEFAULT_LOCALE);
@@ -94,7 +102,7 @@ export async function createInvitation(
     "Νέα βάρδια",
     campaign?.name ?? "",
     store?.name ?? "",
-    `${shift.on_date} · ${String(shift.start_time).slice(0, 5)}–${String(shift.end_time).slice(0, 5)}`,
+    formatShiftWhen(shift.on_date, String(shift.start_time), String(shift.end_time)),
     "",
     "Είσαι διαθέσιμη;",
   ]
@@ -130,7 +138,9 @@ export async function createInvitation(
 export async function loadInvitation(token: string): Promise<
   { ok: true; view: InvitationView } | { ok: false; reason: string }
 > {
-  const verified = verifyToken(token, "invitation");
+  // Expiry is decided below, once we know whether this invitation was already accepted — an
+  // accepted one stays readable so the promoter can come back for the check-in link on the day.
+  const verified = verifyTokenSignature(token, "invitation");
   if (!verified.ok) return { ok: false, reason: verified.reason };
 
   const db = createAdminClient();
@@ -156,6 +166,12 @@ export async function loadInvitation(token: string): Promise<
   const promoter = data.promoters as unknown as { full_name: string } | null;
 
   if (!shift) return { ok: false, reason: "not_found" };
+  if (
+    verified.expired &&
+    !(data.status === "accepted" && acceptedInvitationStillReadable(shift.on_date))
+  ) {
+    return { ok: false, reason: "expired" };
+  }
 
   return {
     ok: true,

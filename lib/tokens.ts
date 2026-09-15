@@ -60,6 +60,27 @@ export type VerifyResult =
   | { ok: false; reason: "malformed" | "bad_signature" | "expired" | "wrong_purpose" };
 
 export function verifyToken(token: string, expected: TokenPurpose): VerifyResult {
+  const checked = verifyTokenSignature(token, expected);
+  if (!checked.ok) return checked;
+  if (checked.expired) return { ok: false, reason: "expired" };
+  return { ok: true, purpose: checked.purpose, recordId: checked.recordId };
+}
+
+export type SignatureResult =
+  | { ok: true; purpose: TokenPurpose; recordId: string; expired: boolean }
+  | { ok: false; reason: "malformed" | "bad_signature" | "wrong_purpose" };
+
+/**
+ * Signature and purpose, with expiry REPORTED rather than enforced.
+ *
+ * For exactly one case: an invitation the promoter has already accepted. Its token expires after
+ * the response window (a day), but the promoter comes back to the same link on the day of the
+ * shift to find their check-in link — which is what the page tells them to do. Verified in
+ * production on 2026-09-15: an invitation accepted two days earlier answered "Η πρόσκληση έχει
+ * λήξει", and the check-in link on it was unreachable. Callers decide what an expired token may
+ * still see (`acceptedInvitationStillReadable`); nothing that WRITES may use this function.
+ */
+export function verifyTokenSignature(token: string, expected: TokenPurpose): SignatureResult {
   const parts = token.split(".");
   if (parts.length !== 2) return { ok: false, reason: "malformed" };
 
@@ -82,9 +103,23 @@ export function verifyToken(token: string, expected: TokenPurpose): VerifyResult
   }
 
   if (payload.p !== expected) return { ok: false, reason: "wrong_purpose" };
-  if (payload.e * 1000 < Date.now()) return { ok: false, reason: "expired" };
 
-  return { ok: true, purpose: payload.p, recordId: payload.i };
+  return { ok: true, purpose: payload.p, recordId: payload.i, expired: payload.e * 1000 < Date.now() };
+}
+
+/**
+ * How long an ACCEPTED invitation stays readable after its token expired: through the day after
+ * the shift, Europe/Athens. Long enough to reopen it on the day for the check-in link and to find
+ * it again the next morning for the field report; short enough that an old link does not keep
+ * showing a finished shift forever. Pure, so it is tested without a clock.
+ */
+export function acceptedInvitationStillReadable(onDate: string, now: Date = new Date()): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(onDate);
+  if (!match) return false;
+  const dayAfter = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]) + 1));
+  const lastReadable = dayAfter.toISOString().slice(0, 10);
+  const athensToday = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Athens" }).format(now);
+  return athensToday <= lastReadable;
 }
 
 export function linkFor(token: string, purpose: TokenPurpose): string {

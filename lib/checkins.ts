@@ -1,6 +1,13 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { mintToken, verifyToken, linkFor, hashToken } from "@/lib/tokens";
+import {
+  mintToken,
+  verifyToken,
+  verifyTokenSignature,
+  acceptedInvitationStillReadable,
+  linkFor,
+  hashToken,
+} from "@/lib/tokens";
 import { distanceMetres, type Coordinates } from "@/lib/geo";
 
 /**
@@ -157,7 +164,9 @@ export function checkinLinkTtlHours(onDate: string, endTime: string, now: Date =
 export async function createCheckinLinkForInvitation(
   token: string,
 ): Promise<{ ok: true; url: string } | { ok: false; reason: string }> {
-  const verified = verifyToken(token, "invitation");
+  // Signature now, expiry below: this only ever serves an ACCEPTED invitation, and the promoter
+  // opens it again on the day of the shift, long after the one-day response window has closed.
+  const verified = verifyTokenSignature(token, "invitation");
   if (!verified.ok) return { ok: false, reason: verified.reason };
 
   const db = createAdminClient();
@@ -174,6 +183,9 @@ export async function createCheckinLinkForInvitation(
 
   const shift = invitation.shifts as unknown as { on_date: string; end_time: string } | null;
   if (!shift) return { ok: false, reason: "not_found" };
+  if (verified.expired && !acceptedInvitationStillReadable(shift.on_date)) {
+    return { ok: false, reason: "expired" };
+  }
 
   const { data: assignment, error: assignmentErr } = await db
     .from("assignments")
