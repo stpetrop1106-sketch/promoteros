@@ -1944,4 +1944,6 @@ export const el = {
 
   "invitation.dress_code": "Ενδυμασία",
   "invitation.rate": "Αμοιβή",
+
+  "report.photos_preparing": "Ετοιμάζουμε τις φωτογραφίες…",
 } as const;

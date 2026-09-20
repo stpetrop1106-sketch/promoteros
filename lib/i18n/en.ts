@@ -1909,4 +1909,6 @@ export const en: Record<TranslationKey, string> = {
 
   "invitation.dress_code": "Dress code",
   "invitation.rate": "Pay",
+
+  "report.photos_preparing": "Preparing the photos…",
 };

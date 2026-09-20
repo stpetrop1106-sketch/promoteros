@@ -115,9 +115,17 @@ export async function submitReport(
   let photosSaved = 0;
   let photosFailed = 0;
   for (const photo of photos) {
-    const photoResult = await attachReportPhoto(token, result.fieldReportId, photo);
-    if (photoResult.ok) photosSaved += 1;
-    else photosFailed += 1;
+    // Best effort means best effort: `attachReportPhoto` returns a reason for the failures it
+    // expects, but a storage call can also throw, and an escaped throw here would take down a
+    // report that is ALREADY SAVED and show the promoter a server error instead. Counted as a
+    // failed photo, which the success message already accounts for.
+    try {
+      const photoResult = await attachReportPhoto(token, result.fieldReportId, photo);
+      if (photoResult.ok) photosSaved += 1;
+      else photosFailed += 1;
+    } catch {
+      photosFailed += 1;
+    }
   }
 
   revalidatePath(`/c/${token}/report`);

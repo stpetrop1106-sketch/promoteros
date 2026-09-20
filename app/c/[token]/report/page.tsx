@@ -64,6 +64,7 @@ export default async function ReportPage({
     notes: t("report.notes_label"),
     photos: t("report.photos_label"),
     photosHint: t("report.photos_hint"),
+    photosPreparing: t("report.photos_preparing"),
     submit: t("report.submit"),
     submitting: t("report.submitting"),
     success: t("report.success"),

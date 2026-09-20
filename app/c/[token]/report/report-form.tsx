@@ -1,9 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { IDLE_STATE, type ReportActionState } from "./state";
+import { shrinkPhoto } from "./shrink-photo";
 
 export type ReportFormLabels = {
   unitsPromoted: string;
@@ -14,6 +15,7 @@ export type ReportFormLabels = {
   notes: string;
   photos: string;
   photosHint: string;
+  photosPreparing: string;
   submit: string;
   submitting: string;
   success: string;
@@ -87,6 +89,28 @@ export function ReportForm({
   labels: ReportFormLabels;
 }) {
   const [state, formAction] = useActionState<ReportActionState, FormData>(action, IDLE_STATE);
+  const photosRef = useRef<HTMLInputElement>(null);
+  const [preparingPhotos, setPreparingPhotos] = useState(false);
+
+  /**
+   * Shrink each chosen photo the moment it is chosen, and put the smaller files back into the
+   * input, so the form still submits natively (which is what keeps the button's pending state
+   * honest). A phone camera produces 3-8 MB; the Server Action body cap is far below that, and
+   * before this the submit failed with a server exception — see ./shrink-photo.ts.
+   */
+  async function onPhotosChosen() {
+    const input = photosRef.current;
+    if (!input?.files?.length) return;
+    setPreparingPhotos(true);
+    try {
+      const shrunk = await Promise.all([...input.files].map(shrinkPhoto));
+      const box = new DataTransfer();
+      for (const file of shrunk) box.items.add(file);
+      input.files = box.files;
+    } finally {
+      setPreparingPhotos(false);
+    }
+  }
 
   if (state.status === "success") {
     return (
@@ -172,18 +196,25 @@ export function ReportForm({
           {labels.photos}
         </label>
         <input
+          ref={photosRef}
           id="photos"
           name="photos"
           type="file"
+          onChange={onPhotosChosen}
           accept="image/jpeg,image/png,image/webp"
           capture="environment"
           multiple
           className="mt-1 block w-full text-sm"
         />
-        <p className="mt-1 text-xs text-[color:var(--color-muted)]">{labels.photosHint}</p>
+        <p className="mt-1 text-xs text-[color:var(--color-muted)]">
+          {preparingPhotos ? labels.photosPreparing : labels.photosHint}
+        </p>
       </div>
 
-      <SubmitButton label={labels.submit} submittingLabel={labels.submitting} />
+      <SubmitButton
+        label={labels.submit}
+        submittingLabel={preparingPhotos ? labels.photosPreparing : labels.submitting}
+      />
     </form>
   );
 }
