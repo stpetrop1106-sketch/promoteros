@@ -129,6 +129,18 @@ the database to file a shift under another campaign's section or another agency'
 ### D21 — Email to third parties waits; manual links in the meantime · 2026-09-15
 Decided by Stella. Sign-in and automatic promoter email go out through Resend's test sender, which delivers only to the Resend account owner. Two ways out were offered: verify a domain (recommended), or a free Brevo account with her Gmail as a verified sender. She chose to leave it as it is for now. Consequences, accepted: a third person cannot receive a sign-in email, so the manager mints a sign-in link on request to be sent by WhatsApp; automatic availability links stay off and every promoter appears on /settings/messaging for manual WhatsApp sending. Nothing in the code has to change when this is revisited — a verified sender and RESEND_API_KEY/EMAIL_FROM switch everything on.
 
+### D22 — Email is on, and it reaches exactly one inbox · 2026-09-20
+The owner supplied the Resend key; `RESEND_API_KEY` and `EMAIL_FROM` are set on Vercel (encrypted,
+never "sensitive" — see the incident log) and production was rebuilt so they apply. Sending works:
+adding a promoter emailed her availability link and Resend reported delivered, then opened.
+
+The sender is still `onboarding@resend.dev`, because the Resend account has no verified domain, so
+**delivery is limited to the Resend account owner's own address**. Two consequences worth writing
+down: the message lands in Gmail's spam or Promotions tab, since nothing authenticates it as ours;
+and the "send to everyone" button would attempt a real third-party address that already sits in the
+promoter list. A verified domain resolves both, and nothing in the code changes when it arrives —
+only `EMAIL_FROM`.
+
 ---
 
 ## Open questions
