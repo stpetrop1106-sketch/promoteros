@@ -21,7 +21,7 @@ const BTN =
 
 function choiceClasses(active: boolean, tone: "ok" | "bad" | "warn"): string {
   if (!active) {
-    return `${BTN} border-[color:var(--color-line)] bg-white text-[color:var(--color-muted)]`;
+    return `${BTN} border-[color:var(--color-line)] bg-[color:var(--color-surface)] text-[color:var(--color-muted)]`;
   }
   const bg =
     tone === "ok"
@@ -29,7 +29,7 @@ function choiceClasses(active: boolean, tone: "ok" | "bad" | "warn"): string {
       : tone === "bad"
         ? "bg-[color:var(--color-bad)]"
         : "bg-[color:var(--color-warn)]";
-  return `${BTN} border-transparent ${bg} text-white`;
+  return `${BTN} border-transparent ${bg} text-[color:var(--color-surface)]`;
 }
 
 export function AvailabilityGrid({
@@ -83,10 +83,10 @@ export function AvailabilityGrid({
         return (
           <li
             key={day.date}
-            className={`rounded-xl border p-3 ${
+            className={`rounded-xl border p-3 shadow-[var(--shadow-xs)] ${
               day.isToday
                 ? "border-[color:var(--color-accent)] bg-[color:var(--color-accent-subtle)]"
-                : "border-[color:var(--color-line)] bg-white"
+                : "border-[color:var(--color-line)] bg-[color:var(--color-surface)]"
             }`}
           >
             <div className="flex items-baseline justify-between gap-3">
@@ -195,7 +195,7 @@ function PartialEditor({
   const [to, setTo] = useState(initialTo ?? "");
 
   const selectClass =
-    "w-full rounded-lg border border-[color:var(--color-line)] bg-white px-2 py-2 text-sm";
+    "w-full rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-2 py-2 text-sm";
 
   return (
     <div className="mt-3 rounded-lg bg-[color:var(--color-canvas)] p-3">
@@ -235,7 +235,7 @@ function PartialEditor({
           type="button"
           disabled={busy}
           onClick={() => onApply(from, to === "" ? null : to)}
-          className="flex-1 rounded-lg bg-[color:var(--color-action)] px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="flex-1 rounded-lg bg-[color:var(--color-accent)] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
         >
           {busy ? labels.saving : labels.apply}
         </button>

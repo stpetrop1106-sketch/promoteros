@@ -25,13 +25,19 @@ const SIZES: Record<AvatarSize, string> = {
  * shift page, in the roster table and in the match list, or the colour reads as
  * meaningful when it is not. These are all low-saturation so a column of them
  * stays calm — an avatar is an anchor for the eye, not a decoration.
+ *
+ * P42a swapped them onto the pastel chips. A roster of thirty initials in
+ * status tints was the one place in the product where green and red appeared
+ * without meaning anything — a promoter called Δήμητρα is not "bad". The
+ * pastels are the system's decorative colours and carry no state at all, which
+ * is the property this needs.
  */
 const TINTS = [
-  "bg-[color:var(--color-accent-subtle)] text-[color:var(--color-accent-ink)]",
-  "bg-[color:var(--color-action-subtle)] text-[color:var(--color-action-ink)]",
-  "bg-[color:var(--color-ok-subtle)] text-[color:var(--color-ok-ink)]",
-  "bg-[color:var(--color-warn-subtle)] text-[color:var(--color-warn-ink)]",
-  "bg-[color:var(--color-bad-subtle)] text-[color:var(--color-bad-ink)]",
+  "bg-[color:var(--color-chip-peach)] text-[color:var(--color-chip-peach-ink)]",
+  "bg-[color:var(--color-chip-mint)] text-[color:var(--color-chip-mint-ink)]",
+  "bg-[color:var(--color-chip-lilac)] text-[color:var(--color-chip-lilac-ink)]",
+  "bg-[color:var(--color-chip-sand)] text-[color:var(--color-chip-sand-ink)]",
+  "bg-[color:var(--color-chip-rose)] text-[color:var(--color-chip-rose-ink)]",
   "bg-[color:var(--color-neutral-subtle)] text-[color:var(--color-neutral-ink)]",
 ] as const;
 
@@ -80,7 +86,7 @@ function tintFor(name: string): string {
 export function Avatar({ name, size = "md", tone = "auto", className }: AvatarProps) {
   const palette =
     tone === "accent"
-      ? "bg-[color:var(--color-accent)] text-white"
+      ? "bg-[color:var(--color-accent)] text-[color:var(--color-n-25)]"
       : tone === "neutral"
         ? "bg-[color:var(--color-neutral-subtle)] text-[color:var(--color-neutral-ink)]"
         : tintFor(name);

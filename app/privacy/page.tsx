@@ -25,7 +25,7 @@ export default function PrivacyPage() {
 
   return (
     <main className="min-h-screen bg-[color:var(--color-canvas)] px-5 py-10 sm:px-8 sm:py-16">
-      <article className="mx-auto max-w-2xl rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 sm:p-10">
+      <article className="mx-auto max-w-2xl rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 shadow-[var(--elevation-card)] sm:p-10">
         <Link className="text-sm font-semibold text-[color:var(--color-accent)] hover:underline" href="/">
           {t("privacy.back")}
         </Link>

@@ -20,7 +20,7 @@ function Buttons({
         name="answer"
         value="accept"
         disabled={pending}
-        className="rounded-lg bg-[color:var(--color-ok)] px-4 py-3 font-medium text-white disabled:opacity-50"
+        className="rounded-lg bg-[color:var(--color-ok)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-ok-ink)] disabled:opacity-50"
       >
         {acceptLabel}
       </button>
@@ -29,7 +29,7 @@ function Buttons({
         name="answer"
         value="decline"
         disabled={pending}
-        className="rounded-lg border border-[color:var(--color-line)] px-4 py-3 font-medium disabled:opacity-50"
+        className="rounded-lg border border-[color:var(--color-line)] px-4 py-3 font-medium text-[color:var(--color-ink)] transition hover:bg-[color:var(--color-surface-hover)] disabled:opacity-50"
       >
         {declineLabel}
       </button>

@@ -22,14 +22,20 @@ function describedBy(...ids: Array<string | undefined>): string | undefined {
  * so a form's tab order looks like one system. And the border darkens on hover,
  * which is the small signal that tells someone the thing is editable before
  * they click it.
+ *
+ * P42a softened the corner to 18px and moved the focus border from the accent
+ * to **clay**. The accent is near-black now, so a focused field drawn in it was
+ * indistinguishable from an unfocused one two rows down; clay is the product's
+ * one live colour and "the control you are in" is exactly what it is for. It
+ * also makes the border and the ring around it the same hue instead of two.
  */
 const CONTROL_BASE =
-  "w-full rounded-lg border bg-[color:var(--color-canvas-sunken)]/50 px-3.5 text-sm " +
+  "w-full rounded-xl border bg-[color:var(--color-canvas-sunken)]/45 px-4 text-sm " +
   "text-[color:var(--color-ink)] outline-none " +
   "transition-[background-color,border-color,box-shadow] duration-150 ease-[var(--ease-out-soft)] " +
   "placeholder:text-[color:var(--color-muted-soft)] " +
   "hover:border-[color:var(--color-line-strong)] " +
-  "focus-visible:border-[color:var(--color-accent)] focus-visible:bg-[color:var(--color-surface)] " +
+  "focus-visible:border-[color:var(--color-action)] focus-visible:bg-[color:var(--color-surface)] " +
   "focus-visible:shadow-[var(--focus-ring)] " +
   // `disabled:` sorts after `hover:` in Tailwind's variant order, so these win: without the
   // border override a disabled control still darkened its edge under the pointer and read as
@@ -156,7 +162,7 @@ export interface SelectFieldProps extends Omit<SelectHTMLAttributes<HTMLSelectEl
  * so it costs no request and cannot 404.
  */
 const SELECT_CHEVRON =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7796' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 9.5 12 16l6.5-6.5'/%3E%3C/svg%3E\")";
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23a89e8f' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 9.5 12 16l6.5-6.5'/%3E%3C/svg%3E\")";
 
 /** Native <select>, labelled and described for assistive tech. */
 export function SelectField({

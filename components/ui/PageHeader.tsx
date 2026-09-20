@@ -61,16 +61,19 @@ export function PageHeader({
       >
         <div className="flex min-w-0 items-start gap-3.5">
           {icon ? (
+            // The same pastel rounded-square chip a `StatTile` uses, so the glyph beside a page
+            // title and the glyph in the corner of a stat card are visibly one idea. Sand is the
+            // quietest of the five, which is right for something that repeats on every screen.
             <span
               aria-hidden="true"
-              className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-accent-subtle)] text-[color:var(--color-accent-ink)]"
+              className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-chip-sand)] text-[color:var(--color-chip-sand-ink)]"
             >
               {icon}
             </span>
           ) : null}
           <div className="min-w-0">
             {eyebrow ? (
-              <div className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[color:var(--color-muted)]">
+              <div className="mb-1.5 text-2xs font-semibold uppercase tracking-wider text-[color:var(--color-muted)]">
                 {eyebrow}
               </div>
             ) : null}

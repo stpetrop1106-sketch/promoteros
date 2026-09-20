@@ -11,9 +11,11 @@ export interface SkeletonProps {
   className?: string;
 }
 
+/* P42a: the corners follow the containers they stand in for — a block skeleton
+   is a card-in-waiting, so it is a card's radius. */
 const VARIANTS: Record<SkeletonVariant, string> = {
-  text: "h-4 w-full rounded-md",
-  block: "h-24 w-full rounded-xl",
+  text: "h-4 w-full rounded-full",
+  block: "h-24 w-full rounded-2xl",
   circle: "size-10 rounded-full",
 };
 

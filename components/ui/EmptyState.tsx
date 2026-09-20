@@ -21,6 +21,12 @@ export interface EmptyStateProps {
  * where a dashed edge is right, because it says "this container is real, it is
  * just not filled yet" — which is exactly the state being communicated. A solid
  * card here would read as content.
+ *
+ * The icon chip stays a `<div>` carrying a `ring`, and that is load-bearing:
+ * `app/dashboard/page.tsx` recolours it through a `[&>div:first-child]:…`
+ * override for its "nothing is wrong" state, and that screen belongs to another
+ * lane. The element and its ring are part of this component's contract as
+ * surely as its props are.
  */
 export function EmptyState({
   icon,
@@ -34,16 +40,16 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-4 px-6 py-14 text-center",
+        "flex flex-col items-center gap-4 px-6 py-16 text-center",
         !bare &&
-          "rounded-2xl border border-dashed border-[color:var(--color-line-strong)] bg-[color:var(--color-surface)]/60",
+          "rounded-2xl border border-dashed border-[color:var(--color-line-strong)] bg-[color:var(--color-surface)]/70",
         className,
       )}
     >
       {icon ? (
         <div
           aria-hidden="true"
-          className="flex size-14 items-center justify-center rounded-2xl bg-[color:var(--color-canvas-sunken)] text-[color:var(--color-muted-soft)] ring-1 ring-inset ring-[color:var(--color-line)]"
+          className="flex size-14 items-center justify-center rounded-2xl bg-[color:var(--color-chip-sand)] text-[color:var(--color-chip-sand-ink)] ring-1 ring-inset ring-[color:var(--color-line)]"
         >
           {icon}
         </div>

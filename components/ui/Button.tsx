@@ -42,7 +42,7 @@ export interface ButtonProps
  * one-pixel press is the cheapest possible way to make a control feel physical.
  */
 const BASE =
-  "relative inline-flex select-none items-center justify-center gap-2 rounded-lg font-semibold " +
+  "relative inline-flex select-none items-center justify-center gap-2 rounded-full font-semibold " +
   "transition-[background-color,border-color,color,box-shadow,transform] duration-150 " +
   "ease-[var(--ease-out-soft)] active:translate-y-px " +
   "focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)] " +
@@ -50,13 +50,15 @@ const BASE =
   "disabled:shadow-none disabled:ring-0 disabled:active:translate-y-0";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  /* A hairline of the darker brand blue inside the fill keeps the button from
-     looking like a flat rectangle of colour, and a tight shadow lifts it off
-     the card without the drop-shadow look of a 2014 button. */
+  /* P42a: near-black on ivory. The contrast is the whole design — no gradient,
+     no inner highlight, no ring, and a shadow you would have to look for. A
+     primary button in this system is the quietest loud thing on the screen. */
   primary:
-    "bg-[color:var(--color-accent)] text-white shadow-[0_1px_2px_0_rgb(20_26_41/0.16),inset_0_1px_0_0_rgb(255_255_255/0.12)] " +
-    "ring-1 ring-inset ring-[color:var(--color-accent-press)]/30 " +
+    "bg-[color:var(--color-accent)] text-[color:var(--color-n-25)] shadow-[var(--shadow-2xs)] " +
     "hover:bg-[color:var(--color-accent-hover)] active:bg-[color:var(--color-accent-press)]",
+  /* A white pill with a hairline: a second piece of paper on the ivory, which
+     is why it keeps a real white fill rather than going transparent the way
+     `ghost` does. */
   secondary:
     "border border-[color:var(--color-line)] bg-[color:var(--color-surface)] text-[color:var(--color-ink)] " +
     "shadow-[var(--shadow-2xs)] hover:border-[color:var(--color-line-strong)] " +
@@ -65,11 +67,10 @@ const VARIANTS: Record<ButtonVariant, string> = {
     "text-[color:var(--color-ink-soft)] hover:bg-[color:var(--color-canvas-sunken)] " +
     "hover:text-[color:var(--color-ink)] active:bg-[color:var(--color-n-200)]",
   danger:
-    "bg-[color:var(--color-bad)] text-white shadow-[0_1px_2px_0_rgb(20_26_41/0.16),inset_0_1px_0_0_rgb(255_255_255/0.14)] " +
-    "ring-1 ring-inset ring-[color:var(--color-bad-ink)]/30 " +
+    "bg-[color:var(--color-bad)] text-white shadow-[var(--shadow-2xs)] " +
     "hover:bg-[color:var(--color-bad-ink)] active:bg-[color:var(--color-bad-ink)]",
-  /* Added in P34: a quiet blue chip for a secondary action that is still the
-     accent's business, e.g. "Δες τις προτάσεις" next to a primary invite. */
+  /* A quiet sand chip for a secondary action that is still the accent's
+     business, e.g. "Δες τις προτάσεις" next to a primary invite. */
   subtle:
     "bg-[color:var(--color-accent-subtle)] text-[color:var(--color-accent-ink)] " +
     "hover:bg-[color:var(--color-accent-line)] active:bg-[color:var(--color-accent-line)]",

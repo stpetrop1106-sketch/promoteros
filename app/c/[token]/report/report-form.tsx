@@ -22,7 +22,7 @@ export type ReportFormLabels = {
 
 function inputClass(hasError: boolean): string {
   return (
-    "mt-1 w-full rounded-lg border bg-white px-3 py-3 text-base outline-none " +
+    "mt-1 w-full rounded-lg border bg-[color:var(--color-surface)] px-3 py-3 text-base outline-none " +
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 " +
     "focus-visible:outline-[color:var(--color-accent)] " +
     (hasError ? "border-[color:var(--color-bad)]" : "border-[color:var(--color-line)]")
@@ -62,7 +62,7 @@ function SubmitButton({ label, submittingLabel }: { label: string; submittingLab
       type="submit"
       disabled={pending}
       aria-busy={pending || undefined}
-      className="w-full rounded-lg bg-[color:var(--color-action)] px-4 py-4 text-base font-semibold text-white disabled:opacity-50"
+      className="w-full rounded-lg bg-[color:var(--color-accent)] px-4 py-4 text-base font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
     >
       {pending ? submittingLabel : label}
     </button>

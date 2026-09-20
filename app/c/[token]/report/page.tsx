@@ -39,7 +39,7 @@ export default async function ReportPage({
         <p className="text-[color:var(--color-muted)]">{t("report.checkin_required_notice")}</p>
         <Link
           href={`/c/${token}`}
-          className="mt-6 inline-block rounded-lg bg-[color:var(--color-action)] px-4 py-3 font-medium text-white"
+          className="mt-6 inline-block rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
         >
           {t("report.back_to_checkin")}
         </Link>

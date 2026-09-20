@@ -32,12 +32,15 @@ const ELEVATIONS: Record<CardElevation, string> = {
 /**
  * Surface container matching the app's card/panel language.
  *
- * The border is now a hairline rather than a frame: with a real shadow doing
- * the separating, a strong border reads as a box drawn around the content. The
- * two work together — soften one and the other has to carry more.
+ * P42a: a card is **white paper on an ivory desk**. That is the whole idea, and
+ * three things carry it — a 24px radius, a warm hairline that is barely a line,
+ * and a shadow so diffuse it reads as lift rather than as a drop shadow. Darken
+ * any one of them and the card goes back to being a box drawn around content.
  *
- * Header and footer sit in a faintly sunken band, which is what gives a card
- * with a title row its sense of structure without adding a second border.
+ * The header and footer bands lost their tint in P42a. A sunken strip inside a
+ * white card was the old system's way of giving a titled card structure; on
+ * ivory it reads as a second, dirtier surface, and the hairline divider alone
+ * does the job.
  */
 export function Card({
   header,
@@ -59,13 +62,13 @@ export function Card({
       )}
     >
       {header ? (
-        <div className="border-b border-[color:var(--color-line)] bg-[color:var(--color-n-25)] px-5 py-3.5 sm:px-6">
+        <div className="border-b border-[color:var(--color-line)] px-5 py-4 sm:px-6">
           {header}
         </div>
       ) : null}
       <div className={flush ? undefined : "px-5 py-5 sm:px-6"}>{children}</div>
       {footer ? (
-        <div className="border-t border-[color:var(--color-line)] bg-[color:var(--color-n-25)] px-5 py-3.5 sm:px-6">
+        <div className="border-t border-[color:var(--color-line)] px-5 py-4 sm:px-6">
           {footer}
         </div>
       ) : null}

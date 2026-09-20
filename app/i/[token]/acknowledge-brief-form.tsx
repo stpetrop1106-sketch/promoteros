@@ -32,7 +32,7 @@ function ConfirmButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-lg border border-[color:var(--color-line)] px-4 py-3 font-medium disabled:opacity-50"
+      className="w-full rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
     >
       {label}
     </button>

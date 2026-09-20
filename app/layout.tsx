@@ -39,8 +39,13 @@ export const metadata: Metadata = {
 };
 
 // Next 15 moved themeColor out of `metadata`; leaving it there logs a warning on every build.
+//
+// P42a: the ivory canvas, not the old brand blue. This colour paints the browser chrome above the
+// page on Android and the status-bar area of an installed PWA, so it is the one token that has to
+// match `--color-canvas` exactly — a blue bar over an ivory page is the most visible possible way
+// for a product to look like it was themed twice.
 export const viewport: Viewport = {
-  themeColor: "#1646B8",
+  themeColor: "#f4f0e8",
 };
 
 /**

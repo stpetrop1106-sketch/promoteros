@@ -15,6 +15,15 @@
         "set NEXT_DIST_DIR=.next-P37a&& set NEXT_PUBLIC_APP_URL=http://localhost:3301&& npx next dev -p 3301"
       ],
       "port": 3301
+    },
+    {
+      "name": "P42b",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": [
+        "/c",
+        "set NEXT_DIST_DIR=.next-P42b&& set NEXT_PUBLIC_APP_URL=http://localhost:3306&& npx next dev -p 3306"
+      ],
+      "port": 3306
     }
   ]
 }

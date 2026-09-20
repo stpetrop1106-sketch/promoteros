@@ -93,10 +93,13 @@ export function TableHead({
   children,
   ...rest
 }: HTMLAttributes<HTMLTableSectionElement>) {
+  // P42a: no fill. A tinted header band inside a white card was the old system's way of
+  // separating the head from the body; on ivory it reads as a second, dirtier surface. A micro
+  // uppercase label over a hairline is both quieter and more obviously a header.
   return (
     <thead
       className={cn(
-        "border-b border-[color:var(--color-line)] bg-[color:var(--color-n-25)] text-2xs font-semibold uppercase tracking-wide text-[color:var(--color-muted)]",
+        "border-b border-[color:var(--color-line)] text-2xs font-semibold uppercase tracking-wider text-[color:var(--color-muted)]",
         className,
       )}
       {...rest}
@@ -151,7 +154,7 @@ export function TableHeaderCell({
   return (
     <th
       scope={scope}
-      className={cn("whitespace-nowrap px-4 py-3 font-semibold", className)}
+      className={cn("whitespace-nowrap px-4 py-3.5 font-semibold sm:px-5", className)}
       {...rest}
     >
       {icon ? (
@@ -169,9 +172,15 @@ export function TableHeaderCell({
 }
 
 export function TableCell({ className, children, ...rest }: TdHTMLAttributes<HTMLTableCellElement>) {
+  // `tabular-nums` on every cell, not only the numeric ones. A table is read down a column, and
+  // lining figures are what let the eye compare 12 against 120 without reading either — and it
+  // costs nothing on a cell full of Greek.
   return (
     <td
-      className={cn("px-4 py-3.5 align-middle text-[color:var(--color-ink-soft)]", className)}
+      className={cn(
+        "px-4 py-4 align-middle text-sm tabular-nums text-[color:var(--color-ink-soft)] sm:px-5",
+        className,
+      )}
       {...rest}
     >
       {children}

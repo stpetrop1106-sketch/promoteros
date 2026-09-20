@@ -65,20 +65,31 @@ function isActive(pathname: string, href: string): boolean {
  *
  * `public/promoteros-mark.svg` exists and is the favicon, but an `<img>` here would flash on every
  * navigation and cannot inherit a colour. This is the same geometry inlined.
+ *
+ * P42a made it a **dark rounded-square tile**. On an ivory sidebar with no white panel behind it,
+ * the mark is the only piece of ink above the fold and it is what tells you the rail is a rail —
+ * so it is near-black paper, not a coloured badge, and its two accents are clay rather than the
+ * old teal, because clay is now the product's single live colour.
  */
 function BrandMark({ className }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
       className={cn(
-        "flex size-9 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-accent)] shadow-[0_2px_6px_-1px_rgb(22_70_184/0.45)]",
+        "flex size-9 shrink-0 items-center justify-center rounded-xl bg-[color:var(--color-accent)] shadow-[0_2px_8px_-2px_rgb(31_27_23/0.35)]",
         className,
       )}
     >
       <svg viewBox="0 0 64 64" className="size-5" fill="none" aria-hidden="true">
-        <path d="M18 46V18H32C41.333 18 46 22.667 46 30C46 37.333 41.333 42 32 42H18Z" fill="white" />
-        <path d="M32 18V42" stroke="#2ED3C6" strokeWidth="6" strokeLinecap="round" />
-        <circle cx="52" cy="42" r="5" fill="#2ED3C6" />
+        {/* Geometry and colours copied verbatim from `public/promoteros-mark.svg` (P42b's file).
+            The two have to stay identical — the favicon and the sidebar mark are the same drawing
+            and a coordinator sees both at once, in the tab and in the rail. */}
+        <path
+          d="M18 46V18H32C41.333 18 46 22.667 46 30C46 37.333 41.333 42 32 42H18Z"
+          fill="#F4F0E8"
+        />
+        <path d="M32 18V42" stroke="#B4693C" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="48" cy="42" r="4" fill="#B4693C" />
       </svg>
     </span>
   );
@@ -86,7 +97,7 @@ function BrandMark({ className }: { className?: string }) {
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
-    <p className="px-3 pb-1.5 pt-5 text-2xs font-semibold uppercase tracking-wider text-[color:var(--color-muted-soft)]">
+    <p className="px-3 pb-2 pt-6 text-2xs font-semibold uppercase tracking-[0.1em] text-[color:var(--color-muted-soft)]">
       {children}
     </p>
   );
@@ -95,9 +106,17 @@ function SectionLabel({ children }: { children: ReactNode }) {
 /**
  * One destination.
  *
- * The active state is a tinted pill plus a short accent rail flush to the sidebar's left edge. The
- * rail is what makes "where am I" readable from the corner of the eye — a tint alone disappears
- * against a white sidebar the moment the screen is not the one you are looking at.
+ * P42a: the active item is a **white rounded pill with a very soft shadow**, and that is the whole
+ * mechanism. The sidebar is the same ivory as the canvas, so white is not a tint on this rail — it
+ * is a different material, the only piece of paper in the column. That reads from the corner of
+ * the eye in a way the old accent-tinted pill never did, and it needs no left-edge rail propping
+ * it up, so the rail is gone.
+ *
+ * An inactive item is plain text with a thin outline icon and no chrome at all. Hover is a
+ * whisper of white rather than a fill — anything stronger and four resting items start competing
+ * with the one that is actually active.
+ *
+ * The icon on the active item is the one place clay appears in the shell.
  */
 function NavItem({
   link,
@@ -116,26 +135,20 @@ function NavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium",
-        "transition-[background-color,color] duration-150 ease-[var(--ease-out-soft)]",
+        "group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm",
+        "transition-[background-color,color,box-shadow] duration-150 ease-[var(--ease-out-soft)]",
         "focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]",
         active
-          ? "bg-[color:var(--color-accent-subtle)] text-[color:var(--color-accent-ink)]"
-          : "text-[color:var(--color-ink-soft)] hover:bg-[color:var(--color-canvas-sunken)] hover:text-[color:var(--color-ink)]",
+          ? "bg-[color:var(--color-surface)] font-semibold text-[color:var(--color-ink)] shadow-[var(--elevation-pill)]"
+          : "font-medium text-[color:var(--color-ink-soft)] hover:bg-[color:var(--color-surface)]/60 hover:text-[color:var(--color-ink)]",
       )}
     >
-      {active ? (
-        <span
-          aria-hidden="true"
-          className="absolute -left-6 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-[color:var(--color-accent)]"
-        />
-      ) : null}
       <Icon
         name={link.icon}
         size={18}
         className={
           active
-            ? "text-[color:var(--color-accent)]"
+            ? "text-[color:var(--color-action)]"
             : "text-[color:var(--color-muted-soft)] transition-colors group-hover:text-[color:var(--color-muted)]"
         }
       />
@@ -157,9 +170,15 @@ function NavPanel({
   return (
     /* `min-h-full`, not `h-full`: inside the mobile drawer's scroll container a hard 100% height
        would clip the settings row on a short landscape phone instead of letting it scroll. On the
-       desktop rail the two resolve identically, so `mt-auto` still pins settings to the bottom. */
-    <div className="flex min-h-full flex-col bg-[color:var(--color-surface)]">
-      <div className="flex items-center gap-2.5 px-6 pb-2 pt-5">
+       desktop rail the two resolve identically, so `mt-auto` still pins settings to the bottom.
+
+       P42a: the ground is `--color-canvas`, the same ivory as the page. There is no white panel
+       and no vertical rule, so the rail reads as margin rather than as a second surface, and the
+       only white in the column is the active pill and the account card. `--focus-ring-gap` is
+       re-pointed at the ivory here so a focus ring inside the sidebar does not draw a white halo
+       on a tinted ground. */
+    <div className="flex min-h-full flex-col bg-[color:var(--color-canvas)] [--focus-ring-gap:var(--color-canvas)]">
+      <div className="flex items-center gap-2.5 px-5 pb-1 pt-6">
         <BrandMark />
         <Link
           href="/dashboard"
@@ -170,22 +189,29 @@ function NavPanel({
         </Link>
       </div>
 
-      <nav aria-label={t("nav.label")} className="flex min-h-0 flex-1 flex-col px-6 pb-6">
+      <nav aria-label={t("nav.label")} className="flex min-h-0 flex-1 flex-col px-5 pb-5">
         <SectionLabel>{t("shell.section_operations")}</SectionLabel>
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-1">
           {LINKS.map((link) => (
             <NavItem key={link.href} link={link} pathname={pathname} onNavigate={onNavigate} />
           ))}
         </div>
 
-        <div className="mt-auto pt-6">
-          <div className="border-t border-[color:var(--color-line)] pt-3">
-            <NavItem link={SETTINGS} pathname={pathname} onNavigate={onNavigate} />
-          </div>
+        <div className="mt-auto pt-8">
+          <SectionLabel>{t("shell.section_account")}</SectionLabel>
+          <NavItem link={SETTINGS} pathname={pathname} onNavigate={onNavigate} />
           {/* P35: the account row. It is a node passed down from the server layout rather than
-              anything this client component fetches — see `components/account-row.tsx`. */}
+              anything this client component fetches — see `components/account-row.tsx`.
+
+              P42a wraps it in a quiet white card. The row was previously fenced off by two
+              stacked hairlines, which on an ivory rail is two lines saying what one piece of
+              paper says better — and the card also gives the email address and the sign-out
+              button a surface of their own, which is what stops them reading as a fifth,
+              oddly-shaped nav item. */}
           {account ? (
-            <div className="mt-3 border-t border-[color:var(--color-line)] px-1 pt-3">{account}</div>
+            <div className="mt-3 rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-2.5 shadow-[var(--elevation-pill)] [--focus-ring-gap:var(--color-surface)]">
+              {account}
+            </div>
           ) : null}
         </div>
       </nav>
@@ -299,15 +325,16 @@ function NavChrome({ pathname, account }: { pathname: string; account?: ReactNod
     <>
       {/* Desktop: a fixed rail. Fixed rather than sticky so a long table scrolling under it never
           drags the navigation off screen. */}
-      <div
-        className="fixed inset-y-0 left-0 z-30 hidden w-[var(--shell-sidebar-w)] overflow-y-auto overscroll-contain border-r border-[color:var(--color-line)] bg-[color:var(--color-surface)] lg:block"
-        style={{ boxShadow: "1px 0 0 0 rgb(20 26 41 / 0.02), 4px 0 24px -12px rgb(20 26 41 / 0.10)" }}
-      >
+      {/* P42a: no border, no shadow. The rail is the same ivory as the page, so anything drawn
+          down its right edge turns it back into a panel — which is the single thing the reference
+          does not do. The content column's own white cards are what mark where the rail ends. */}
+      <div className="fixed inset-y-0 left-0 z-30 hidden w-[var(--shell-sidebar-w)] overflow-y-auto overscroll-contain bg-[color:var(--color-canvas)] lg:block">
         <NavPanel pathname={pathname} account={account} />
       </div>
 
-      {/* Mobile: a sticky bar with the mark and a menu button. */}
-      <div className="sticky top-0 z-30 flex h-[var(--shell-topbar-h)] items-center justify-between gap-3 border-b border-[color:var(--color-line)] bg-[color:var(--color-surface)]/85 px-4 backdrop-blur-md lg:hidden">
+      {/* Mobile: a sticky bar with the mark and a menu button. A hairline here, unlike the rail —
+          this bar sits *over* scrolling content and needs an edge to stop the two merging. */}
+      <div className="sticky top-0 z-30 flex h-[var(--shell-topbar-h)] items-center justify-between gap-3 border-b border-[color:var(--color-line)] bg-[color:var(--color-canvas)]/85 px-4 backdrop-blur-md lg:hidden [--focus-ring-gap:var(--color-canvas)]">
         <Link
           href="/dashboard"
           className="flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)]"
@@ -341,7 +368,7 @@ function NavChrome({ pathname, account }: { pathname: string; account?: ReactNod
             tabIndex={-1}
             aria-label={t("shell.close_menu")}
             onClick={close}
-            className="absolute inset-0 h-full w-full cursor-default bg-[color:var(--color-n-950)]/35 backdrop-blur-[2px]"
+            className="absolute inset-0 h-full w-full cursor-default bg-[color:var(--color-n-950)]/30 backdrop-blur-[2px]"
           />
           {/* A real dialog, not a styled div: `aria-modal` is what stops a screen reader walking
               into the page behind the overlay, which the Tab trap above only handles for sighted
@@ -434,7 +461,7 @@ export function AppShell({
           lanes — so the wrapper below provides it. */}
       <a
         href="#promoteros-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[color:var(--color-surface)] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[color:var(--color-accent-ink)] focus:shadow-[var(--elevation-overlay)]"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:border focus:border-[color:var(--color-line)] focus:bg-[color:var(--color-surface)] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[color:var(--color-ink)] focus:shadow-[var(--elevation-overlay)]"
       >
         {t("shell.skip_to_content")}
       </a>

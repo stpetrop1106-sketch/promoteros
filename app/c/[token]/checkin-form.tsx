@@ -128,7 +128,7 @@ export function CheckinForm<RouteType extends string>({
         )}
         <Link
           href={reportHref}
-          className="inline-block rounded-lg bg-[color:var(--color-action)] px-4 py-3 font-medium text-white"
+          className="inline-block rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
         >
           {labels.goToReport}
         </Link>
@@ -152,13 +152,13 @@ export function CheckinForm<RouteType extends string>({
               onChange={(e) => setReason(e.target.value)}
               placeholder={labels.overrideReasonPlaceholder}
               rows={3}
-              className="mt-1 w-full rounded-lg border border-[color:var(--color-line)] p-3 text-sm"
+              className="mt-1 w-full rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-3 text-sm outline-none transition focus:border-[color:var(--color-accent)]"
             />
           </div>
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-lg bg-[color:var(--color-action)] px-4 py-3 font-medium text-white disabled:opacity-50"
+            className="w-full rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
           >
             {labels.overrideSubmit}
           </button>
@@ -166,7 +166,7 @@ export function CheckinForm<RouteType extends string>({
             type="button"
             onClick={requestLocation}
             disabled={pending}
-            className="w-full rounded-lg border border-[color:var(--color-line)] px-4 py-3 font-medium disabled:opacity-50"
+            className="w-full rounded-lg border border-[color:var(--color-line)] px-4 py-3 font-medium text-[color:var(--color-ink)] transition hover:bg-[color:var(--color-surface-hover)] disabled:opacity-50"
           >
             {labels.retryGeo}
           </button>
@@ -183,7 +183,7 @@ export function CheckinForm<RouteType extends string>({
         type="button"
         onClick={requestLocation}
         disabled={busy}
-        className="w-full rounded-lg bg-[color:var(--color-action)] px-4 py-4 text-base font-semibold text-white disabled:opacity-50"
+        className="w-full rounded-lg bg-[color:var(--color-accent)] px-4 py-4 text-base font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
       >
         {phase === "locating" ? labels.locating : phase === "submitting" ? labels.submitting : labels.confirm}
       </button>

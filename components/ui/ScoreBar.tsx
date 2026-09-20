@@ -87,7 +87,7 @@ export function ScoreBar({
           aria-valuenow={percent}
           aria-label={label}
           className={cn(
-            "relative w-full min-w-16 flex-1 overflow-hidden rounded-full bg-[color:var(--color-canvas-sunken)] ring-1 ring-inset ring-[color:var(--color-ink)]/5",
+            "relative w-full min-w-16 flex-1 overflow-hidden rounded-full bg-[color:var(--color-canvas-sunken)] ring-1 ring-inset ring-[color:var(--color-ink)]/4",
             HEIGHTS[size],
           )}
         >
@@ -96,7 +96,7 @@ export function ScoreBar({
                 <span
                   key={tick}
                   aria-hidden="true"
-                  className="absolute inset-y-0 w-px bg-[color:var(--color-n-300)]/70"
+                  className="absolute inset-y-0 w-px bg-[color:var(--color-n-300)]/60"
                   style={{ left: `${tick}%` }}
                 />
               ))
@@ -109,11 +109,16 @@ export function ScoreBar({
             )}
             style={{
               width: percent === 0 ? "0%" : `max(${percent}%, ${size === "sm" ? 6 : 10}px)`,
+              /* P42a: clay, not a two-colour gradient. The accent is near-black
+                 now, so the old accent→action ramp started at ink and read as a
+                 bar that fades in from a shadow. Clay is the product's one live
+                 colour and a score is precisely what it is for; the faint
+                 lighten to the right keeps the fill from looking like a decal. */
               ...(tone === "brand"
                 ? {
                     backgroundImage:
-                      "linear-gradient(90deg, var(--color-accent), var(--color-action))",
-                    boxShadow: "inset 0 1px 0 0 rgb(255 255 255 / 0.22)",
+                      "linear-gradient(90deg, var(--color-action-hover), var(--color-action))",
+                    boxShadow: "inset 0 1px 0 0 rgb(255 255 255 / 0.18)",
                   }
                 : null),
             }}

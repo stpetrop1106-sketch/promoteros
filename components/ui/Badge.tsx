@@ -12,19 +12,24 @@ export type BadgeSize = "sm" | "md";
  * A shift list is twenty rows of pills. At full saturation that is a page of
  * traffic lights and the eye cannot find the one row that is actually wrong —
  * which is the entire job of the status column. So each variant is a `subtle`
- * tint behind an `ink` foreground that clears AA on it, plus an inset hairline
- * of the `line` tone, which is what gives the pill an edge without a border
- * that darkens the whole row.
+ * tint behind an `ink` foreground that clears AA on it.
+ *
+ * P42a dropped the inset hairline. The reference's status pills are flat
+ * pastel with no edge at all, and on a white card inside an ivory page the
+ * hairline was only there to fight the old cool-grey ramp — on a warm tint it
+ * reads as a smudge around the word. The tint alone has enough contrast against
+ * white to hold its shape, and the pill is `rounded-full`, so nothing about it
+ * can be mistaken for a table cell.
  */
 const VARIANTS: Record<BadgeVariant, string> = {
   neutral:
-    "bg-[color:var(--color-neutral-subtle)] text-[color:var(--color-neutral-ink)] ring-[color:var(--color-neutral-line)]",
-  ok: "bg-[color:var(--color-ok-subtle)] text-[color:var(--color-ok-ink)] ring-[color:var(--color-ok-line)]",
-  warn: "bg-[color:var(--color-warn-subtle)] text-[color:var(--color-warn-ink)] ring-[color:var(--color-warn-line)]",
-  bad: "bg-[color:var(--color-bad-subtle)] text-[color:var(--color-bad-ink)] ring-[color:var(--color-bad-line)]",
-  info: "bg-[color:var(--color-accent-subtle)] text-[color:var(--color-accent-ink)] ring-[color:var(--color-accent-line)]",
+    "bg-[color:var(--color-neutral-subtle)] text-[color:var(--color-neutral-ink)]",
+  ok: "bg-[color:var(--color-ok-subtle)] text-[color:var(--color-ok-ink)]",
+  warn: "bg-[color:var(--color-warn-subtle)] text-[color:var(--color-warn-ink)]",
+  bad: "bg-[color:var(--color-bad-subtle)] text-[color:var(--color-bad-ink)]",
+  info: "bg-[color:var(--color-accent-subtle)] text-[color:var(--color-accent-ink)]",
   accent:
-    "bg-[color:var(--color-action-subtle)] text-[color:var(--color-action-ink)] ring-[color:var(--color-action)]/25",
+    "bg-[color:var(--color-action-subtle)] text-[color:var(--color-action-ink)]",
 };
 
 const DOTS: Record<BadgeVariant, string> = {
@@ -36,9 +41,12 @@ const DOTS: Record<BadgeVariant, string> = {
   accent: "bg-[color:var(--color-action-hover)]",
 };
 
+/* Fully rounded, and wide enough that the fill reads as a pill rather than as a
+   highlighter stroke behind the word. The extra horizontal padding is most of
+   why the reference's pills look considered. */
 const SIZES: Record<BadgeSize, string> = {
-  sm: "h-5 gap-1.5 px-2 text-2xs",
-  md: "h-6 gap-1.5 px-2.5 text-xs",
+  sm: "h-5.5 gap-1.5 px-2.5 text-2xs",
+  md: "h-6.5 gap-1.5 px-3 text-xs",
 };
 
 export interface BadgeProps {
@@ -69,7 +77,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex max-w-full items-center rounded-full font-semibold leading-none ring-1 ring-inset",
+        "inline-flex max-w-full items-center rounded-full font-semibold leading-none",
         SIZES[size],
         VARIANTS[variant],
         className,

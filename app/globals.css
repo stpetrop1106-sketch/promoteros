@@ -25,56 +25,62 @@
   /* -----------------------------------------------------------------------
      Neutral ramp.
 
-     Before P34 every grey in the product was one of three values, so a border,
-     a divider, a disabled label and a table header all read at the same
-     weight and nothing had hierarchy. The ramp is a single blue-grey hue
-     (~222°) so neutrals sit under the brand blue instead of fighting it.
+     Warm, not cool (P42). One hue around 35-40°, so the canvas reads as paper
+     rather than as a screen and every border, divider and label sits on the
+     same warm axis. A cool grey dropped onto this canvas immediately looks
+     like a foreign component pasted in — which is the whole reason the ramp
+     is a ramp and not three greys.
      ----------------------------------------------------------------------- */
   --color-n-0: #ffffff;
-  --color-n-25: #fbfcfe;
-  --color-n-50: #f6f8fc;
-  --color-n-100: #eef1f8;
-  --color-n-150: #e7ebf4;
-  --color-n-200: #dde3ee;
-  --color-n-300: #c3cbdd;
-  --color-n-400: #9aa5bf;
-  --color-n-500: #737f9c;
-  --color-n-600: #57637f;
-  --color-n-700: #3d4964;
-  --color-n-800: #262f45;
-  --color-n-900: #141a29;
-  --color-n-950: #0b0f1a;
+  --color-n-25: #fdfbf8;
+  --color-n-50: #faf7f2;
+  --color-n-100: #f4efe7;
+  --color-n-150: #ede7dd;
+  --color-n-200: #e4ddd1;
+  --color-n-300: #d2c9ba;
+  --color-n-400: #b0a596;
+  --color-n-500: #8d8375;
+  --color-n-600: #6e655a;
+  --color-n-700: #544c43;
+  --color-n-800: #36302a;
+  --color-n-900: #1f1b17;
+  --color-n-950: #13100d;
 
   /* -----------------------------------------------------------------------
      Core surfaces and text. These nine names predate P34 and are referenced
      across the whole app — the values are tuned, the names are permanent.
      ----------------------------------------------------------------------- */
-  --color-ink: #141a29; /* primary text, headings */
-  --color-ink-soft: #3d4964; /* body copy inside cards, table cells */
-  --color-muted: #6b7796; /* labels, captions, secondary text */
-  --color-muted-soft: #9aa5bf; /* placeholders, disabled text, icon rests */
-  --color-line: #e3e8f2; /* default hairline: borders and dividers */
-  --color-line-strong: #cfd7e6; /* a border that has to be seen, e.g. focus-adjacent */
-  --color-canvas: #f5f7fc; /* the page behind the cards */
-  --color-canvas-sunken: #eef1f8; /* a well inside a card: table head, code, track */
+  --color-ink: #1f1b17; /* primary text, headings */
+  --color-ink-soft: #4a4238; /* body copy inside cards, table cells */
+  --color-muted: #7d7466; /* labels, captions, secondary text */
+  --color-muted-soft: #a89e8f; /* placeholders, disabled text, icon rests */
+  --color-line: #e9e2d7; /* default hairline: borders and dividers */
+  --color-line-strong: #d8cfc1; /* a border that has to be seen, e.g. focus-adjacent */
+  --color-canvas: #f4f0e8; /* the page behind the cards — warm paper, not white */
+  --color-canvas-sunken: #ece6db; /* a well inside a card: table head, code, track */
   --color-surface: #ffffff; /* cards, sheets, menus */
-  --color-surface-hover: #f8fafd; /* row and menu-item hover */
+  --color-surface-hover: #faf7f1; /* row and menu-item hover */
 
   /* -----------------------------------------------------------------------
-     Brand. `accent` is the mark's blue (`public/promoteros-mark.svg`) and
-     `action` its teal counterpoint; neither moves without moving the mark.
-     ----------------------------------------------------------------------- */
-  --color-accent: #1646b8;
-  --color-accent-hover: #103a99;
-  --color-accent-press: #0d2f7d;
-  --color-accent-subtle: #eaf0fe; /* tinted fill behind accent text */
-  --color-accent-line: #c6d6fa;
-  --color-accent-ink: #123a96; /* accent text on an accent-subtle fill */
+     Brand (P42). The primary action is near-black on ivory: the contrast
+     carries it, so nothing else on the screen has to shout. `action` is the
+     clay counterpoint, spent once per screen — a chart line, the active nav
+     pill, a focus ring — and never as a second button colour.
 
-  --color-action: #2ed3c6;
-  --color-action-hover: #12afa3;
-  --color-action-subtle: #e2faf7;
-  --color-action-ink: #0a7d74;
+     Both keep their names because 73 files reference them. What changed is
+     that `accent` no longer has to be the mark's blue.
+     ----------------------------------------------------------------------- */
+  --color-accent: #26221d;
+  --color-accent-hover: #3a342c;
+  --color-accent-press: #151210;
+  --color-accent-subtle: #f0eae0; /* tinted fill behind accent text */
+  --color-accent-line: #ddd4c6;
+  --color-accent-ink: #2c261f; /* accent text on an accent-subtle fill */
+
+  --color-action: #b4693c;
+  --color-action-hover: #9a5730;
+  --color-action-subtle: #f8ece3;
+  --color-action-ink: #8c4e2a;
 
   /* -----------------------------------------------------------------------
      Status. Each one is a triple — a saturated `base` for solid fills and
@@ -82,38 +88,64 @@
      enough to clear AA on that tint. A status pill is never a saturated
      block; it is `subtle` behind `ink`.
      ----------------------------------------------------------------------- */
-  --color-ok: #0f7a52;
-  --color-ok-subtle: #e4f5ed;
-  --color-ok-line: #b6e0cd;
-  --color-ok-ink: #0a5c3e;
+  --color-ok: #3f7d5a;
+  --color-ok-subtle: #e6f0e6;
+  --color-ok-line: #c3ddc9;
+  --color-ok-ink: #2f5f45;
 
-  --color-warn: #b26a05;
-  --color-warn-subtle: #fdf1dc;
-  --color-warn-line: #f0d6a4;
-  --color-warn-ink: #8a5104;
+  --color-warn: #b07c2e;
+  --color-warn-subtle: #f8efdc;
+  --color-warn-line: #e8d3ab;
+  --color-warn-ink: #8a5f1f;
 
-  --color-bad: #c0362f;
-  --color-bad-subtle: #fdeceb;
-  --color-bad-line: #f3c6c3;
-  --color-bad-ink: #96261f;
+  --color-bad: #b4503f;
+  --color-bad-subtle: #f8e7e2;
+  --color-bad-line: #e8c6bc;
+  --color-bad-ink: #8f3c2d;
 
-  --color-neutral-subtle: #eef1f8;
-  --color-neutral-line: #dde3ee;
-  --color-neutral-ink: #57637f;
+  --color-neutral-subtle: #f0ebe2;
+  --color-neutral-line: #e0d8cb;
+  --color-neutral-ink: #6e655a;
+
+  /* -----------------------------------------------------------------------
+     Pastel chips (P42a).
+
+     The reference dashboard is almost entirely ivory, white and ink — and then
+     each stat card carries one small rounded-square icon chip in a pastel.
+     Those chips are the ONLY saturated colour on a coordinator screen, and
+     they work precisely because nothing around them competes.
+
+     Five, not four: `rose` exists so a `bad` tone has a chip of its own rather
+     than borrowing peach, which is the clay family and means "accent".
+
+     Each is a `-bg` (the chip fill) and an `-ink` (the glyph on it, dark enough
+     to clear AA on that fill). Never use a `-bg` behind body text; it is a
+     36–40px square with a stroke icon in it and nothing else.
+     ----------------------------------------------------------------------- */
+  --color-chip-peach: #f7e2d2;
+  --color-chip-peach-ink: #98532c;
+  --color-chip-mint: #dcebdd;
+  --color-chip-mint-ink: #3c6b4e;
+  --color-chip-lilac: #e5dff0;
+  --color-chip-lilac-ink: #5b4f77;
+  --color-chip-sand: #f0e6cd;
+  --color-chip-sand-ink: #7a6331;
+  --color-chip-rose: #f7dfdb;
+  --color-chip-rose-ink: #9a4636;
 
   /* -----------------------------------------------------------------------
      Radius. Generous at the card level, tight at the control level. These
      override Tailwind's defaults, so every existing `rounded-lg` in the app
      softens by a couple of pixels without any screen being edited.
      ----------------------------------------------------------------------- */
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.625rem;
-  --radius-xl: 0.875rem;
-  --radius-2xl: 1.125rem;
-  --radius-3xl: 1.5rem;
-  --radius-4xl: 2rem;
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 1.75rem;
+  --radius-4xl: 2.25rem;
 
   /* -----------------------------------------------------------------------
      Elevation. The single biggest reason the pre-P34 UI read as a prototype
@@ -124,17 +156,21 @@
      which is what stops a shadow looking like grey smudge on a blue-grey
      canvas.
      ----------------------------------------------------------------------- */
-  --shadow-2xs: 0 1px 1px 0 rgb(20 26 41 / 0.04);
-  --shadow-xs: 0 1px 2px 0 rgb(20 26 41 / 0.05);
+  --shadow-2xs: 0 1px 1px 0 rgb(31 27 23 / 0.03);
+  --shadow-xs: 0 1px 2px 0 rgb(31 27 23 / 0.04);
+  /* P42a: the contact shadow lost most of its weight and the ambient one grew.
+     A card on ivory should read as *lifted*, never as an object with a drop
+     shadow under it — the moment the tight layer is visible as a dark line the
+     whole page stops looking like paper. */
   --shadow-sm:
-    0 1px 2px -1px rgb(20 26 41 / 0.08), 0 2px 6px -1px rgb(20 26 41 / 0.05);
+    0 1px 2px -1px rgb(31 27 23 / 0.04), 0 6px 18px -8px rgb(31 27 23 / 0.08);
   --shadow-md:
-    0 2px 4px -2px rgb(20 26 41 / 0.07), 0 8px 18px -4px rgb(20 26 41 / 0.08);
+    0 2px 4px -3px rgb(31 27 23 / 0.05), 0 12px 28px -10px rgb(31 27 23 / 0.10);
   --shadow-lg:
-    0 4px 8px -4px rgb(20 26 41 / 0.07), 0 18px 36px -8px rgb(20 26 41 / 0.11);
+    0 4px 8px -4px rgb(31 27 23 / 0.07), 0 18px 36px -8px rgb(31 27 23 / 0.11);
   --shadow-xl:
-    0 8px 16px -8px rgb(20 26 41 / 0.08), 0 32px 60px -12px rgb(20 26 41 / 0.16);
-  --shadow-2xl: 0 44px 80px -16px rgb(20 26 41 / 0.24);
+    0 8px 16px -8px rgb(31 27 23 / 0.08), 0 32px 60px -12px rgb(31 27 23 / 0.16);
+  --shadow-2xl: 0 44px 80px -16px rgb(31 27 23 / 0.24);
 
   /* -----------------------------------------------------------------------
      Type scale. Deliberate weights and tracking: tracking tightens as the
@@ -203,9 +239,20 @@
   --elevation-card-hover: var(--shadow-md);
   --elevation-raised: var(--shadow-lg);
   --elevation-overlay: var(--shadow-xl);
+  /* P42a. The white pill that marks where you are in the ivory sidebar, and
+     anything else that has to float a millimetre off a *tinted* ground. It is
+     deliberately lighter than `--elevation-card`: the pill sits on ivory, where
+     the white itself already does most of the separating. */
+  --elevation-pill:
+    0 1px 2px -1px rgb(31 27 23 / 0.05), 0 4px 12px -6px rgb(31 27 23 / 0.10);
 
-  /* The focus ring, in one place. Every interactive element uses this. */
-  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-accent);
+  /* The focus ring, in one place. Every interactive element uses this.
+     Two shadows: a gap the colour of whatever the control sits on, then the
+     clay accent. `--focus-ring-gap` defaults to white because most controls sit
+     on a card; the ivory sidebar and the canvas override it locally so the ring
+     never draws a white halo on a tinted ground. */
+  --focus-ring-gap: var(--color-surface);
+  --focus-ring: 0 0 0 2px var(--focus-ring-gap), 0 0 0 4px var(--color-action);
 
   /* App shell geometry. `coordinator-nav.tsx` and `layout.tsx` share these so
      the sidebar width and the content offset can never disagree. */
@@ -313,8 +360,8 @@ h4 {
     background-image:
       linear-gradient(to right, var(--scroll-shadow-bg, var(--color-surface)), transparent),
       linear-gradient(to left, var(--scroll-shadow-bg, var(--color-surface)), transparent),
-      linear-gradient(to right, rgb(20 26 41 / 0.11), transparent),
-      linear-gradient(to left, rgb(20 26 41 / 0.11), transparent);
+      linear-gradient(to right, rgb(31 27 23 / 0.11), transparent),
+      linear-gradient(to left, rgb(31 27 23 / 0.11), transparent);
     background-position:
       left center,
       right center,

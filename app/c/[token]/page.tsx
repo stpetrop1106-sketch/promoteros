@@ -66,7 +66,7 @@ export default async function CheckinPage({
     <main className="mx-auto max-w-md px-6 py-12">
       <h1 className="text-lg font-semibold">{t("checkin.title")}</h1>
 
-      <dl className="mt-6 space-y-3 rounded-lg border border-[color:var(--color-line)] bg-white p-5 text-sm">
+      <dl className="mt-6 space-y-3 rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 text-sm shadow-[var(--elevation-card)]">
         <div>
           <dt className="text-[color:var(--color-muted)]">{t("shifts.campaign")}</dt>
           <dd className="font-medium">{v.campaignName}</dd>
@@ -108,7 +108,7 @@ export default async function CheckinPage({
           )}
           <Link
             href={`/c/${token}/report`}
-            className="inline-block rounded-lg bg-[color:var(--color-action)] px-4 py-3 font-medium text-white"
+            className="inline-block rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
           >
             {t("checkin.go_to_report")}
           </Link>

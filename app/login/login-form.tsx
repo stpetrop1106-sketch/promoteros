@@ -27,7 +27,7 @@ function Submit({ label, pendingLabel }: { label: string; pendingLabel: string }
     <button
       type="submit"
       disabled={pending}
-      className="mt-4 w-full rounded bg-[color:var(--color-accent)] px-4 py-2 text-sm font-medium text-[color:var(--color-surface)] hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
+      className="mt-4 w-full rounded-lg bg-[color:var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-[color:var(--color-surface)] transition hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
     >
       {pending ? pendingLabel : label}
     </button>
@@ -40,7 +40,7 @@ function SecondarySubmit({ label, pendingLabel }: { label: string; pendingLabel:
     <button
       type="submit"
       disabled={pending}
-      className="mt-3 w-full rounded border border-[color:var(--color-line)] px-4 py-2 text-sm font-medium hover:bg-[color:var(--color-surface)] disabled:opacity-50"
+      className="mt-3 w-full rounded-lg border border-[color:var(--color-line)] px-4 py-2.5 text-sm font-medium text-[color:var(--color-ink)] transition hover:bg-[color:var(--color-surface-hover)] disabled:opacity-50"
     >
       {pending ? pendingLabel : label}
     </button>
@@ -81,7 +81,7 @@ function CodeForm({ next, email, labels }: { next: string; email: string; labels
         pattern="[0-9]*"
         maxLength={6}
         required
-        className="mt-2 w-full rounded border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-2 text-center text-lg tracking-[0.4em]"
+        className="mt-2 w-full rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-2.5 text-center text-lg tracking-[0.4em] outline-none transition focus:border-[color:var(--color-accent)]"
       />
 
       <SecondarySubmit label={labels.codeSubmit} pendingLabel={labels.codeChecking} />
@@ -132,7 +132,7 @@ export function LoginForm({ next, labels }: { next: string; labels: Labels }) {
           autoComplete="email"
           required
           placeholder={labels.placeholder}
-          className="mt-1 w-full rounded border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-2 text-sm"
+          className="mt-1 w-full rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-2.5 text-sm outline-none transition focus:border-[color:var(--color-accent)]"
         />
 
         <Submit label={labels.submit} pendingLabel={labels.sending} />

@@ -21,8 +21,12 @@ export interface SectionHeadingProps {
   className?: string;
 }
 
+/* P42a: level 2 dropped to the micro step. The reference's section labels are
+   11px uppercase with open tracking — small enough that the label reads as a
+   tab on a filing divider rather than as a competing headline, which is exactly
+   the relationship a section label should have to its own content. */
 const LEVEL_CLASS = {
-  2: "text-sm font-semibold uppercase tracking-wide text-[color:var(--color-muted)]",
+  2: "text-2xs font-semibold uppercase tracking-wider text-[color:var(--color-muted)]",
   3: "text-sm font-semibold text-[color:var(--color-ink)]",
 } as const;
 

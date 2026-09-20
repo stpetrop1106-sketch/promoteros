@@ -67,3 +67,9 @@ export type {
 /* --- Added in P36. Nothing above this line changed shape. --- */
 
 export { CopyButton, WhatsAppButton } from "./CopyButton";
+
+/* --- Added in P42a. Nothing above this line changed shape: these are the two
+       optional prop types `StatTile` grew (the pastel corner chip and the
+       delta's direction), exported so a screen can name them. --- */
+
+export type { StatTileChip, StatTileDelta } from "./StatTile";

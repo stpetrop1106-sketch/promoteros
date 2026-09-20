@@ -73,21 +73,23 @@ export function CompleteSignIn({ next }: { next: string }) {
   if (failed) {
     return (
       <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-        <h1 className="text-xl font-semibold tracking-tight">{t("auth.login_title")}</h1>
-        <p className="mt-3 text-sm text-[color:var(--color-muted)]">{t("auth.link_failed")}</p>
-        <Link
-          href="/login"
-          className="mt-6 inline-flex w-fit items-center justify-center rounded-lg bg-[color:var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
-        >
-          {t("auth.send_link")}
-        </Link>
+        <div className="rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 shadow-[var(--elevation-card)] sm:p-8">
+          <h1 className="text-xl font-semibold tracking-tight text-[color:var(--color-ink)]">{t("auth.login_title")}</h1>
+          <p className="mt-3 text-sm text-[color:var(--color-muted)]">{t("auth.link_failed")}</p>
+          <Link
+            href="/login"
+            className="mt-6 inline-flex w-fit items-center justify-center rounded-lg bg-[color:var(--color-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
+          >
+            {t("auth.send_link")}
+          </Link>
+        </div>
       </main>
     );
   }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-      <p className="text-sm text-[color:var(--color-muted)]">{t("auth.completing")}</p>
+      <p className="text-center text-sm text-[color:var(--color-muted)]">{t("auth.completing")}</p>
     </main>
   );
 }
