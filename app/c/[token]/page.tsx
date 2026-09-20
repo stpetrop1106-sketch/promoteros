@@ -4,6 +4,7 @@ import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { Markdown } from "@/components/ui";
 import { CheckinForm } from "./checkin-form";
 import { formatShiftWhen } from "@/lib/shift-format";
+import { athensDate } from "@/lib/exceptions";
 
 export const dynamic = "force-dynamic";
 
@@ -11,9 +12,9 @@ export const dynamic = "force-dynamic";
  * The promoter's arrival page. No login: the signed link is the credential, same shape as
  * `/i/[token]`. Mobile-first — this is opened standing in a supermarket, on one bar of signal.
  *
- * The "not yet time" gate is date-level only (not hour-level): the codebase has no timezone
- * utility yet, and a wrong hour-level cutoff that blocks a legitimate early or late arrival is
- * a worse failure than being slightly permissive. See docs/status/P9.md.
+ * The "not yet time" gate is date-level only (not hour-level) on purpose: a wrong hour-level cutoff
+ * that blocks a legitimate early or late arrival is a worse failure than being slightly permissive.
+ * See docs/status/P9.md. The date itself is Athens, not UTC — see the comment on `todayIso`.
  */
 export default async function CheckinPage({
   params,
@@ -33,7 +34,11 @@ export default async function CheckinPage({
   }
 
   const v = result.view;
-  const todayIso = new Date().toISOString().slice(0, 10);
+  // The agency's wall clock, not the server's. `toISOString()` is UTC, and Athens runs two to three
+  // hours ahead of it: between midnight and 03:00 Athens time, UTC is still yesterday, so a promoter
+  // opening this page on the morning of her own shift was told it had not started yet. Found while
+  // the owner was testing an invitation on 2026-09-20.
+  const todayIso = athensDate(new Date());
   const notYetTime = !v.checkedIn && v.onDate > todayIso;
   const alreadyDone = v.checkedIn && v.hasReport;
 
