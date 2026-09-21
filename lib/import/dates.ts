@@ -96,7 +96,12 @@ export function parseDateCell(cell: Cell, todayIso: string): DateParseResult {
 
   if (cell instanceof Date) {
     if (Number.isNaN(cell.getTime())) return { ok: false };
-    return finalizeYmd(cell.getUTCFullYear(), cell.getUTCMonth() + 1, cell.getUTCDate());
+    // LOCAL getters, not UTC. SheetJS builds a date cell as midnight in the reader's own timezone,
+    // so in Athens (UTC+2/+3) a UTC read of "22 September" returns the 21st — every imported shift
+    // landed one day early, silently. The rule elsewhere in this codebase ("never read a naive date
+    // through local time") is about dates we build from a string; this is the opposite case: the
+    // Date was built locally, so it has to be read locally.
+    return finalizeYmd(cell.getFullYear(), cell.getMonth() + 1, cell.getDate());
   }
 
   if (typeof cell === "number") {

@@ -202,9 +202,13 @@ export function SelectField({
         {...rest}
       >
         {placeholder ? (
-          <option value="" disabled hidden>
-            {placeholder}
-          </option>
+          // NOT `hidden`. A hidden option cannot be the selected one, so a select with no explicit
+          // default silently started on the first REAL option: /campaigns/new filed a campaign
+          // under the alphabetically first client, and the shift-series form picked the first
+          // store — which also fed the ranked list the wrong coordinates. The field looked empty
+          // and behaved as filled, and `required` could not help because a value was present.
+          // Keeping it selectable-but-empty makes `required` do its job again.
+          <option value="">{placeholder}</option>
         ) : null}
         {options.map((option) => (
           <option key={option.value} value={option.value}>

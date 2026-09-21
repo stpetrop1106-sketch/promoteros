@@ -74,7 +74,11 @@ export function readWorkbook(data: ArrayBuffer): SheetGrid[] {
     } else {
       const text = decodeCsvText(bytes);
       const delimiter = detectDelimiter(text);
-      workbook = read(text, { type: "string", FS: delimiter, cellDates: true });
+      // `raw: true` keeps every CSV cell as the text the client typed. Without it SheetJS guesses
+      // at date-shaped strings MONTH-FIRST: "10/09/2026" came back as 9 October, silently turning
+      // a Greek 10 September into an October shift. Our own parser is day-first by design
+      // (lib/import/dates.ts), so the text must reach it untouched.
+      workbook = read(text, { type: "string", FS: delimiter, raw: true });
     }
   } catch (err) {
     throw new ImportFileError("unreadable", err instanceof Error ? err.message : "Could not read the file.");
