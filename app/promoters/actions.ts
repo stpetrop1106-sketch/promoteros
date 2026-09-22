@@ -9,7 +9,7 @@ import { sendWelcomeAvailabilityLink } from "@/lib/dispatch/run";
 import { requireUser } from "@/lib/auth";
 import { getGeocoder, type GeocodeResult } from "@/lib/geocoding";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
-import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
+import { checkBillingFor, lookupEntitlement } from "@/lib/billing/subscription";
 import type { PlanId } from "@/lib/billing/plans";
 import type { FieldErrors, PromoterFormState } from "./state";
 
@@ -219,25 +219,31 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult | n
  * Checked before the form is even parsed: there is no reason to validate fields the request is
  * going to be refused anyway, and it gives the coordinator the real reason immediately.
  */
-async function checkPromoterCreationAllowed(agencyId: string): Promise<string | null> {
-  const entitlement = await getEntitlement(agencyId);
-  // No entitlement row is the same "agency not found" shape `requireUser()` already guards
-  // against — fail open here rather than inventing a block for a state that should not reach
-  // this line at all.
-  if (!entitlement) return null;
-
-  const gate = checkBilling(entitlement, "add_promoter");
+async function checkPromoterWriteAllowed(
+  agencyId: string,
+  action: "add_promoter" | "write",
+): Promise<string | null> {
+  const gate = await checkBillingFor(agencyId, action);
   if (gate.allowed) return null;
 
   if (gate.block === "promoter_limit_reached") {
+    const lookup = await lookupEntitlement(agencyId);
+    if (!lookup.ok) return t("enforcement.promoters.blocked_read_only");
     return t("enforcement.promoters.blocked_limit", {
-      plan: t(PLAN_LABEL_KEY[entitlement.planId]),
-      limit: entitlement.promoterLimit,
+      plan: t(PLAN_LABEL_KEY[lookup.entitlement.planId]),
+      limit: lookup.entitlement.promoterLimit,
     });
   }
 
   // "subscription_read_only" — the account is read-only, unrelated to how many promoters it has.
-  return t("enforcement.promoters.blocked_read_only");
+  // The two wordings differ because the coordinator is doing two different things: being told
+  // "you cannot add a promoter" while trying to correct someone's phone number would read as a
+  // bug rather than as a billing state.
+  return t(
+    action === "write"
+      ? "enforcement.promoters.blocked_read_only_edit"
+      : "enforcement.promoters.blocked_read_only",
+  );
 }
 
 export async function createPromoter(
@@ -246,7 +252,7 @@ export async function createPromoter(
 ): Promise<PromoterFormState> {
   const user = await requireUser();
 
-  const blockedMessage = await checkPromoterCreationAllowed(user.agencyId);
+  const blockedMessage = await checkPromoterWriteAllowed(user.agencyId, "add_promoter");
   if (blockedMessage) {
     return { status: "error", errors: { general: blockedMessage } };
   }
@@ -328,7 +334,15 @@ export async function updatePromoter(
   _prev: PromoterFormState,
   formData: FormData,
 ): Promise<PromoterFormState> {
-  await requireUser();
+  const user = await requireUser();
+
+  // A1-05. Editing a promoter is an ordinary write, and commercial-architecture.md §3 says a
+  // read-only agency does not write. Deliberately NOT applied to `archivePromoter` below: that
+  // one FREES a promoter slot, and blocking it would trap a read-only agency with a roster it
+  // cannot shrink — the same reasoning P27 used for `revokeInvitation` and `removeMember`.
+  const blockedMessage = await checkPromoterWriteAllowed(user.agencyId, "write");
+  if (blockedMessage) return { status: "error", errors: { general: blockedMessage } };
+
   const db = await createServerSupabase();
 
   const promoterId = String(formData.get("promoterId") ?? "");

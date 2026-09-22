@@ -8,6 +8,8 @@
 
 export type MessagingErrorCode =
   | "not_owner"
+  /** A1-05 — the subscription is read-only, so this write is refused. */
+  | "subscription_read_only"
   | "migration_missing"
   | "email_not_configured"
   | "write_not_permitted"

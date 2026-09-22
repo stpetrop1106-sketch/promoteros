@@ -108,3 +108,32 @@ export async function checkWaitlistRateLimit(): Promise<RateLimitResult> {
 
   return { allowed: true };
 }
+
+/**
+ * The same cleanup, on a schedule rather than only on traffic.
+ *
+ * `checkWaitlistRateLimit()` above sweeps opportunistically, which works right up until nobody
+ * submits the form — and then the table keeps whatever is in it indefinitely. The audit found
+ * rows from eleven days earlier, two closed windows, still present (A1-11). That is trivial at
+ * this size; it matters because this is the same table an anonymous caller could inflate, and the
+ * cleanup that bounds it was suppressed by the very traffic pattern that fills it.
+ *
+ * Returns the number of rows removed, or null if the delete failed — the caller is the daily
+ * cron, and a housekeeping failure must never fail the run that sends people their links.
+ */
+export async function sweepWaitlistRateLimit(now: Date = new Date()): Promise<number | null> {
+  const db = createAdminClient();
+  const cutoff = new Date(now.getTime() - CLEANUP_AGE_MS).toISOString();
+
+  const { data, error } = await db
+    .from("waitlist_rate_limit")
+    .delete()
+    .lt("window_start", cutoff)
+    .select("ip_hash");
+
+  if (error) {
+    console.error("Waitlist rate limit sweep failed", { code: error.code });
+    return null;
+  }
+  return data?.length ?? 0;
+}

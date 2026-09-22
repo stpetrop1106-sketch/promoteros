@@ -5,6 +5,7 @@ import { runAvailabilityLinks, runCheckinLinks, type RunSummary } from "@/lib/di
 import { automaticDeliveryConfigured } from "@/lib/messaging";
 import { athensToday } from "@/lib/availability-links";
 import { sweepOrphanedPhotos, type SweepResult } from "@/lib/photo-sweep";
+import { sweepWaitlistRateLimit } from "@/lib/waitlist/rate-limit";
 
 /**
  * P39 — the one daily job.
@@ -63,6 +64,11 @@ export async function GET(request: NextRequest) {
     photoSweep = { error: err instanceof Error ? err.message : "failed" };
   }
 
+  // A1-11. The waitlist limiter sweeps itself, but only while the form is being used; with no
+  // traffic its rows sit there indefinitely, and it is the same table an anonymous caller could
+  // inflate. Null means the delete failed and said so in the log.
+  const waitlistRowsSwept = await sweepWaitlistRateLimit(startedAt);
+
   if (!automaticDeliveryConfigured()) {
     // Today's behaviour, unchanged: no channel can send unattended, so nothing is attempted and
     // nothing is recorded. Said plainly so a manager reading the cron log knows why.
@@ -73,6 +79,7 @@ export async function GET(request: NextRequest) {
       checkinLinks: { ran: false },
       availabilityLinks: { ran: false, periodKey },
       photoSweep,
+      waitlistRowsSwept,
     });
   }
 
@@ -109,6 +116,7 @@ export async function GET(request: NextRequest) {
       checkinLinks,
       availabilityLinks,
       photoSweep,
+      waitlistRowsSwept,
     },
     { status: ok ? 200 : 500 },
   );

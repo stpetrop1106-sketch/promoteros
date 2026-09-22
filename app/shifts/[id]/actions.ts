@@ -74,6 +74,27 @@ export async function invite(
  * Keeps `shifts.status` consistent the same way `respondToInvitation` does: by calling the
  * shared `refreshShiftStatus` after the write, never by computing status locally.
  */
+/**
+ * ---------------------------------------------------------------------------------------------
+ * A1-05: why the three actions below carry NO billing gate, on purpose
+ * ---------------------------------------------------------------------------------------------
+ * The audit lists `cancelAssignment`, `markNoShow` and `mintCheckinLink` as write paths with no
+ * `checkBilling()`. They stay that way, for the reason P27 already gave for `revokeInvitation`
+ * and `removeMember`: a read-only agency must not be *trapped*, only prevented from taking on
+ * anything new.
+ *
+ *   cancelAssignment  frees capacity rather than consuming it. Blocking it leaves an agency
+ *                     unable to unstaff a shift it cannot run — and the promoter travels to a
+ *                     store for work that is not happening.
+ *   markNoShow        records something that has already happened. Refusing to write it does not
+ *                     undo the no-show; it only corrupts the record the agency bills from, and
+ *                     the reliability score the matching engine reads.
+ *   mintCheckinLink   serves a shift that was already confirmed while the subscription was live.
+ *                     Blocking it strands a promoter at the door with no way to check in.
+ *
+ * `reoffer` further down DOES carry the gate: it creates a new invitation, which is exactly the
+ * new commitment commercial-architecture.md §3 says a read-only agency does not get to make.
+ */
 export async function cancelAssignment(
   _prev: CancelAssignmentState,
   formData: FormData,

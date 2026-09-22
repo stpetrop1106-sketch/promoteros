@@ -10,6 +10,7 @@ import { AUTO_SWITCH_IDLE, type AutoSwitchState, type MessagingErrorCode } from 
 const t = translatorFor(DEFAULT_LOCALE);
 
 export const ERROR_KEYS: Record<MessagingErrorCode, TranslationKey> = {
+  subscription_read_only: "enforcement.messaging.blocked_read_only_auto",
   not_owner: "messaging.errors.not_owner",
   migration_missing: "messaging.errors.migration_missing",
   email_not_configured: "messaging.errors.email_not_configured",

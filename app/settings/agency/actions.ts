@@ -19,6 +19,14 @@ import type { AgencyIdentityFormState } from "./state";
  * `updateAgencyIdentity()` is the security boundary, not this function — a server action is a
  * public HTTP endpoint, and this one would still be safe to call directly with someone else's
  * form data because the owner check happens inside it, against the caller's real session.
+ *
+ * A1-05 lists this as a write path with no billing gate. It stays ungated, and that is a
+ * decision rather than an oversight. The columns it writes are the agency's registered legal
+ * name and its privacy contact address — the two things `/privacy/promoters` refuses to render
+ * without (migration 0014). Gating this would mean a read-only agency could not correct the
+ * identity on the privacy notice its own promoters are told to read, which is a legal obligation
+ * we would be blocking to collect a subscription. Nothing here consumes a seat, a promoter slot
+ * or any other billable resource, so there is nothing for the gate to protect.
  */
 export async function saveAgencyIdentity(
   _prev: AgencyIdentityFormState,

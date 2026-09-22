@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { ownerContext } from "@/lib/team";
+import { checkBillingFor } from "@/lib/billing/subscription";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { automaticDeliveryConfigured } from "@/lib/messaging";
 import { checkEmailAddress } from "@/lib/messaging/email-address";
@@ -24,6 +25,11 @@ export async function saveAutoAvailabilityLinks(
 ): Promise<AutoSwitchState> {
   const owner = await ownerContext();
   if (!owner) return { status: "error", code: "not_owner" };
+
+  // A1-05. Turning automatic sending back on is a configuration change that commits the agency to
+  // future outbound work, so it is a write in checkBilling's own terms.
+  const gate = await checkBillingFor(owner.agencyId, "write");
+  if (!gate.allowed) return { status: "error", code: "subscription_read_only" };
 
   const enabled = String(formData.get("enabled") ?? "") === "true";
 
@@ -63,6 +69,12 @@ export async function sendAvailabilityLinksNow(
 ): Promise<SendNowState> {
   const owner = await ownerContext();
   if (!owner) return { status: "error", code: "not_owner" };
+
+  // A1-05. This emails the entire roster and costs real money on every send; it is the clearest
+  // "new commitment" on this screen.
+  const gate = await checkBillingFor(owner.agencyId, "write");
+  if (!gate.allowed) return { status: "error", code: "subscription_read_only" };
+
   if (!automaticDeliveryConfigured()) return { status: "error", code: "email_not_configured" };
 
   const db = await createServerSupabase();
