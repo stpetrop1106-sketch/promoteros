@@ -24,6 +24,10 @@ export type CheckinFormLabels = {
   geoTimeout: string;
   geoUnsupported: string;
   geoInsecure: string;
+  /** A3-01 — shown when the action never reached the server at all. */
+  offline: string;
+  /** A3-21 — the arrival is already on record; not an error to recover from. */
+  alreadyCheckedIn: string;
   saveFailedByReason: Record<string, string>;
 };
 
@@ -40,6 +44,7 @@ type Phase = "idle" | "locating" | "submitting" | "success" | "override";
 export function CheckinForm<RouteType extends string>({
   token,
   reportHref,
+  reportQuery,
   labels,
 }: {
   token: string;
@@ -48,10 +53,13 @@ export function CheckinForm<RouteType extends string>({
   // prop would widen the caller's literal/template href and fail `next/link`'s `RouteImpl`
   // check even for a href that is a valid route.
   reportHref: Route<RouteType>;
+  /** A3-16 — carries `?lang=` onwards so a promoter reading in English stays in English. */
+  reportQuery?: { lang: string };
   labels: CheckinFormLabels;
 }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [errorText, setErrorText] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [withinGeofence, setWithinGeofence] = useState<boolean | null>(null);
   const [reason, setReason] = useState("");
   const [pending, startTransition] = useTransition();
@@ -63,8 +71,38 @@ export function CheckinForm<RouteType extends string>({
       setErrorText(null);
       return;
     }
+    // A3-21 — "you are already checked in" is not a failure to recover from, and dropping the
+    // promoter into the manual-override form invited them to submit something that would fail
+    // in exactly the same way. The arrival is on record: show them that, and the way onwards.
+    if (result.reason === "already_checked_in") {
+      setWithinGeofence(null);
+      setNotice(labels.alreadyCheckedIn);
+      setPhase("success");
+      setErrorText(null);
+      return;
+    }
     setErrorText(labels.saveFailedByReason[result.reason] ?? labels.saveFailedByReason.default ?? "");
     setPhase("override");
+  }
+
+  /**
+   * A3-01, second half. Both action calls below used to be awaited inside `startTransition` with
+   * no `try/catch`: a transport rejection could not reach `handleActionResult`, so `phase` stayed
+   * `"submitting"` and the button stayed disabled forever with nothing on screen. The promoter
+   * standing in the store had no way to tell a failed tap from a slow one.
+   *
+   * `fallbackPhase` is where the form goes back to, so the promoter can simply tap again: the
+   * main button for a geolocation attempt, the override form for a manual one.
+   */
+  function runAction(fallbackPhase: Phase, call: () => Promise<CheckinActionState>) {
+    startTransition(async () => {
+      try {
+        handleActionResult(await call());
+      } catch {
+        setErrorText(labels.offline);
+        setPhase(fallbackPhase);
+      }
+    });
   }
 
   function requestLocation() {
@@ -85,14 +123,9 @@ export function CheckinForm<RouteType extends string>({
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setPhase("submitting");
-        startTransition(async () => {
-          const result = await checkinWithGeo(
-            token,
-            position.coords.latitude,
-            position.coords.longitude,
-          );
-          handleActionResult(result);
-        });
+        runAction("idle", () =>
+          checkinWithGeo(token, position.coords.latitude, position.coords.longitude),
+        );
       },
       (geoError) => {
         const message =
@@ -111,23 +144,20 @@ export function CheckinForm<RouteType extends string>({
   function submitOverride(event: React.FormEvent) {
     event.preventDefault();
     setPhase("submitting");
-    startTransition(async () => {
-      const result = await checkinWithOverride(token, reason);
-      handleActionResult(result);
-    });
+    runAction("override", () => checkinWithOverride(token, reason));
   }
 
   if (phase === "success") {
     return (
       <div className="mt-6 space-y-3 text-center text-sm">
-        <p className="font-medium text-[color:var(--color-ok)]">{labels.success}</p>
+        <p className="font-medium text-[color:var(--color-ok)]">{notice ?? labels.success}</p>
         {withinGeofence === false && (
           <p className="text-[color:var(--color-muted)]">
             {labels.tooFar} {labels.recordedFarNote}
           </p>
         )}
         <Link
-          href={reportHref}
+          href={{ pathname: reportHref, query: reportQuery }}
           className="inline-block rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
         >
           {labels.goToReport}
@@ -179,6 +209,16 @@ export function CheckinForm<RouteType extends string>({
 
   return (
     <div className="mt-6 space-y-3">
+      {/* A3-01 — this used to have nowhere to render. A geolocation attempt that never reached
+          the server comes back here so the promoter can simply tap again. */}
+      {errorText && (
+        <p
+          role="alert"
+          className="rounded-lg border border-[color:var(--color-bad)] bg-[color:var(--color-surface)] p-3 text-sm font-medium text-[color:var(--color-bad)]"
+        >
+          {errorText}
+        </p>
+      )}
       <button
         type="button"
         onClick={requestLocation}

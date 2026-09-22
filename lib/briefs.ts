@@ -1,7 +1,12 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { createServerSupabase } from "@/lib/supabase/server";
-import { verifyToken } from "@/lib/tokens";
+import {
+  acceptedInvitationStillReadable,
+  hashToken,
+  verifyToken,
+  verifyTokenSignature,
+} from "@/lib/tokens";
 
 /**
  * Brief acknowledgement — P31, docs/product-spec.md §9.
@@ -23,39 +28,87 @@ export type PromoterBriefView = {
   bodyMd: string;
   /** Null until this promoter has acknowledged this exact brief version. */
   acknowledgedAt: string | null;
+  /**
+   * A3-09 — false once the invitation token has passed its own 24-hour expiry. The brief is still
+   * readable (that is the fix), but `acknowledgeBriefForInvitation` is a write and deliberately
+   * keeps the strict verifier, so the page hides the button rather than offering one that cannot
+   * work.
+   */
+  canAcknowledge: boolean;
 };
 
 type InvitationCampaignRow = {
   id: string;
   promoter_id: string;
-  shifts: { campaign_id: string } | null;
+  status: string;
+  token_hash: string;
+  shifts: { campaign_id: string; on_date: string } | null;
 };
 
+/**
+ * A3-09 — the brief used to vanish from an accepted invitation after 24 hours.
+ *
+ * `lib/invitations.ts:loadInvitation` and `lib/checkins.ts:createCheckinLinkForInvitation` both
+ * verify the SIGNATURE and then let an accepted invitation stay readable through the day of the
+ * shift, precisely so the promoter can reopen the link on the morning and find their check-in
+ * link. This function used `verifyToken`, which enforces expiry — so on the morning of the shift,
+ * which is the normal case and more than 24 hours after the invitation was sent, the brief section
+ * simply disappeared. No error, no gap, no trace. The brief is the document telling them what to
+ * do in the store; it is the thing they reopen the link for.
+ *
+ * `mode: "read"` now follows the same rule as the rest of the page. `mode: "write"` keeps the
+ * strict verifier, because recording an acknowledgement against a dead token is a different
+ * question from letting someone read what they already agreed to work.
+ */
 async function loadInvitationCampaign(
   token: string,
+  mode: "read" | "write",
 ): Promise<
-  | { ok: true; invitationId: string; promoterId: string; campaignId: string }
+  | { ok: true; invitationId: string; promoterId: string; campaignId: string; expired: boolean }
   | { ok: false; reason: string }
 > {
-  const verified = verifyToken(token, "invitation");
-  if (!verified.ok) return { ok: false, reason: verified.reason };
+  // Written as two branches rather than one ternary so each verifier keeps its own result type:
+  // only `verifyTokenSignature` reports `expired` instead of refusing on it.
+  let recordId: string;
+  let expired = false;
+  if (mode === "read") {
+    const verified = verifyTokenSignature(token, "invitation");
+    if (!verified.ok) return { ok: false, reason: verified.reason };
+    recordId = verified.recordId;
+    expired = verified.expired;
+  } else {
+    const verified = verifyToken(token, "invitation");
+    if (!verified.ok) return { ok: false, reason: verified.reason };
+    recordId = verified.recordId;
+  }
 
   const db = createAdminClient();
   const { data, error } = await db
     .from("invitations")
-    .select("id, promoter_id, shifts(campaign_id)")
-    .eq("id", verified.recordId)
+    .select("id, promoter_id, status, token_hash, shifts(campaign_id, on_date)")
+    .eq("id", recordId)
     .single();
   if (error || !data) return { ok: false, reason: "not_found" };
 
   const row = data as unknown as InvitationCampaignRow;
   if (!row.shifts) return { ok: false, reason: "not_found" };
+  // Defence in depth, matching `loadInvitation` and `createCheckinLinkForInvitation`: a valid
+  // signature must also match the stored hash. The strict path got this for free from the TTL;
+  // the readable-after-expiry path must not be weaker than the page it sits on.
+  if (row.token_hash !== hashToken(token)) return { ok: false, reason: "bad_signature" };
+  if (
+    expired &&
+    !(row.status === "accepted" && acceptedInvitationStillReadable(row.shifts.on_date))
+  ) {
+    return { ok: false, reason: "expired" };
+  }
 
   return {
     ok: true,
     invitationId: row.id,
     promoterId: row.promoter_id,
     campaignId: row.shifts.campaign_id,
+    expired,
   };
 }
 
@@ -83,7 +136,7 @@ async function loadPublishedBrief(
 export async function loadBriefForInvitation(
   token: string,
 ): Promise<{ ok: true; view: PromoterBriefView | null } | { ok: false; reason: string }> {
-  const resolved = await loadInvitationCampaign(token);
+  const resolved = await loadInvitationCampaign(token, "read");
   if (!resolved.ok) return resolved;
 
   const db = createAdminClient();
@@ -104,6 +157,7 @@ export async function loadBriefForInvitation(
       title: brief.title,
       bodyMd: brief.body_md,
       acknowledgedAt: ack?.acknowledged_at ?? null,
+      canAcknowledge: !resolved.expired,
     },
   };
 }
@@ -120,7 +174,7 @@ export async function loadBriefForInvitation(
 export async function acknowledgeBriefForInvitation(
   token: string,
 ): Promise<{ ok: true; acknowledgedAt: string } | { ok: false; reason: string }> {
-  const resolved = await loadInvitationCampaign(token);
+  const resolved = await loadInvitationCampaign(token, "write");
   if (!resolved.ok) return resolved;
 
   const db = createAdminClient();

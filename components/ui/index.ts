@@ -80,3 +80,10 @@ export type { StatTileChip, StatTileDelta } from "./StatTile";
 
 export { ConfirmButton } from "./ConfirmButton";
 export type { ConfirmButtonProps } from "./ConfirmButton";
+
+/* --- Added in F2 (A3-16). Purely additive: the `?lang=` toggle the four promoter
+       pages needed so the complete English dictionary is reachable at all.
+       Nothing above this line changed shape. --- */
+
+export { PromoterLanguageToggle } from "./PromoterLanguageToggle";
+export type { PromoterLanguageToggleProps } from "./PromoterLanguageToggle";

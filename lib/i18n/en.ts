@@ -67,7 +67,8 @@ export const en: Record<TranslationKey, string> = {
   "shifts.needed": "People",
 
   "invitation.title": "New shift",
-  "invitation.question": "Are you available?",
+  // A3-17 — see el.ts.
+  "invitation.question": "Can you take it?",
   "invitation.accept": "Accept",
   "invitation.decline": "Decline",
   "invitation.accepted": "Thank you! The shift is confirmed.",
@@ -1088,6 +1089,14 @@ export const en: Record<TranslationKey, string> = {
   "enforcement.promoters.blocked_limit":
     "You've reached the {plan} plan limit ({limit} promoters). Upgrade from Billing in Settings to add another.",
 
+  // --- A1-05 — see el.ts. Keys only; the wiring is in lane M. ---
+  "enforcement.promoters.blocked_read_only_edit":
+    "The account is read-only right now, so changes to a promoter cannot be saved. See Billing in Settings to continue.",
+  "enforcement.messaging.blocked_read_only_auto":
+    "The account is read-only right now, so the automatic links setting cannot be changed. See Billing in Settings to continue.",
+  "enforcement.messaging.blocked_read_only_send":
+    "The account is read-only right now, so availability links cannot be sent. See Billing in Settings to continue.",
+
   // --- P24 — write guards on the remaining server actions (shifts, campaigns, team, invitations) ---
   "enforcement.invitations.blocked_read_only":
     "This account is read-only right now, so you can't send new invitations. Go to Billing in Settings to continue.",
@@ -1989,7 +1998,77 @@ export const en: Record<TranslationKey, string> = {
   "shifts.import.done.recover_retry": "Nothing was created. You can try again with the same file.",
 
   "invitation.dress_code": "Dress code",
-  "invitation.rate": "Pay",
+  // A3-04 — this is the campaign's HOURLY rate; see el.ts.
+  "invitation.rate": "Pay (per hour)",
 
   "report.photos_preparing": "Preparing the photos…",
+
+  // -------------------------------------------------------------------------------------------
+  // F2 — the promoter-side audit (docs/audit/promoter.md). Greek is the reference locale.
+  // -------------------------------------------------------------------------------------------
+
+  // A3-05
+  "promoter_error.title": "This link does not work",
+  "promoter_error.ask_coordinator": "Ask your coordinator to send you a new link.",
+  "invitation.error.expired": "This invitation has expired.",
+  "invitation.error.bad_token": "The link is not valid — it may have been cut when it was copied.",
+  "invitation.error.not_found": "We could not find this invitation.",
+  "invitation.error.wrong_purpose": "This link is not a shift invitation.",
+  "checkin.error.expired": "This link has expired.",
+  "checkin.error.bad_token": "The link is not valid — it may have been cut when it was copied.",
+  "checkin.error.not_found": "We could not find this shift.",
+  "checkin.error.wrong_purpose": "This link is not an arrival page.",
+  "checkin.error.cancelled": "This shift was cancelled. You do not need to go to the store.",
+
+  // A3-02
+  "invitation.cancelled.title": "The shift was cancelled",
+  "invitation.cancelled.body":
+    "Your coordinator cancelled this shift. You do not need to go to the store.",
+  "invitation.cancelled.ask_coordinator":
+    "If you were not expecting this, talk to your coordinator.",
+
+  // A3-01
+  "promoter.offline": "Not sent — there is no connection. Try again.",
+
+  // A3-11
+  "invitation.sending": "Sending…",
+  "invitation.brief.sending": "Saving…",
+  "invitation.error.already_answered":
+    "This invitation has already been answered. Refresh the page to see the answer.",
+  "invitation.error.generic": "Your answer was not recorded. Try again.",
+
+  // A3-12
+  "invitation.hello": "Hi {name}.",
+  "invitation.from_agency": "From {agency}",
+
+  // A3-17
+  "invitation.message.title": "New shift",
+  "invitation.message.question": "Can you take it?",
+
+  // A3-07
+  "report.validation.number_too_large": "That number is too large.",
+
+  // A3-08
+  "report.success_with_photo_failures_one":
+    "The report was saved, but 1 photo did not upload. Your text and numbers are saved.",
+  "report.success_with_photo_failures_many":
+    "The report was saved, but {count} photos did not upload. Your text and numbers are saved.",
+  "report.photo_failures_tell_coordinator":
+    "Tell your coordinator and send them the photos from your phone.",
+
+  // A3-14
+  "report.confirm_empty.question": "You have not filled anything in. Submit it like this?",
+  "report.confirm_empty.note": "A report is submitted once — after that it cannot be changed.",
+  "report.confirm_empty.yes": "Yes, submit an empty report",
+  "report.confirm_empty.no": "No, let me fill it in",
+
+  // A3-10
+  "promoter_availability.day.invitation_pending":
+    "You have an invitation for this day. Answer it on the invitation link — saying it here is not enough.",
+  "promoter_availability.day.shift_booked":
+    "You have a booked shift on this day. Talk to your coordinator before you change anything.",
+
+  // A3-16 — the value is the OTHER language's own name in each dictionary.
+  "promoter.language.other": "Ελληνικά",
+  "promoter.language.label": "Language",
 };

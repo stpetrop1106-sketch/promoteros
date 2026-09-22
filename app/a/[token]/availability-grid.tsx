@@ -154,6 +154,20 @@ export function AvailabilityGrid({
               </button>
             )}
 
+            {/* A3-10 — the promoter has used the only tool the agency gave them to say they
+                cannot work this day, and nothing here reaches the invitation or the assignment.
+                Say so, and point at the thing that does. Date-only: see `./data.ts`. */}
+            {day.hasBookedShift && (
+              <p className="mt-2 text-xs font-medium text-[color:var(--color-warn)]">
+                {labels.shiftBooked}
+              </p>
+            )}
+            {!day.hasBookedShift && day.hasPendingInvitation && (
+              <p className="mt-2 text-xs font-medium text-[color:var(--color-warn)]">
+                {labels.invitationPending}
+              </p>
+            )}
+
             {day.source && day.source !== "self" && (
               <p className="mt-2 text-xs text-[color:var(--color-muted)]">{labels.byCoordinator}</p>
             )}
@@ -194,6 +208,17 @@ function PartialEditor({
   const [from, setFrom] = useState(initialFrom ?? startTimes[11] ?? "17:00");
   const [to, setTo] = useState(initialTo ?? "");
 
+  /**
+   * A3-18 — choosing 22:00 → 08:00 used to cost a twelve-second round trip to be told the end
+   * must be after the start, on a connection where twelve seconds is normal. The page already
+   * knows. `planRow` on the server stays the real gate; this just stops offering the answer that
+   * is guaranteed to be refused.
+   */
+  const selectableEndTimes = endTimes.filter((time) => time > from);
+  // If the promoter moves "Από" past their existing "Έως", the stale end is no longer on offer;
+  // fall back to "until the end of the day" rather than submitting something the server refuses.
+  const effectiveTo = selectableEndTimes.includes(to) ? to : "";
+
   const selectClass =
     "w-full rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-2 py-2 text-sm";
 
@@ -217,12 +242,12 @@ function PartialEditor({
         <label className="flex-1 text-xs text-[color:var(--color-muted)]">
           {labels.to}
           <select
-            value={to}
+            value={effectiveTo}
             onChange={(e) => setTo(e.target.value)}
             className={`mt-1 ${selectClass}`}
           >
             <option value="">{labels.endOfDay}</option>
-            {endTimes.map((time) => (
+            {selectableEndTimes.map((time) => (
               <option key={time} value={time}>
                 {time}
               </option>
@@ -234,7 +259,7 @@ function PartialEditor({
         <button
           type="button"
           disabled={busy}
-          onClick={() => onApply(from, to === "" ? null : to)}
+          onClick={() => onApply(from, effectiveTo === "" ? null : effectiveTo)}
           className="flex-1 rounded-lg bg-[color:var(--color-accent)] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)] disabled:opacity-50"
         >
           {busy ? labels.saving : labels.apply}

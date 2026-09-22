@@ -85,7 +85,22 @@ async function resolvePromoter(token: string): Promise<Resolved> {
 export type AvailabilityView = {
   promoterName: string;
   /** The fortnight, in order, starting with today in Athens. */
-  days: { date: string; state: DayState }[];
+  days: {
+    date: string;
+    state: DayState;
+    /**
+     * A3-10. A promoter who taps "Δεν μπορώ" on a day they have already been invited to, or
+     * already accepted, has used the tool the agency gave them to say they cannot work — and
+     * nothing happens to that invitation or that assignment. They will believe the message was
+     * received, and be stood up.
+     *
+     * DATE-ONLY, deliberately. This file's header promises the page shows nothing about the
+     * agency — no campaign, no client, no store, no rate, no other promoter — and a bare flag on
+     * a date keeps that promise while still routing the promoter to the action that works.
+     */
+    hasPendingInvitation: boolean;
+    hasBookedShift: boolean;
+  }[];
 };
 
 export type LoadResult =
@@ -102,13 +117,35 @@ export async function loadAvailability(token: string): Promise<LoadResult> {
   if (!first || !last) return { ok: false, reason: "save_failed" };
 
   const db = createAdminClient();
-  const { data, error } = await db
-    .from("availability")
-    .select("on_date, status, from_time, to_time, source")
-    .eq("promoter_id", resolved.promoter.id)
-    .gte("on_date", first)
-    .lte("on_date", last);
 
+  // A3-10 — two extra reads, both pinned to this promoter's own id and both selecting the shift
+  // DATE and nothing else. `shifts!inner(on_date)` so the date range filters the join rather than
+  // pulling the promoter's whole history, and `neq("status", "cancelled")` so a shift the agency
+  // already cancelled never produces a warning.
+  const [availabilityResult, assignmentResult, invitationResult] = await Promise.all([
+    db
+      .from("availability")
+      .select("on_date, status, from_time, to_time, source")
+      .eq("promoter_id", resolved.promoter.id)
+      .gte("on_date", first)
+      .lte("on_date", last),
+    db
+      .from("assignments")
+      .select("shifts!inner(on_date)")
+      .eq("promoter_id", resolved.promoter.id)
+      .neq("status", "cancelled")
+      .gte("shifts.on_date", first)
+      .lte("shifts.on_date", last),
+    db
+      .from("invitations")
+      .select("shifts!inner(on_date)")
+      .eq("promoter_id", resolved.promoter.id)
+      .eq("status", "pending")
+      .gte("shifts.on_date", first)
+      .lte("shifts.on_date", last),
+  ]);
+
+  const { data, error } = availabilityResult;
   if (error) return { ok: false, reason: "save_failed" };
 
   const rows = (data ?? []) as unknown as (AvailabilityRow & { on_date: string })[];
@@ -119,11 +156,30 @@ export async function loadAvailability(token: string): Promise<LoadResult> {
     else byDate.set(row.on_date, [row]);
   }
 
+  /**
+   * A failure on either of the two extra reads is swallowed into an empty set rather than
+   * failing the page: the warning is an improvement on top of the grid, and losing it must never
+   * cost the promoter the ability to declare their availability at all.
+   */
+  const datesFrom = (result: { data: unknown }): Set<string> => {
+    const shiftRows = (result.data ?? []) as { shifts: { on_date: string } | null }[];
+    return new Set(
+      shiftRows.map((row) => row.shifts?.on_date).filter((date): date is string => Boolean(date)),
+    );
+  };
+  const bookedDates = datesFrom(assignmentResult);
+  const invitedDates = datesFrom(invitationResult);
+
   return {
     ok: true,
     view: {
       promoterName: resolved.promoter.fullName,
-      days: dates.map((date) => ({ date, state: summariseDay(byDate.get(date) ?? []) })),
+      days: dates.map((date) => ({
+        date,
+        state: summariseDay(byDate.get(date) ?? []),
+        hasPendingInvitation: invitedDates.has(date),
+        hasBookedShift: bookedDates.has(date),
+      })),
     },
   };
 }

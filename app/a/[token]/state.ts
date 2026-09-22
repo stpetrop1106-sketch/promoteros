@@ -50,6 +50,13 @@ export type GridDay = {
   /** `self` means the promoter said it. Anything else was entered for them. */
   source: "self" | "coordinator" | "inferred" | null;
   contradictory: boolean;
+  /**
+   * A3-10 — this date already carries a pending invitation, or a confirmed shift. A date-only
+   * flag: `app/a/[token]/data.ts` explains why nothing about the campaign, client or store may
+   * cross onto this page.
+   */
+  hasPendingInvitation: boolean;
+  hasBookedShift: boolean;
 };
 
 /** Every string the grid renders, resolved through `t()` on the server and passed down. */
@@ -67,5 +74,8 @@ export type GridLabels = {
   saved: string;
   byCoordinator: string;
   contradiction: string;
+  /** A3-10. */
+  invitationPending: string;
+  shiftBooked: string;
   errors: Record<SaveFailure, string>;
 };

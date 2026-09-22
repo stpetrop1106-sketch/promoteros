@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { loadCheckin } from "@/lib/checkins";
-import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { Markdown } from "@/components/ui";
+import { translatorFor } from "@/lib/i18n";
+import { Markdown, PromoterLanguageToggle } from "@/components/ui";
 import { CheckinForm } from "./checkin-form";
+import { CheckinErrorScreen } from "./error-screen";
 import { formatShiftWhen } from "@/lib/shift-format";
 import { athensDate } from "@/lib/exceptions";
+import {
+  langQuery,
+  localeFromSearchParams,
+  otherLocale,
+  type PromoterSearchParams,
+} from "@/lib/promoter-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -18,20 +25,18 @@ export const dynamic = "force-dynamic";
  */
 export default async function CheckinPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ token: string }>;
+  searchParams?: PromoterSearchParams;
 }) {
   const { token } = await params;
-  const t = translatorFor(DEFAULT_LOCALE);
+  const locale = localeFromSearchParams(await searchParams);
+  const t = translatorFor(locale);
   const result = await loadCheckin(token);
 
-  if (!result.ok) {
-    return (
-      <main className="mx-auto max-w-md px-6 py-16 text-center">
-        <p className="text-[color:var(--color-muted)]">{t("checkin.expired")}</p>
-      </main>
-    );
-  }
+  // A3-05 — including `cancelled`, which used to be told "the link has expired".
+  if (!result.ok) return <CheckinErrorScreen reason={result.reason} locale={locale} />;
 
   const v = result.view;
   // The agency's wall clock, not the server's. `toISOString()` is UTC, and Athens runs two to three
@@ -61,6 +66,8 @@ export default async function CheckinPage({
     geoTimeout: t("checkin.geo_timeout"),
     geoUnsupported: t("checkin.geo_unsupported"),
     geoInsecure: t("checkin.geo_insecure"),
+    offline: t("promoter.offline"),
+    alreadyCheckedIn: t("checkin.already_checked_in_error"),
     saveFailedByReason: {
       already_checked_in: t("checkin.already_checked_in_error"),
       default: t("checkin.save_failed"),
@@ -112,7 +119,7 @@ export default async function CheckinPage({
             </p>
           )}
           <Link
-            href={`/c/${token}/report`}
+            href={{ pathname: `/c/${token}/report`, query: langQuery(locale) }}
             className="inline-block rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
           >
             {t("checkin.go_to_report")}
@@ -123,19 +130,32 @@ export default async function CheckinPage({
           {t("checkin.not_yet_time")}
         </p>
       ) : (
-        <CheckinForm token={token} reportHref={`/c/${token}/report`} labels={labels} />
+        <CheckinForm
+          token={token}
+          reportHref={`/c/${token}/report`}
+          reportQuery={langQuery(locale)}
+          labels={labels}
+        />
       )}
 
       {/* P32 · Gate 1. This is the page where location is asked for, so it is the page where
-          the notice explaining that no location is stored matters most. */}
-      <p className="mt-10 text-center text-xs">
+          the notice explaining that no location is stored matters most.
+          A3-22 — a 44px target instead of a 15px line of grey text. */}
+      <div className="mt-10 flex items-center justify-center gap-2 text-center">
         <Link
-          className="text-[color:var(--color-muted)] underline underline-offset-2"
-          href={`/c/${token}/privacy`}
+          className="inline-flex min-h-[44px] items-center px-3 py-2 text-sm text-[color:var(--color-muted)] underline underline-offset-2"
+          href={{ pathname: `/c/${token}/privacy`, query: langQuery(locale) }}
         >
           {t("promoter_privacy.link")}
         </Link>
-      </p>
+        <span aria-hidden className="text-[color:var(--color-line)]">·</span>
+        <PromoterLanguageToggle
+          pathname={`/c/${token}`}
+          query={langQuery(otherLocale(locale))}
+          label={t("promoter.language.label")}
+          otherLabel={t("promoter.language.other")}
+        />
+      </div>
     </main>
   );
 }

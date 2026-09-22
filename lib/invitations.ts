@@ -20,8 +20,12 @@ const t = translatorFor(DEFAULT_LOCALE);
 export type InvitationView = {
   invitationId: string;
   promoterName: string;
+  /** A3-12 — who the invitation is from. A promoter working for three agencies could not tell. */
+  agencyName: string;
   campaignName: string;
   storeName: string;
+  /** A3-13 — "ΑΒ Βασιλόπουλος" is not an answer to "can you work this?"; how far away it is, is. */
+  storeAddress: string | null;
   onDate: string;
   startTime: string;
   endTime: string;
@@ -98,13 +102,17 @@ export async function createInvitation(
   const store = shift.stores as unknown as { name: string } | null;
   const url = linkFor(token, "invitation");
 
+  // A3-17 — these two lines were string literals in this file: the only user-facing strings in
+  // the product not behind a key, in a module that already holds a `t`. They also addressed
+  // everyone in the feminine ("Είσαι διαθέσιμη;"), which the roster makes wrong for a good share
+  // of the people receiving it. Both are keys now, and the question is phrased without a gender.
   const body = [
-    "Νέα βάρδια",
+    t("invitation.message.title"),
     campaign?.name ?? "",
     store?.name ?? "",
     formatShiftWhen(shift.on_date, String(shift.start_time), String(shift.end_time)),
     "",
-    "Είσαι διαθέσιμη;",
+    t("invitation.message.question"),
   ]
     .filter(Boolean)
     .join("\n");
@@ -151,7 +159,11 @@ export async function loadInvitation(token: string): Promise<
       // `app/campaigns/[id]/shifts/new/actions.ts` and, until this line, was read by nothing:
       // the coordinator set "Αμοιβή για αυτές τις βάρδιες" and the promoter was still quoted the
       // campaign's own rate. The override is what the shift pays when it is set.
-      "id, status, token_hash, expires_at, promoters(full_name), shifts(on_date, start_time, end_time, rate_cents_override, campaigns(name, dress_code, rate_cents), stores(name))",
+      // A3-12 adds `agencies(name)` and A3-13 adds `stores(address)`. Both are already visible to
+      // this promoter by other means (the agency is named in the privacy notice they can reach
+      // from this page; the address is on the arrival page they get after accepting) — no new
+      // class of data reaches the link, it is only shown at the moment the decision is made.
+      "id, status, token_hash, expires_at, agencies(name), promoters(full_name), shifts(on_date, start_time, end_time, rate_cents_override, campaigns(name, dress_code, rate_cents), stores(name, address))",
     )
     .eq("id", verified.recordId)
     .single();
@@ -166,9 +178,10 @@ export async function loadInvitation(token: string): Promise<
     end_time: string;
     rate_cents_override: number | null;
     campaigns: { name: string; dress_code: string | null; rate_cents: number } | null;
-    stores: { name: string } | null;
+    stores: { name: string; address: string | null } | null;
   } | null;
   const promoter = data.promoters as unknown as { full_name: string } | null;
+  const agency = data.agencies as unknown as { name: string } | null;
 
   if (!shift) return { ok: false, reason: "not_found" };
   if (
@@ -183,8 +196,10 @@ export async function loadInvitation(token: string): Promise<
     view: {
       invitationId: data.id,
       promoterName: promoter?.full_name ?? "",
+      agencyName: agency?.name ?? "",
       campaignName: shift.campaigns?.name ?? "",
       storeName: shift.stores?.name ?? "",
+      storeAddress: shift.stores?.address ?? null,
       onDate: shift.on_date,
       startTime: String(shift.start_time).slice(0, 5),
       endTime: String(shift.end_time).slice(0, 5),

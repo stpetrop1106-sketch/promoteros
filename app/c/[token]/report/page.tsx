@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { loadCheckin } from "@/lib/checkins";
-import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { translatorFor } from "@/lib/i18n";
 import { ReportForm } from "./report-form";
 import { submitReport } from "./actions";
+import { CheckinErrorScreen } from "../error-screen";
 import { formatShiftWhen } from "@/lib/shift-format";
+import {
+  langQuery,
+  localeFromSearchParams,
+  type PromoterSearchParams,
+} from "@/lib/promoter-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -16,20 +22,18 @@ export const dynamic = "force-dynamic";
  */
 export default async function ReportPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ token: string }>;
+  searchParams?: PromoterSearchParams;
 }) {
   const { token } = await params;
-  const t = translatorFor(DEFAULT_LOCALE);
+  const locale = localeFromSearchParams(await searchParams);
+  const t = translatorFor(locale);
   const result = await loadCheckin(token);
 
-  if (!result.ok) {
-    return (
-      <main className="mx-auto max-w-md px-6 py-16 text-center">
-        <p className="text-[color:var(--color-muted)]">{t("checkin.expired")}</p>
-      </main>
-    );
-  }
+  // A3-05 — the same named-reason screen the arrival page now uses.
+  if (!result.ok) return <CheckinErrorScreen reason={result.reason} locale={locale} />;
 
   const v = result.view;
 
@@ -38,7 +42,7 @@ export default async function ReportPage({
       <main className="mx-auto max-w-md px-6 py-16 text-center">
         <p className="text-[color:var(--color-muted)]">{t("report.checkin_required_notice")}</p>
         <Link
-          href={`/c/${token}`}
+          href={{ pathname: `/c/${token}`, query: langQuery(locale) }}
           className="mt-6 inline-block rounded-lg bg-[color:var(--color-accent)] px-4 py-3 font-semibold text-white transition hover:bg-[color:var(--color-accent-hover)]"
         >
           {t("report.back_to_checkin")}
@@ -68,7 +72,14 @@ export default async function ReportPage({
     submit: t("report.submit"),
     submitting: t("report.submitting"),
     success: t("report.success"),
-    successWithPhotoFailures: t("report.success_with_photo_failures"),
+    successWithPhotoFailuresOne: t("report.success_with_photo_failures_one"),
+    successWithPhotoFailuresMany: t("report.success_with_photo_failures_many"),
+    photoFailuresTellCoordinator: t("report.photo_failures_tell_coordinator"),
+    offline: t("promoter.offline"),
+    confirmEmptyQuestion: t("report.confirm_empty.question"),
+    confirmEmptyNote: t("report.confirm_empty.note"),
+    confirmEmptyYes: t("report.confirm_empty.yes"),
+    confirmEmptyNo: t("report.confirm_empty.no"),
   };
 
   return (
@@ -84,7 +95,7 @@ export default async function ReportPage({
         </div>
       </dl>
 
-      <ReportForm action={submitReport.bind(null, token)} labels={labels} />
+      <ReportForm action={submitReport.bind(null, token, locale)} labels={labels} />
     </main>
   );
 }

@@ -1,18 +1,29 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { submitFieldReport, attachReportPhoto, type FieldReportInput } from "@/lib/checkins";
-import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { translatorFor, type Locale } from "@/lib/i18n";
+import { readReportValues } from "./state";
 import type { ReportActionState, ReportFieldErrors } from "./state";
 
-// Same shape as app/promoters/actions.ts's field-error pattern: server-rendered validation
-// messages in the reference locale, since promoter-facing pages have no locale switcher yet.
-const t = translatorFor(DEFAULT_LOCALE);
+/**
+ * A3-16 — the locale is now bound by the page (`submitReport.bind(null, token, locale)`) rather
+ * than pinned to `DEFAULT_LOCALE`, so a promoter reading the form in English gets its validation
+ * messages in English too.
+ */
 
 /** `value` is always present so a caller never needs to cast after checking `ok` on a sibling
  *  field — it is simply ignored (left `null`) when parsing failed. */
-type ParsedNumber = { ok: boolean; value: number | null };
+type ParsedNumber = { ok: boolean; value: number | null; reason?: "too_large" };
 type ParsedText = { ok: boolean; value: string | null };
+
+/**
+ * A3-07 — the upper bound is the point. `field_reports.units_promoted` and its siblings are
+ * Postgres `integer` (0001_init.sql), and `1e24` satisfies `Number.isInteger` and `>= 0`, so it
+ * used to pass the browser, pass this function, and then fail at the database with
+ * `save_failed` — a generic "try again" that could never work, on a form that cannot be edited
+ * afterwards. Named here, on the field, instead.
+ */
+const MAX_PG_INT = 2_147_483_647;
 
 function parseOptionalNonNegativeInt(raw: FormDataEntryValue | null): ParsedNumber {
   if (raw === null) return { ok: true, value: null };
@@ -20,6 +31,7 @@ function parseOptionalNonNegativeInt(raw: FormDataEntryValue | null): ParsedNumb
   if (s === "") return { ok: true, value: null };
   const n = Number(s);
   if (!Number.isFinite(n) || !Number.isInteger(n) || n < 0) return { ok: false, value: null };
+  if (n > MAX_PG_INT) return { ok: false, value: null, reason: "too_large" };
   return { ok: true, value: n };
 }
 
@@ -31,7 +43,7 @@ function parseOptionalText(raw: FormDataEntryValue | null, maxLen: number): Pars
   return { ok: true, value: s };
 }
 
-function submitErrorMessage(reason: string): string {
+function submitErrorMessage(t: ReturnType<typeof translatorFor>, reason: string): string {
   switch (reason) {
     case "checkin_required":
       return t("report.error.checkin_required");
@@ -65,19 +77,25 @@ function submitErrorMessage(reason: string): string {
  */
 export async function submitReport(
   token: string,
+  locale: Locale,
   _prevState: ReportActionState,
   formData: FormData,
 ): Promise<ReportActionState> {
+  const t = translatorFor(locale);
   const errors: ReportFieldErrors = {};
+  const numberError = (parsed: ParsedNumber) =>
+    parsed.reason === "too_large"
+      ? t("report.validation.number_too_large")
+      : t("report.validation.number_invalid");
 
   const units = parseOptionalNonNegativeInt(formData.get("unitsPromoted"));
-  if (!units.ok) errors.unitsPromoted = t("report.validation.number_invalid");
+  if (!units.ok) errors.unitsPromoted = numberError(units);
 
   const sales = parseOptionalNonNegativeInt(formData.get("salesCount"));
-  if (!sales.ok) errors.salesCount = t("report.validation.number_invalid");
+  if (!sales.ok) errors.salesCount = numberError(sales);
 
   const interactions = parseOptionalNonNegativeInt(formData.get("interactionsCount"));
-  if (!interactions.ok) errors.interactionsCount = t("report.validation.number_invalid");
+  if (!interactions.ok) errors.interactionsCount = numberError(interactions);
 
   const stockIssues = parseOptionalText(formData.get("stockIssues"), 2000);
   if (!stockIssues.ok) errors.stockIssues = t("report.validation.too_long");
@@ -89,7 +107,7 @@ export async function submitReport(
   if (!notes.ok) errors.notes = t("report.validation.too_long");
 
   if (Object.keys(errors).length > 0) {
-    return { status: "error", errors };
+    return { status: "error", errors, values: readReportValues(formData) };
   }
 
   const input: FieldReportInput = {
@@ -103,7 +121,11 @@ export async function submitReport(
 
   const result = await submitFieldReport(token, input);
   if (!result.ok) {
-    return { status: "error", errors: { general: submitErrorMessage(result.reason) } };
+    return {
+      status: "error",
+      errors: { general: submitErrorMessage(t, result.reason) },
+      values: readReportValues(formData),
+    };
   }
 
   // The report is saved as of this line. Everything below is best-effort — see the
@@ -128,6 +150,12 @@ export async function submitReport(
     }
   }
 
-  revalidatePath(`/c/${token}/report`);
+  // A3-08 — there is deliberately NO `revalidatePath` here. It used to run before this return,
+  // which re-rendered `page.tsx` with `hasReport` already true; the page then returned its
+  // terminal "already submitted" screen and unmounted the form together with the success state
+  // this line produces. The consequence was that a promoter whose photo the server rejected was
+  // never told: the warning string existed and was unreachable. The page is `force-dynamic`, so
+  // nothing is cached and a reload still shows the terminal screen — the revalidate bought
+  // nothing and cost the only message that mattered.
   return { status: "success", photosSaved, photosFailed };
 }

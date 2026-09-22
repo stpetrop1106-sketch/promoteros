@@ -65,7 +65,8 @@ export const el = {
   "shifts.needed": "Άτομα",
 
   "invitation.title": "Νέα βάρδια",
-  "invitation.question": "Είσαι διαθέσιμη;",
+  // A3-17 — was "Είσαι διαθέσιμη;", feminine. The roster contains men.
+  "invitation.question": "Μπορείς να την αναλάβεις;",
   "invitation.accept": "Αποδοχή",
   "invitation.decline": "Απόρριψη",
   "invitation.accepted": "Ευχαριστούμε! Η βάρδια καταχωρήθηκε.",
@@ -1108,6 +1109,14 @@ export const el = {
   "enforcement.promoters.blocked_limit":
     "Έφτασες το όριο του πακέτου {plan} ({limit} promoters). Αναβάθμισε από τη Χρέωση στις Ρυθμίσεις για να προσθέσεις άλλον.",
 
+  // --- A1-05 — the write gates the manager is adding. Keys only; the wiring is in lane M. ---
+  "enforcement.promoters.blocked_read_only_edit":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να αποθηκεύσεις αλλαγές σε promoter. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
+  "enforcement.messaging.blocked_read_only_auto":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε η ρύθμιση για τους αυτόματους συνδέσμους δεν αλλάζει. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
+  "enforcement.messaging.blocked_read_only_send":
+    "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να στείλεις συνδέσμους διαθεσιμότητας. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
+
   // --- P24 — write guards on the remaining server actions (shifts, campaigns, team, invitations) ---
   "enforcement.invitations.blocked_read_only":
     "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να στείλεις νέες προσκλήσεις. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
@@ -2027,7 +2036,83 @@ export const el = {
   "shifts.import.done.recover_retry": "Δεν δημιουργήθηκε τίποτα. Μπορείς να ξαναδοκιμάσεις με το ίδιο αρχείο.",
 
   "invitation.dress_code": "Ενδυμασία",
-  "invitation.rate": "Αμοιβή",
+  // A3-04 — this is the campaign's HOURLY rate. Shown bare, it read as the pay for the whole
+  // shift, which on an eight-hour day is an alarming number and a false one.
+  "invitation.rate": "Αμοιβή (ανά ώρα)",
 
   "report.photos_preparing": "Ετοιμάζουμε τις φωτογραφίες…",
+
+  // -------------------------------------------------------------------------------------------
+  // F2 — the promoter-side audit (docs/audit/promoter.md). Greek is written for a promoter
+  // standing in a supermarket on one bar of signal, not translated from the English.
+  // -------------------------------------------------------------------------------------------
+
+  // A3-05 · /i and /c answered every failure with "expired". Each reason gets its own sentence,
+  // in the shape /a already proves works.
+  "promoter_error.title": "Ο σύνδεσμος δεν λειτουργεί",
+  "promoter_error.ask_coordinator":
+    "Ζήτησε από τον συντονιστή σου να σου στείλει καινούργιο σύνδεσμο.",
+  "invitation.error.expired": "Αυτή η πρόσκληση έληξε.",
+  "invitation.error.bad_token":
+    "Ο σύνδεσμος δεν είναι έγκυρος — μπορεί να κόπηκε όταν αντιγράφηκε.",
+  "invitation.error.not_found": "Δεν βρήκαμε αυτή την πρόσκληση.",
+  "invitation.error.wrong_purpose": "Αυτός ο σύνδεσμος δεν είναι πρόσκληση σε βάρδια.",
+  "checkin.error.expired": "Αυτός ο σύνδεσμος έληξε.",
+  "checkin.error.bad_token":
+    "Ο σύνδεσμος δεν είναι έγκυρος — μπορεί να κόπηκε όταν αντιγράφηκε.",
+  "checkin.error.not_found": "Δεν βρήκαμε αυτή τη βάρδια.",
+  "checkin.error.wrong_purpose": "Αυτός ο σύνδεσμος δεν είναι σελίδα άφιξης.",
+  "checkin.error.cancelled": "Αυτή η βάρδια ακυρώθηκε. Δεν χρειάζεται να πας στο κατάστημα.",
+
+  // A3-02 · a cancelled assignment must replace the confirmation, never sit underneath it.
+  "invitation.cancelled.title": "Η βάρδια ακυρώθηκε",
+  "invitation.cancelled.body":
+    "Ο συντονιστής ακύρωσε αυτή τη βάρδια. Δεν χρειάζεται να πας στο κατάστημα.",
+  "invitation.cancelled.ask_coordinator": "Αν δεν το περίμενες, μίλα με τον συντονιστή σου.",
+
+  // A3-01 · a submit that never reached the server used to fail in complete silence.
+  "promoter.offline": "Δεν στάλθηκε — δεν υπάρχει σύνδεση. Δοκίμασε ξανά.",
+
+  // A3-11 · the invitation buttons showed nothing at all while they ran.
+  "invitation.sending": "Αποστολή…",
+  "invitation.brief.sending": "Αποθήκευση…",
+  "invitation.error.already_answered":
+    "Αυτή η πρόσκληση έχει ήδη απαντηθεί. Ανανέωσε τη σελίδα για να δεις την απάντηση.",
+  "invitation.error.generic": "Δεν καταγράφηκε η απάντησή σου. Δοκίμασε ξανά.",
+
+  // A3-12 · the invitation never said who it was from, or who it was for.
+  "invitation.hello": "Γεια σου {name}.",
+  "invitation.from_agency": "Από {agency}",
+
+  // A3-17 · the pasted message was hardcoded Greek and addressed everyone in the feminine.
+  "invitation.message.title": "Νέα βάρδια",
+  "invitation.message.question": "Μπορείς να την αναλάβεις;",
+
+  // A3-07 · a number too large for an `integer` column used to die at the database.
+  "report.validation.number_too_large": "Ο αριθμός είναι πολύ μεγάλος.",
+
+  // A3-08 · the photo-failure warning existed but could never be reached.
+  "report.success_with_photo_failures_one":
+    "Η αναφορά καταχωρήθηκε, αλλά 1 φωτογραφία δεν ανέβηκε. Το κείμενο και οι αριθμοί είναι αποθηκευμένα.",
+  "report.success_with_photo_failures_many":
+    "Η αναφορά καταχωρήθηκε, αλλά {count} φωτογραφίες δεν ανέβηκαν. Το κείμενο και οι αριθμοί είναι αποθηκευμένα.",
+  "report.photo_failures_tell_coordinator":
+    "Πες το στον συντονιστή σου και στείλε του τις φωτογραφίες από το κινητό σου.",
+
+  // A3-14 · a stray tap filed an empty report and locked out the real one.
+  "report.confirm_empty.question": "Δεν συμπλήρωσες τίποτα. Να υποβληθεί έτσι;",
+  "report.confirm_empty.note": "Η αναφορά υποβάλλεται μία φορά — μετά δεν αλλάζει.",
+  "report.confirm_empty.yes": "Ναι, υποβολή κενής αναφοράς",
+  "report.confirm_empty.no": "Όχι, να τη συμπληρώσω",
+
+  // A3-10 · "Δεν μπορώ" on a day that already carries a shift did nothing about that shift.
+  "promoter_availability.day.invitation_pending":
+    "Έχεις πρόσκληση για αυτή τη μέρα. Απάντησε στον σύνδεσμο της πρόσκλησης — εδώ δεν φτάνει.",
+  "promoter_availability.day.shift_booked":
+    "Έχεις κλεισμένη βάρδια αυτή τη μέρα. Μίλα με τον συντονιστή σου πριν αλλάξεις κάτι.",
+
+  // A3-16 · English was complete in the dictionary and unreachable on every promoter page.
+  // The value is deliberately the OTHER language's own name in each dictionary.
+  "promoter.language.other": "English",
+  "promoter.language.label": "Γλώσσα",
 } as const;

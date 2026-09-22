@@ -7,10 +7,17 @@ import {
   isoAsUtcDate,
   type DayState,
 } from "@/lib/availability-links";
-import { translatorFor, DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
+import { translatorFor, type Locale } from "@/lib/i18n";
+import { PromoterLanguageToggle } from "@/components/ui";
 import { loadAvailability } from "./data";
 import { AvailabilityGrid } from "./availability-grid";
 import type { GridDay, GridLabels, SaveFailure } from "./state";
+import {
+  langQuery,
+  localeFromSearchParams,
+  otherLocale,
+  type PromoterSearchParams,
+} from "@/lib/promoter-locale";
 
 export const dynamic = "force-dynamic";
 
@@ -97,33 +104,39 @@ function ErrorScreen({ reason, locale }: { reason: SaveFailure; locale: Locale }
 
 export default async function PromoterAvailabilityPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ token: string }>;
+  searchParams?: PromoterSearchParams;
 }) {
   const { token } = await params;
-  const locale = DEFAULT_LOCALE;
+  const locale = localeFromSearchParams(await searchParams);
   const t = translatorFor(locale);
 
   const result = await loadAvailability(token);
   if (!result.ok) return <ErrorScreen reason={result.reason} locale={locale} />;
 
   const today = athensToday();
-  const days: GridDay[] = result.view.days.map(({ date, state }) => {
-    const { weekday, dayLabel, isWeekend } = formatDay(date, locale);
-    return {
-      date,
-      weekday,
-      dayLabel,
-      isToday: date === today,
-      isWeekend,
-      choice: state.choice,
-      fromTime: state.fromTime,
-      toTime: state.toTime,
-      summary: summarise(state, t),
-      source: state.source,
-      contradictory: state.contradictory,
-    };
-  });
+  const days: GridDay[] = result.view.days.map(
+    ({ date, state, hasPendingInvitation, hasBookedShift }) => {
+      const { weekday, dayLabel, isWeekend } = formatDay(date, locale);
+      return {
+        date,
+        weekday,
+        dayLabel,
+        isToday: date === today,
+        isWeekend,
+        choice: state.choice,
+        fromTime: state.fromTime,
+        toTime: state.toTime,
+        summary: summarise(state, t),
+        source: state.source,
+        contradictory: state.contradictory,
+        hasPendingInvitation,
+        hasBookedShift,
+      };
+    },
+  );
 
   const labels: GridLabels = {
     available: t("promoter_availability.choice.available"),
@@ -139,6 +152,8 @@ export default async function PromoterAvailabilityPage({
     saved: t("promoter_availability.saved"),
     byCoordinator: t("promoter_availability.source.coordinator"),
     contradiction: t("promoter_availability.source.contradiction"),
+    invitationPending: t("promoter_availability.day.invitation_pending"),
+    shiftBooked: t("promoter_availability.day.shift_booked"),
     errors: {
       bad_token: t("promoter_availability.error.bad_token"),
       expired: t("promoter_availability.error.expired"),
@@ -175,15 +190,23 @@ export default async function PromoterAvailabilityPage({
         {t("promoter_availability.footer")}
       </p>
 
-      {/* P32 · Gate 1 — a promoter-facing page must reach the privacy notice without a login. */}
-      <p className="mt-6 text-center text-xs">
+      {/* P32 · Gate 1 — a promoter-facing page must reach the privacy notice without a login.
+          A3-22 — a 44px target instead of a 15px line of grey text. */}
+      <div className="mt-6 flex items-center justify-center gap-2 text-center">
         <Link
-          className="text-[color:var(--color-muted)] underline underline-offset-2"
-          href={`/a/${token}/privacy`}
+          className="inline-flex min-h-[44px] items-center px-3 py-2 text-sm text-[color:var(--color-muted)] underline underline-offset-2"
+          href={{ pathname: `/a/${token}/privacy`, query: langQuery(locale) }}
         >
           {t("promoter_privacy.link")}
         </Link>
-      </p>
+        <span aria-hidden className="text-[color:var(--color-line)]">·</span>
+        <PromoterLanguageToggle
+          pathname={`/a/${token}`}
+          query={langQuery(otherLocale(locale))}
+          label={t("promoter.language.label")}
+          otherLabel={t("promoter.language.other")}
+        />
+      </div>
     </main>
   );
 }
