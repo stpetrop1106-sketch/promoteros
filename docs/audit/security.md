@@ -947,3 +947,33 @@ This is the mechanism `app_user_invites` should be replaced by.
    policy decision around it is the part that needs the owner's sign-off.
 4. **A1-05** and **A1-07** before launch. **A1-06**, **A1-09**, **A1-10**, **A1-11** in a quiet
    moment. **A1-08** when `lib/tokens.ts` is next owned.
+
+---
+
+## Verification after migration 0018 (2026-09-22)
+
+Re-run of the original attacks against the patched production database, with the **public anon key**,
+from a throwaway agency that the probe creates and deletes (`scratchpad/verify-0018.mjs`).
+
+| Attack | Before | After |
+| --- | --- | --- |
+| A1-01 — coordinator INSERTs an `owner` invite | created an owner | **HTTP 403 `42501`** |
+| A1-01b — coordinator PATCHes their own invite to `owner` | succeeded | **HTTP 403 `42501`** |
+| A1-02 — anonymous drives `increment_waitlist_rate_limit` | executed | **HTTP 401 `42501`** |
+| A1-04 — anonymous calls `admin_suspend_agency` | reached the body | **HTTP 401 `42501`** |
+
+The denial is `permission denied for table/function` — a **grant-level** refusal, which happens before
+RLS and therefore does not depend on the attacker's role being read correctly.
+
+The paths the product needs were re-checked in the same run and still work: an anonymous visitor can
+open a staff invitation link (200), a signed-in user is provisioned (`ensure_app_user` → 200, and the
+seeded coordinator really comes back as `role: coordinator`), and an owner can still invite staff
+(200; a later run returns `seat_limit_reached`, which is the trial's own seat rule, not a grant).
+
+**Two lessons, both already paid for once in this repo.** The first run of this probe reported four
+neat "BLOCKED" lines while holding *no session at all* (`Expected 3 parts in JWT; got 1`) — a negative
+path that short-circuits proves nothing. The second run reported "BROKEN — an owner can no longer
+invite staff" purely because the probe guessed the RPC argument names: `create_agency_for_user` takes
+`(p_name, p_city, p_timezone, p_full_name)` and `invite_team_member` takes `p_invitation_id`, not
+`p_agency_id`; a wrong name is PGRST202, which is an HTTP **404** and reads exactly like a revoked
+grant. Argument names now come from `pg_proc`, the same way the migration itself does.
