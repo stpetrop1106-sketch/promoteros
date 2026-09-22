@@ -2,6 +2,7 @@ import { createServerClient, type CookieMethodsServer } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { createRateLimiter } from "@/lib/rate-limit";
 
 /**
  * P22 — the suspension explanation, and its sign-out escape hatch.
@@ -114,8 +115,85 @@ async function handleSignOut(request: NextRequest): Promise<NextResponse> {
   return response;
 }
 
+
+/**
+ * The promoter-facing token routes, which until now had no limit of any kind.
+ *
+ * The A3 audit fired 40 requests at `/i/<garbage>` and 25 at a valid `/a/<token>` and was
+ * answered every time, each answer costing two database reads through the service-role client.
+ * The signature is not brute-forceable, so what is at stake is availability and our Supabase
+ * bill — made worse by the availability link living for eight weeks with no way to revoke it.
+ *
+ * Keyed on the caller's address and the route family, never on the token: keying on the
+ * credential would let anyone lock a promoter out of their own shift by replaying their link.
+ *
+ * 60 a minute is deliberately generous. Greek mobile carriers put many subscribers behind one
+ * address, so several promoters opening their links from the same network must not collide; a
+ * real promoter loads a handful of pages, a script loads thousands. See lib/rate-limit.ts for
+ * what this does NOT guarantee — the counter is per instance, not global.
+ */
+const PROMOTER_PREFIXES = ["/i/", "/c/", "/a/"];
+const promoterLimiter = createRateLimiter({ limit: 60, windowMs: 60_000 });
+
+function callerKey(request: NextRequest): string {
+  // Vercel sets x-forwarded-for; the left-most entry is the client. Locally there is none, and
+  // every caller shares one bucket, which is the conservative direction.
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+  const family = request.nextUrl.pathname.slice(0, 3);
+  return `${ip}${family}`;
+}
+
+function tooManyRequests(retryAfterSeconds: number): NextResponse {
+  const t = translatorFor(DEFAULT_LOCALE);
+  const html = `<!doctype html>
+<html lang="${DEFAULT_LOCALE}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${t("rate_limit.title")}</title>
+<style>
+  :root { color-scheme: light; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: #f4f0e8; color: #1f1b17;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 420px; }
+  h1 { font-size: 1.15rem; font-weight: 600; margin: 0 0 12px; }
+  p { font-size: 0.95rem; line-height: 1.6; color: #7d7466; margin: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>${t("rate_limit.title")}</h1>
+  <p>${t("rate_limit.body")}</p>
+</main>
+</body>
+</html>`;
+
+  return new NextResponse(html, {
+    status: 429,
+    headers: {
+      "content-type": "text/html; charset=utf-8",
+      "retry-after": String(retryAfterSeconds),
+      "cache-control": "no-store",
+    },
+  });
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  if (PROMOTER_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+    const decision = promoterLimiter.check(callerKey(request));
+    if (!decision.allowed) return tooManyRequests(decision.retryAfterSeconds);
+
+    // Deliberately NOT updateSession(): these routes are anonymous by design, and refreshing a
+    // session against the auth server on every promoter tap is the round trip the matcher was
+    // kept narrow to avoid.
+    return NextResponse.next();
+  }
 
   if (pathname === SUSPENDED_PATH) {
     if (request.method === "POST" && searchParams.get("action") === "signout") {
@@ -159,5 +237,10 @@ export const config = {
     "/campaigns/:path*",
     "/settings/:path*",
     "/login",
+    // Added for rate limiting only. The handler above answers these and returns before any auth
+    // work happens, so the round trip the note above warns about is still not paid.
+    "/i/:path*",
+    "/c/:path*",
+    "/a/:path*",
   ],
 };
