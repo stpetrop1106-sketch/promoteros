@@ -4,6 +4,7 @@ import { periodKeyFor } from "@/lib/dispatch/period";
 import { runAvailabilityLinks, runCheckinLinks, type RunSummary } from "@/lib/dispatch/run";
 import { automaticDeliveryConfigured } from "@/lib/messaging";
 import { athensToday } from "@/lib/availability-links";
+import { sweepOrphanedPhotos, type SweepResult } from "@/lib/photo-sweep";
 
 /**
  * P39 — the one daily job.
@@ -34,6 +35,12 @@ export const maxDuration = 300;
 
 const BUDGET_MS = 240_000;
 
+/**
+ * The photo sweep's share of the run. Small and fixed: it is housekeeping, and it must never be
+ * the reason a promoter's check-in link for this morning did not go out.
+ */
+const SWEEP_BUDGET_MS = 25_000;
+
 type Section = { ran: boolean; periodKey?: string | null; counts?: RunSummary; error?: string };
 
 export async function GET(request: NextRequest) {
@@ -46,6 +53,16 @@ export async function GET(request: NextRequest) {
   const todayIso = athensToday(startedAt);
   const periodKey = periodKeyFor(startedAt);
 
+  // Housekeeping first, and deliberately outside the email branch below: orphaned photo files
+  // accumulate whether or not a messaging channel is configured. Failures are reported, never
+  // thrown — a bucket problem must not stop the links going out.
+  let photoSweep: SweepResult | { error: string };
+  try {
+    photoSweep = await sweepOrphanedPhotos({ budgetMs: SWEEP_BUDGET_MS });
+  } catch (err) {
+    photoSweep = { error: err instanceof Error ? err.message : "failed" };
+  }
+
   if (!automaticDeliveryConfigured()) {
     // Today's behaviour, unchanged: no channel can send unattended, so nothing is attempted and
     // nothing is recorded. Said plainly so a manager reading the cron log knows why.
@@ -55,6 +72,7 @@ export async function GET(request: NextRequest) {
       athensDate: todayIso,
       checkinLinks: { ran: false },
       availabilityLinks: { ran: false, periodKey },
+      photoSweep,
     });
   }
 
@@ -90,6 +108,7 @@ export async function GET(request: NextRequest) {
       durationMs: Date.now() - startedAt.getTime(),
       checkinLinks,
       availabilityLinks,
+      photoSweep,
     },
     { status: ok ? 200 : 500 },
   );
