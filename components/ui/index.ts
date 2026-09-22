@@ -73,3 +73,10 @@ export { CopyButton, WhatsAppButton } from "./CopyButton";
        delta's direction), exported so a screen can name them. --- */
 
 export type { StatTileChip, StatTileDelta } from "./StatTile";
+
+/* --- Added in F1 (A2 finding 11). Purely additive: the two-step confirmation the
+       product had already written by hand twice, so the four `window.confirm` sites
+       can share one implementation. Nothing above this line changed shape. --- */
+
+export { ConfirmButton } from "./ConfirmButton";
+export type { ConfirmButtonProps } from "./ConfirmButton";

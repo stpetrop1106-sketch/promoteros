@@ -1,9 +1,9 @@
-import { Badge, Button, Card, EmptyState, Icon, LinkButton } from "@/components/ui";
+import { Badge, Card, EmptyState, Icon, LinkButton } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import type { ProgrammeSummary } from "@/lib/programmes";
 import { ImportShifts } from "@/app/shifts/import/import-shifts";
 import { RenameSectionForm } from "./rename-section-form";
-import { setSectionArchived } from "./actions";
+import { ArchiveSectionForm } from "./archive-section-form";
 import { formatDateString, needsPeopleKey, shiftsToggleKey } from "./format";
 import { ShiftTable } from "./shift-table";
 
@@ -54,25 +54,31 @@ export function SectionCard({ section }: { section: ProgrammeSummary }) {
               />
             )}
             <RenameSectionForm programmeId={section.id} currentName={section.name} />
-            <form action={setSectionArchived.bind(null, section.id, !section.archived)}>
-              <Button type="submit" variant="ghost" size="sm">
-                {section.archived ? t("shifts.sections.unarchive_button") : t("shifts.sections.archive_button")}
-              </Button>
-            </form>
+            <ArchiveSectionForm programmeId={section.id} archived={section.archived} />
           </div>
         </div>
       }
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-[color:var(--color-ink-soft)]">
-          <span className="font-medium tabular-nums text-[color:var(--color-ink)]">
-            {t("shift.coverage", { filled: section.confirmedTotal, required: section.requiredTotal })}
-          </span>
-          <span className={section.openShiftCount > 0 ? "text-[color:var(--color-warn-ink)]" : "text-[color:var(--color-ok-ink)]"}>
-            {section.openShiftCount > 0
-              ? t(needsPeopleKey(section.openShiftCount), { count: section.openShiftCount })
-              : t("shifts.sections.needs_people_none")}
-          </span>
+          {/* A2 finding 22 — a section with no shifts used to read "0 από 0 καλυμμένες ·
+              Πλήρως στελεχωμένη", which is the one thing an empty section is not. With nothing
+              inside it there is no coverage to report either, so both go and the line says what
+              is actually true. */}
+          {section.shiftCount === 0 ? (
+            <span className="text-[color:var(--color-muted)]">{t("shifts.sections.needs_people_empty")}</span>
+          ) : (
+            <>
+              <span className="font-medium tabular-nums text-[color:var(--color-ink)]">
+                {t("shift.coverage", { filled: section.confirmedTotal, required: section.requiredTotal })}
+              </span>
+              <span className={section.openShiftCount > 0 ? "text-[color:var(--color-warn-ink)]" : "text-[color:var(--color-ok-ink)]"}>
+                {section.openShiftCount > 0
+                  ? t(needsPeopleKey(section.openShiftCount), { count: section.openShiftCount })
+                  : t("shifts.sections.needs_people_none")}
+              </span>
+            </>
+          )}
           <span className="text-[color:var(--color-muted)]">
             {section.fromDate && section.toDate
               ? t("shifts.sections.date_range", {

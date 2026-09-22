@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { Button } from "@/components/ui";
+import { ConfirmButton } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { markNoShow, type MarkNoShowState } from "./actions";
 
@@ -17,12 +17,16 @@ function errorMessage(reason: string | undefined): string {
   return t(`shifts.board.error.${safe}` as TranslationKey);
 }
 
-function Submit({ label }: { label: string }) {
+function Submit({ labels }: { labels: { label: string; confirm: string; cancel: string; warning: string } }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" variant="danger" size="sm" loading={pending}>
-      {label}
-    </Button>
+    <ConfirmButton
+      label={labels.label}
+      confirmLabel={labels.confirm}
+      cancelLabel={labels.cancel}
+      warning={labels.warning}
+      loading={pending}
+    />
   );
 }
 
@@ -31,18 +35,24 @@ function Submit({ label }: { label: string }) {
  * will eventually earn its value (build-plan §8, P10), so it has to be reachable from the one
  * place a coordinator is already looking when the exception shows up: this row. Confirm-gated
  * and visually separated from re-invite/cancel — same "destructive action, never adjacent to a
- * common one" rule as `CancelAssignmentButton`.
+ * common one" rule as `CancelAssignmentButton`, and since A2 finding 11 the same in-page
+ * two-step arming rather than `window.confirm`.
  */
 export function MarkNoShowButton({
   shiftId,
   assignmentId,
   label,
   confirmText,
+  confirmLabel,
+  cancelLabel,
 }: {
   shiftId: string;
   assignmentId: string;
   label: string;
+  /** The sentence spelling out what marking this person a no-show means. */
   confirmText: string;
+  confirmLabel: string;
+  cancelLabel: string;
 }) {
   const [state, formAction] = useActionState<MarkNoShowState, FormData>(markNoShow, {
     status: "idle",
@@ -51,16 +61,10 @@ export function MarkNoShowButton({
   if (state.status === "done") return null;
 
   return (
-    <form
-      action={formAction}
-      onSubmit={(event) => {
-        if (!window.confirm(confirmText)) event.preventDefault();
-      }}
-      className="flex items-center gap-2"
-    >
+    <form action={formAction} className="flex items-center gap-2">
       <input type="hidden" name="shiftId" value={shiftId} />
       <input type="hidden" name="assignmentId" value={assignmentId} />
-      <Submit label={label} />
+      <Submit labels={{ label, confirm: confirmLabel, cancel: cancelLabel, warning: confirmText }} />
       {state.status === "error" ? (
         <span role="alert" className="text-xs font-medium text-[color:var(--color-bad-ink)]">
           {errorMessage(state.reason)}

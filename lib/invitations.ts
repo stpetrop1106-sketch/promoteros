@@ -147,7 +147,11 @@ export async function loadInvitation(token: string): Promise<
   const { data, error } = await db
     .from("invitations")
     .select(
-      "id, status, token_hash, expires_at, promoters(full_name), shifts(on_date, start_time, end_time, campaigns(name, dress_code, rate_cents), stores(name))",
+      // A2 finding 4 — `shifts.rate_cents_override` is written by
+      // `app/campaigns/[id]/shifts/new/actions.ts` and, until this line, was read by nothing:
+      // the coordinator set "Αμοιβή για αυτές τις βάρδιες" and the promoter was still quoted the
+      // campaign's own rate. The override is what the shift pays when it is set.
+      "id, status, token_hash, expires_at, promoters(full_name), shifts(on_date, start_time, end_time, rate_cents_override, campaigns(name, dress_code, rate_cents), stores(name))",
     )
     .eq("id", verified.recordId)
     .single();
@@ -160,6 +164,7 @@ export async function loadInvitation(token: string): Promise<
     on_date: string;
     start_time: string;
     end_time: string;
+    rate_cents_override: number | null;
     campaigns: { name: string; dress_code: string | null; rate_cents: number } | null;
     stores: { name: string } | null;
   } | null;
@@ -184,7 +189,7 @@ export async function loadInvitation(token: string): Promise<
       startTime: String(shift.start_time).slice(0, 5),
       endTime: String(shift.end_time).slice(0, 5),
       dressCode: shift.campaigns?.dress_code ?? null,
-      rateCents: shift.campaigns?.rate_cents ?? 0,
+      rateCents: shift.rate_cents_override ?? shift.campaigns?.rate_cents ?? 0,
       status: data.status,
     },
   };

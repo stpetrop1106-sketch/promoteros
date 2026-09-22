@@ -124,6 +124,31 @@ function roleOptions() {
 export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
   const [state, formAction] = useActionState<InviteState, FormData>(inviteTeamMember, INVITE_IDLE);
 
+  // A2 finding 24 — `useActionState` keeps the last result across a revalidation caused by a
+  // *different* action, so revoking a pending invitation brought the invite form back with the
+  // previous attempt's red "Έφτασες το όριο θέσεων" still sitting above it. The seat count is
+  // exactly the fact that verdict was about; when it moves, the verdict is stale. Adjusting
+  // state during render in response to a changed prop is React's own documented pattern for
+  // this — no effect, no second paint.
+  const [seatsSeen, setSeatsSeen] = useState(seatsRemaining);
+  const [seenState, setSeenState] = useState(state);
+  const [staleResult, setStaleResult] = useState(false);
+
+  // A fresh result from THIS form: useActionState hands back a new object every time the
+  // action returns, so identity is the signal. Whatever it says is current.
+  if (seenState !== state) {
+    setSeenState(state);
+    setStaleResult(false);
+  }
+  // The seat count moved, and nothing in this form caused it — a pending invitation was revoked
+  // elsewhere on the page. The seat count is exactly what the last verdict was about.
+  if (seatsSeen !== seatsRemaining) {
+    setSeatsSeen(seatsRemaining);
+    setStaleResult(true);
+  }
+
+  const showError = state.status === "error" && !staleResult;
+
   if (seatsRemaining <= 0 && state.status !== "sent") {
     return (
       <div
@@ -149,11 +174,7 @@ export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
           label={t("team.invite.email_label")}
           hint={t("team.invite.email_hint")}
           placeholder={t("team.invite.email_placeholder")}
-          error={
-            state.status === "error" && state.code === "email_invalid"
-              ? t("team.errors.email_invalid")
-              : undefined
-          }
+          error={showError && state.code === "email_invalid" ? t("team.errors.email_invalid") : undefined}
           required
           maxLength={200}
           autoComplete="off"
@@ -168,7 +189,7 @@ export function InviteForm({ seatsRemaining }: { seatsRemaining: number }) {
           options={roleOptions()}
         />
 
-        {state.status === "error" && state.code !== "email_invalid" ? (
+        {showError && state.code !== "email_invalid" ? (
           <ErrorNote code={state.code ?? "unknown"} message={state.message} />
         ) : null}
 

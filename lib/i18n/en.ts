@@ -32,6 +32,16 @@ export const en: Record<TranslationKey, string> = {
   "match.brief_completed": "Brief completed",
   "match.brand_experience": "Brand experience",
   "match.why_ranked": "Why this ranking",
+  "match.none_no_promoters":
+    "There are no active promoters on the roster, so there is nothing to rank.",
+  "match.none_no_promoters_cta": "Add a promoter",
+  "match.none_nobody_declared":
+    "None of the {active} active promoters has declared availability for {date}. It is not that nobody fits — nobody has told us who can work that day yet.",
+  "match.none_nobody_declared_cta": "Send an availability link",
+  "match.none_all_excluded_one":
+    "One person said they can work on {date}, but they are not available for this shift: too far away, blocklisted, already booked, or already invited.",
+  "match.none_all_excluded_many":
+    "{declared} people said they can work on {date}, but none of them is available for this shift: too far away, blocklisted, already booked, or already invited.",
   "match.none": "No available promoter for this shift.",
   "match.factor.distance": "Distance",
   "match.factor.brand_experience": "Brand experience",
@@ -43,7 +53,10 @@ export const en: Record<TranslationKey, string> = {
 
   "shifts.title": "Shifts",
   "shifts.none": "No shifts yet.",
-  "shifts.list.subtitle": "{count} shifts, earliest first.",
+  "shifts.list.subtitle_shifts_one": "1 shift",
+  "shifts.list.subtitle_shifts_many": "{count} shifts",
+  "shifts.list.subtitle_sections_one": "in 1 section",
+  "shifts.list.subtitle_sections_many": "in {count} sections",
   "shifts.empty.title": "No shifts yet",
   "shifts.empty.body":
     "Shifts live inside a campaign. Create your first campaign and add its shifts to it.",
@@ -142,6 +155,10 @@ export const en: Record<TranslationKey, string> = {
   "auth.sending": "Sending…",
   "auth.link_sent": "If that address has access, the link is on its way. Open it on this same device.",
   "auth.link_failed": "That link has expired or was already used. Request a new one.",
+
+  "rate_limit.title": "Too many requests",
+  "rate_limit.body":
+    "Please try again shortly. If you opened your link several times in a row, wait a minute and try again — the link still works.",
   "auth.error_invalid_email": "Enter a valid email address.",
   "auth.error_rate_limited": "Too many attempts. Try again in a few minutes.",
   "auth.error_generic": "We could not send the link right now. Please try again.",
@@ -156,6 +173,12 @@ export const en: Record<TranslationKey, string> = {
   "auth.code_submit": "Sign in with code",
   "auth.code_checking": "Checking…",
   "auth.code_invalid": "That code is wrong or has expired. Request a new one.",
+  "auth.invitation_waiting_title": "An invitation is waiting for you",
+  "auth.invitation_waiting_body":
+    "“{agency}” invited you to their team as {role}. Until you accept it, your account cannot see any data.",
+  "auth.invitation_waiting_how":
+    "Open the invitation link from the email sent to {email}. That link is unique and cannot be rebuilt here — if you cannot find it, ask the owner to send it again.",
+  "auth.invitation_waiting_other": "Did you mean to start your own agency?",
   "auth.create_agency_cta": "Create your agency",
 
   "promoters.add": "Add promoter",
@@ -175,7 +198,8 @@ export const en: Record<TranslationKey, string> = {
   "promoters.edit.archive_confirm_cancel": "Cancel",
   "promoters.edit.archived_notice": "This promoter is archived. Change the status above to \"Active\" to bring them back.",
 
-  "promoters.list.subtitle": "{count} promoters",
+  "promoters.list.subtitle_one": "1 promoter",
+  "promoters.list.subtitle_many": "{count} promoters",
   "promoters.list.low_count_hint":
     "The ranking only makes sense with a handful of promoters — add at least 5-8 across different areas before trying a shift.",
 
@@ -194,6 +218,11 @@ export const en: Record<TranslationKey, string> = {
   "promoters.filter.apply": "Filter",
   "promoters.filter.clear": "Clear filters",
   "promoters.filter.result_count": "{shown} of {total}",
+  "promoters.page.nav_label": "Roster pages",
+  "promoters.page.range": "{from}–{to} of {total}",
+  "promoters.page.of": "Page {page} of {pages}",
+  "promoters.page.prev": "Previous",
+  "promoters.page.next": "Next",
 
   "promoters.empty.title": "No promoters yet",
   "promoters.empty.description":
@@ -366,6 +395,11 @@ export const en: Record<TranslationKey, string> = {
   "campaigns.detail.mark_active": "Activate",
   "campaigns.detail.mark_completed": "Mark completed",
   "campaigns.detail.cancel": "Cancel campaign",
+  "campaigns.detail.cancel_confirm_yes": "Yes, cancel the campaign",
+  "campaigns.detail.cancel_confirm_no": "Never mind",
+  "campaigns.detail.status_error.transition":
+    "This campaign's status changed in the meantime. Reload the page to see where it is now.",
+  "campaigns.detail.status_error.save_failed": "Not saved. Try again.",
   "campaigns.detail.cancel_confirm":
     "Cancel the campaign '{name}'? Its shifts stay on record, but the campaign will be marked cancelled.",
 
@@ -410,6 +444,15 @@ export const en: Record<TranslationKey, string> = {
   "campaigns.brief.default_title": "Brief — {campaign}",
   "campaigns.brief.save_draft": "Save draft",
   "campaigns.brief.publish": "Publish",
+  "campaigns.brief.republish": "Publish again",
+  "campaigns.brief.state.published": "Published",
+  "campaigns.brief.state.published_at": "Published {when}",
+  "campaigns.brief.state.draft": "Draft",
+  "campaigns.brief.state.none": "No brief yet",
+  "campaigns.brief.state.published_hint":
+    "Promoters are already reading this from their invitation link. Anything you save here reaches them immediately.",
+  "campaigns.brief.state.draft_hint":
+    "No promoter can see this yet. Press “Publish” to let them.",
   "campaigns.brief.saving": "Saving…",
   "campaigns.brief.error.save_failed": "We could not save the brief. Please try again.",
 
@@ -508,10 +551,34 @@ export const en: Record<TranslationKey, string> = {
   "shifts.board.started_no_checkin": "The shift has started and there is still no check-in.",
   "shifts.board.cancel_action": "Cancel assignment",
   "shifts.board.cancel_confirm": "Cancel {name}'s assignment?",
+  "shifts.board.cancel_confirm_yes": "Yes, cancel it",
+  "shifts.board.invite_link.action": "Copy the link",
+  "shifts.board.invite_link.message.intro": "New shift",
+  "shifts.board.invite_link.message.cta": "Answer here:",
+  "shifts.board.invite_link.error.missing_ids": "Something is missing from the request. Reload the page.",
+  "shifts.board.invite_link.error.not_found": "That invitation could not be found. Reload the page.",
+  "shifts.board.invite_link.error.not_pending":
+    "This invitation is no longer open — it was answered or withdrawn. Reload the page.",
+  "shifts.board.invite_link.error.invitation_expired":
+    "This invitation has expired. Withdraw it and send a new one.",
+  "shifts.board.invite_link.error.link_unavailable":
+    "This invitation's link cannot be rebuilt. Withdraw it and send a new one.",
+  "shifts.board.invite_link.error.blocked_read_only":
+    "The account is read-only, so invitations cannot go out. Sort out Billing.",
+  "shifts.board.cancel_invite.action": "Withdraw the invitation",
+  "shifts.board.cancel_invite.confirm":
+    "Withdraw {name}'s invitation? The link they have stops working, and the shift can be offered to someone else.",
+  "shifts.board.cancel_invite.confirm_yes": "Yes, withdraw it",
+  "shifts.board.cancel_invite.error.missing_ids": "Something is missing from the request. Reload the page.",
+  "shifts.board.cancel_invite.error.not_found": "That invitation could not be found. Reload the page.",
+  "shifts.board.cancel_invite.error.not_pending": "This invitation is no longer open. Reload the page.",
+  "shifts.board.cancel_invite.error.save_failed": "Not saved. Try again.",
+  "shifts.board.confirm_no": "Never mind",
   "shifts.board.cancel_reason_label": "Cancellation reason (optional)",
   "shifts.board.cancel_reason_placeholder": "e.g. called in sick",
   "shifts.board.no_show_action": "No show",
   "shifts.board.no_show_confirm": "Record that {name} did not show up for this shift?",
+  "shifts.board.no_show_confirm_yes": "Yes, a no-show",
   "shifts.board.error.missing_ids": "The form is missing data. Please reload the page.",
   "shifts.board.error.not_found": "This assignment could not be found.",
   "shifts.board.error.not_confirmed": "This assignment is no longer confirmed.",
@@ -521,7 +588,8 @@ export const en: Record<TranslationKey, string> = {
   "shifts.replacements.why_title": "Why this shift needs a replacement",
   "shifts.replacements.declined": "{name} declined — {when}",
   "shifts.replacements.cancelled": "{name}'s assignment was cancelled — {when}",
-  "shifts.replacements.pending_count": "{count} invitations awaiting reply",
+  "shifts.replacements.pending_count_one": "1 invitation awaiting reply",
+  "shifts.replacements.pending_count_many": "{count} invitations awaiting reply",
   "shifts.replacements.score_label": "Match score for {name}",
   "shifts.replacements.reinvite": "Invite",
 
@@ -826,14 +894,16 @@ export const en: Record<TranslationKey, string> = {
   "billing.plan.promoters": "Up to {count} promoters",
   "billing.plan.price_missing": "This plan's price has not been created in Stripe yet.",
 
-  "billing.interval.per_month": "/ month",
-  "billing.interval.per_year": "/ year",
+  "billing.interval.per_month": "/month",
+  "billing.interval.per_year": "/year",
   "billing.interval.annual_effective": "{price} a month, two months free",
   "billing.interval.switch_to_annual": "Annual billing — two months free",
   "billing.interval.switch_to_monthly": "Monthly billing",
 
   "billing.cta.subscribe": "Start subscription",
   "billing.cta.change_plan": "Change plan",
+  "billing.cta.unavailable":
+    "Not clickable yet: billing is not switched on for this account.",
   "billing.cta.current_plan": "Current plan",
   "billing.cta.working": "Opening Stripe…",
 
@@ -1021,6 +1091,8 @@ export const en: Record<TranslationKey, string> = {
   // --- P24 — write guards on the remaining server actions (shifts, campaigns, team, invitations) ---
   "enforcement.invitations.blocked_read_only":
     "This account is read-only right now, so you can't send new invitations. Go to Billing in Settings to continue.",
+  "enforcement.campaigns.blocked_read_only_status":
+    "The account is read-only, so the campaign's status cannot change. Sort out Billing and try again.",
   "enforcement.campaigns.blocked_read_only_create":
     "This account is read-only right now, so you can't create a new campaign. Go to Billing in Settings to continue.",
   "enforcement.campaigns.blocked_read_only_brief":
@@ -1507,6 +1579,7 @@ export const en: Record<TranslationKey, string> = {
   "shifts.sections.needs_people_one": "{count} shift still needs people",
   "shifts.sections.needs_people_many": "{count} shifts still need people",
   "shifts.sections.needs_people_none": "Fully staffed",
+  "shifts.sections.needs_people_empty": "No shifts yet",
   "shifts.sections.add_shifts": "Add shifts",
   "shifts.sections.shifts_toggle_one": "Shift ({count})",
   "shifts.sections.shifts_toggle_many": "Shifts ({count})",
@@ -1626,6 +1699,11 @@ export const en: Record<TranslationKey, string> = {
     "With no email configured, every promoter needs the link from you. It is ready for each of them.",
   "messaging.unreachable.none": "Every active promoter can receive the link automatically.",
   "messaging.unreachable.no_promoters": "There are no active promoters yet.",
+  "messaging.unreachable.search_label": "Search this list",
+  "messaging.unreachable.search_placeholder": "Name or phone",
+  "messaging.unreachable.search_count": "{shown} of {total}",
+  "messaging.unreachable.search_empty_title": "Nothing matched",
+  "messaging.unreachable.search_empty_body": "Try another name or phone number.",
   "messaging.unreachable.link_label": "Availability link for {name}",
   "messaging.unreachable.fix_email": "Fix email",
 
@@ -1713,6 +1791,8 @@ export const en: Record<TranslationKey, string> = {
   "shifts.import.step.preview": "Check",
   "shifts.import.step.done": "Done",
   "shifts.import.close": "Close",
+  "shifts.import.close_confirm_yes": "Yes, close it",
+  "shifts.import.close_confirm_no": "Keep importing",
   "shifts.import.close_confirm": "Close the import? Your choices will be lost. Nothing has been created.",
   "shifts.import.back": "Back",
   "shifts.import.next": "Next",
@@ -1803,6 +1883,7 @@ export const en: Record<TranslationKey, string> = {
   "shifts.import.stores.badge.chosen": "Chosen",
   "shifts.import.stores.change": "Change",
   "shifts.import.stores.choice_legend": "What to do with “{name}”",
+  "shifts.import.stores.likely_compare": "In the file: {file} — In the database: {existing}",
   "shifts.import.stores.likely_hint": "Looks like “{store}”. Make sure it is the same store.",
   "shifts.import.stores.use_existing": "It is an existing store",
   "shifts.import.stores.existing_label": "Store",

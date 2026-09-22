@@ -24,6 +24,8 @@ export type RawInvitation = {
   id: string;
   promoterId: string;
   fullName: string;
+  /** A2 finding 7 — carried onto the board row so the coordinator can re-copy the link. */
+  phone?: string | null;
   status: "pending" | "accepted" | "declined" | "expired" | "superseded";
   sentAt: string;
   expiresAt: string;
@@ -60,6 +62,8 @@ export type BoardRow = {
   tier: 0 | 1 | 2 | 3;
   minutesUntilStart: number;
   assignmentId?: string;
+  /** A2 finding 7 — present on an `awaiting_reply` row, so its link can be rebuilt and resent. */
+  invitationId?: string;
   sentAt?: string;
   expiresAt?: string;
   respondedAt?: string;
@@ -270,6 +274,8 @@ export function buildBoard(
     rows.push({
       promoterId: inv.promoterId,
       fullName: inv.fullName,
+      phone: inv.phone ?? null,
+      invitationId: inv.id,
       state: "awaiting_reply",
       tier: urgent ? 0 : TIER.awaiting_reply,
       minutesUntilStart: minsUntilStart,

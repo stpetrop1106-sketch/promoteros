@@ -5,7 +5,6 @@ import { requireUser } from "@/lib/auth";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import {
   Badge,
-  Button,
   Card,
   Detail,
   DetailList,
@@ -31,8 +30,7 @@ import {
   type CampaignStatus,
   type ShiftStatus,
 } from "@/app/campaigns/_shared";
-import { setCampaignStatus } from "./actions";
-import { CancelCampaignForm } from "./cancel-campaign-form";
+import { CampaignStatusButton, CancelCampaignForm } from "./status-controls";
 
 export const dynamic = "force-dynamic";
 
@@ -262,28 +260,19 @@ export default async function CampaignDetailPage({ params }: { params: Promise<{
         {(c.status === "draft" || c.status === "active") && (
           <Card header={<h2 className="text-sm font-semibold text-[color:var(--color-ink)]">{t("campaigns.detail.status_title")}</h2>}>
             <div className="flex flex-wrap items-center justify-between gap-4">
+              {/* A2 finding 12 — these were bare `<form action={boundServerAction}>`, which
+                  return void and so could not report the billing guard refusing. Each control is
+                  now its own `useActionState` island that renders the refusal beside itself. */}
               <div className="flex flex-wrap gap-3">
                 {c.status === "draft" ? (
-                  <form action={setCampaignStatus.bind(null, id, "active")}>
-                    <Button type="submit" variant="secondary" size="sm">
-                      {t("campaigns.detail.mark_active")}
-                    </Button>
-                  </form>
+                  <CampaignStatusButton campaignId={id} next="active" label={t("campaigns.detail.mark_active")} />
                 ) : null}
                 {c.status === "active" ? (
-                  <form action={setCampaignStatus.bind(null, id, "completed")}>
-                    <Button type="submit" variant="secondary" size="sm">
-                      {t("campaigns.detail.mark_completed")}
-                    </Button>
-                  </form>
+                  <CampaignStatusButton campaignId={id} next="completed" label={t("campaigns.detail.mark_completed")} />
                 ) : null}
               </div>
 
-              <CancelCampaignForm
-                action={setCampaignStatus.bind(null, id, "cancelled")}
-                label={t("campaigns.detail.cancel")}
-                confirmText={t("campaigns.detail.cancel_confirm", { name: c.name })}
-              />
+              <CancelCampaignForm campaignId={id} campaignName={c.name} />
             </div>
           </Card>
         )}

@@ -110,6 +110,8 @@ export function ImportWizard({
   const [existingKeys, setExistingKeys] = useState<ReadonlySet<string> | "loading" | "failed">(new Set());
   const [result, setResult] = useState<CommitResult>({ status: "idle" });
   const [submitting, setSubmitting] = useState(false);
+  /** A2 finding 11 — the two-step close prompt that replaced `window.confirm`. */
+  const [closeArmed, setCloseArmed] = useState(false);
   const inFlight = useRef(false);
 
   // --- Context ---------------------------------------------------------------------------------
@@ -134,12 +136,26 @@ export function ImportWizard({
     titleRef.current?.focus();
   }, [step]);
 
+  // Moving on disarms the close prompt: it belongs to the step it was raised on.
+  useEffect(() => {
+    setCloseArmed(false);
+  }, [step]);
+
+  /**
+   * A2 finding 11 — this used to gate on `window.confirm`: an operating-system dialog, in the
+   * operating system's language, over a full-screen Greek wizard. It asks in the wizard now. The
+   * first press (or Escape) arms; the second, or the explicit "Ναι, κλείσιμο", closes. Escape
+   * therefore still takes two presses to throw work away, which is the point.
+   */
   const requestClose = useCallback(() => {
     if (submitting) return;
     const hasDecisions = step === "stores" || step === "preview";
-    if (hasDecisions && !window.confirm(t("shifts.import.close_confirm"))) return;
+    if (hasDecisions && !closeArmed) {
+      setCloseArmed(true);
+      return;
+    }
     onClose();
-  }, [onClose, step, submitting]);
+  }, [closeArmed, onClose, step, submitting]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -340,6 +356,25 @@ export function ImportWizard({
             <Icon name="close" size={18} />
           </Button>
         </header>
+
+        {closeArmed ? (
+          <div
+            role="alert"
+            className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] px-5 py-3 sm:px-6"
+          >
+            <p className="min-w-0 text-sm font-medium text-[color:var(--color-bad-ink)]">
+              {t("shifts.import.close_confirm")}
+            </p>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <Button type="button" variant="danger" size="sm" autoFocus onClick={onClose}>
+                {t("shifts.import.close_confirm_yes")}
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setCloseArmed(false)}>
+                {t("shifts.import.close_confirm_no")}
+              </Button>
+            </div>
+          </div>
+        ) : null}
 
         <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
           {contextFailed ? (

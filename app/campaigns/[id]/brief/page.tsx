@@ -30,6 +30,8 @@ function formatInstant(iso: string): string {
     timeZone: "Europe/Athens",
     dateStyle: "medium",
     timeStyle: "short",
+    // A2 finding 30 — 24-hour everywhere. This is a product about shift times.
+    hourCycle: "h23",
   }).format(new Date(parsed));
 }
 
@@ -83,7 +85,7 @@ export default async function CampaignBriefPage({ params }: { params: Promise<{ 
 
   const { data: brief } = await db
     .from("briefs")
-    .select("title, body_md")
+    .select("title, body_md, published_at, version")
     .eq("campaign_id", id)
     .order("version", { ascending: false })
     .limit(1)
@@ -108,11 +110,40 @@ export default async function CampaignBriefPage({ params }: { params: Promise<{ 
           subtitle={t("campaigns.brief.subtitle", { campaign: campaign.name })}
         />
 
+        {/* A2 finding 26 — this screen showed "Αποθήκευση πρόχειρου" and "Δημοσίευση"
+            identically before and after publishing, so a coordinator reopening it to fix a typo
+            could not tell whether promoters were reading it at that moment. They are: an update
+            keeps `published_at`, so saving over a published brief changes what every promoter
+            sees immediately. Say both things, here, above the fields. */}
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {brief?.published_at ? (
+              <>
+                <Badge variant="ok" dot>{t("campaigns.brief.state.published")}</Badge>
+                <span className="text-xs text-[color:var(--color-muted)]">
+                  {t("campaigns.brief.state.published_at", { when: formatInstant(brief.published_at) })}
+                </span>
+              </>
+            ) : brief ? (
+              <Badge variant="warn" dot>{t("campaigns.brief.state.draft")}</Badge>
+            ) : (
+              <Badge variant="neutral" dot>{t("campaigns.brief.state.none")}</Badge>
+            )}
+          </div>
+          <p className="flex items-start gap-1.5 text-xs leading-5 text-[color:var(--color-muted)]">
+            <Icon name="alert" size={14} className="mt-0.5 shrink-0" />
+            {brief?.published_at
+              ? t("campaigns.brief.state.published_hint")
+              : t("campaigns.brief.state.draft_hint")}
+          </p>
+        </div>
+
         <Card elevation="raised">
           <BriefForm
             campaignId={id}
             initialTitle={brief?.title ?? t("campaigns.brief.default_title", { campaign: campaign.name })}
             initialBody={brief?.body_md ?? ""}
+            published={Boolean(brief?.published_at)}
           />
         </Card>
 

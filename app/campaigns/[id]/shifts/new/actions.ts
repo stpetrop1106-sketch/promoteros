@@ -95,7 +95,21 @@ const schema = z
   .refine((v) => !v.rateOverrideEuros || parseEurosToCents(v.rateOverrideEuros) !== null, {
     message: "campaigns.validation.rate_invalid",
     path: ["rateOverrideEuros"],
-  });
+  })
+  // A2 finding 6 — "no dates at all" used to be checked *after* the new store and the new
+  // section had already been inserted, so every retry of a Tue–Fri range with only the weekend
+  // ticked left another junk store in the importer's known-store list and another empty section
+  // on the coordinator's home screen, neither of which can be deleted. It depends on nothing but
+  // the form, so it belongs here with the rest of the validation — and as a field error on
+  // `weekdays`, which is the control the coordinator has to change.
+  .refine(
+    (v) =>
+      !DATE_RE.test(v.fromDate) ||
+      !DATE_RE.test(v.toDate) ||
+      v.toDate < v.fromDate ||
+      expandSeriesDates(v.fromDate, v.toDate, new Set(v.weekdays.map(Number))).length > 0,
+    { message: "campaigns.validation.no_dates", path: ["weekdays"] },
+  );
 
 export async function createShifts(_prev: ShiftFormState, formData: FormData): Promise<ShiftFormState> {
   const user = await requireUser();
@@ -214,6 +228,8 @@ export async function createShifts(_prev: ShiftFormState, formData: FormData): P
   const weekdaySet = new Set(data.weekdays.map(Number));
   const dates = expandSeriesDates(data.fromDate, data.toDate, weekdaySet);
 
+  // Unreachable now that the schema refines on it above — kept as the last line of defence, so
+  // an empty insert can never be attempted if that refine is ever weakened.
   if (dates.length === 0) {
     return { status: "error", formError: "campaigns.validation.no_dates" };
   }

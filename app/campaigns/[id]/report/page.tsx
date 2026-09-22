@@ -80,6 +80,8 @@ function formatInstant(iso: string, locale: Locale): string {
     timeZone: "Europe/Athens",
     dateStyle: "medium",
     timeStyle: "short",
+    // A2 finding 30 — 24-hour everywhere.
+    hourCycle: "h23",
   }).format(new Date(parsed));
 }
 

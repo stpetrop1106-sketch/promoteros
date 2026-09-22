@@ -23,3 +23,11 @@ export type RenameSectionState = {
 };
 
 export const RENAME_SECTION_IDLE: RenameSectionState = { status: "idle" };
+
+/** A2 finding 12 — `setSectionArchived` used to return `void`, so a refusal was invisible. */
+export type ArchiveSectionState = {
+  status: "idle" | "done" | "error";
+  formError?: TranslationKey;
+};
+
+export const ARCHIVE_SECTION_IDLE: ArchiveSectionState = { status: "idle" };

@@ -30,9 +30,12 @@ type PreviewRow = {
 };
 
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("el-GR", { dateStyle: "long", timeStyle: "short" }).format(
-    new Date(value),
-  );
+  // A2 finding 30 — 24-hour everywhere.
+  return new Intl.DateTimeFormat("el-GR", {
+    dateStyle: "long",
+    timeStyle: "short",
+    hourCycle: "h23",
+  }).format(new Date(value));
 }
 
 function Shell({ children }: { children: React.ReactNode }) {

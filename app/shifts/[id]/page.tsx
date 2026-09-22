@@ -6,6 +6,7 @@ import { matchPromoters } from "@/lib/matching";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { Badge, Icon, PageHeader, Section } from "@/components/ui";
 import { buildBoard, summariseCoverage, type RawAssignment, type RawCheckIn, type RawInvitation } from "./board";
+import { diagnoseNoCandidates, type NoCandidatesDiagnosis } from "./no-candidates";
 import { StatusBoard } from "./status-board";
 import { ReplacementPanel } from "./replacement-panel";
 
@@ -60,7 +61,7 @@ export default async function ShiftDetailPage({
       .eq("shift_id", id),
     db
       .from("invitations")
-      .select("id, promoter_id, status, sent_at, expires_at, responded_at, decline_reason, promoters(full_name)")
+      .select("id, promoter_id, status, sent_at, expires_at, responded_at, decline_reason, promoters(full_name, phone)")
       .eq("shift_id", id)
       .order("sent_at", { ascending: false }),
   ]);
@@ -91,6 +92,7 @@ export default async function ShiftDetailPage({
     id: i.id,
     promoterId: i.promoter_id,
     fullName: (i.promoters as unknown as PromoterRef)?.full_name ?? "—",
+    phone: (i.promoters as unknown as PromoterRef)?.phone ?? null,
     status: i.status,
     sentAt: i.sent_at,
     expiresAt: i.expires_at,
@@ -114,6 +116,14 @@ export default async function ShiftDetailPage({
   // boundary. It is still the last call on a coordinator path reaching the service role —
   // `lib/matching` is another lane's file. See "Requests to other lanes" in docs/status/P1.md.
   const replacementCandidates = coverage.coverageMet ? [] : await matchPromoters(id, 3);
+
+  // A2 finding 9 — an empty ranked list used to say only "nobody is available", which a
+  // coordinator reads as "my roster does not fit this shift". Usually it means nobody has
+  // declared anything for that date yet. Only asked when the list actually came back empty.
+  const noCandidates: NoCandidatesDiagnosis | null =
+    !coverage.coverageMet && replacementCandidates.length === 0
+      ? await diagnoseNoCandidates(db, { onDate: shift.on_date, startTime, endTime })
+      : null;
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
@@ -146,7 +156,14 @@ export default async function ShiftDetailPage({
         </Section>
 
         {!coverage.coverageMet ? (
-          <ReplacementPanel shiftId={id} coverage={coverage} candidates={replacementCandidates} t={t} />
+          <ReplacementPanel
+            shiftId={id}
+            coverage={coverage}
+            candidates={replacementCandidates}
+            noCandidates={noCandidates}
+            onDate={shift.on_date}
+            t={t}
+          />
         ) : (
           <p className="flex items-center gap-2 rounded-2xl border border-[color:var(--color-ok-line)] bg-[color:var(--color-ok-subtle)] px-4 py-3.5 text-sm font-medium text-[color:var(--color-ok-ink)]">
             <Icon name="check" size={18} />

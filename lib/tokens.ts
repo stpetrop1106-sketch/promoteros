@@ -37,7 +37,27 @@ export function mintToken(
   recordId: string,
   ttlSeconds: number,
 ): { token: string; tokenHash: string; expiresAt: Date } {
-  const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
+  return mintTokenAt(purpose, recordId, new Date(Date.now() + ttlSeconds * 1000));
+}
+
+/**
+ * The same token, minted against an expiry that is already known.
+ *
+ * Added in F1 for A2 finding 7: once "Αποστολή πρόσκλησης" had been pressed, the link was shown
+ * once and was then unreachable — with the default `ClipboardAdapter` the coordinator pastes it
+ * by hand, so losing the clipboard is not an edge case. A token is a pure function of
+ * (purpose, record id, expiry, secret), and `invitations` stores the expiry, so the link a
+ * promoter was sent can be rebuilt exactly — the stored `token_hash` still matches and the
+ * original message keeps working. Nothing new is issued and nothing is invalidated.
+ *
+ * Sub-second precision is dropped the same way `mintToken` always dropped it (the payload holds
+ * whole seconds), so rebuilding from a stored `expires_at` is byte-identical.
+ */
+export function mintTokenAt(
+  purpose: TokenPurpose,
+  recordId: string,
+  expiresAt: Date,
+): { token: string; tokenHash: string; expiresAt: Date } {
   const payload: Payload = {
     p: purpose,
     i: recordId,

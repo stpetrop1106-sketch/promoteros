@@ -1,8 +1,9 @@
-import { Avatar, Badge, Card, Icon, ScoreBar } from "@/components/ui";
+import { Avatar, Badge, Card, Icon, LinkButton, ScoreBar } from "@/components/ui";
 import type { TranslationKey } from "@/lib/i18n";
 import { topReasons, type Candidate, type MatchFactor } from "@/lib/matching";
 import { formatAthens } from "./time";
 import type { CoverageSummary } from "./board";
+import type { NoCandidatesDiagnosis } from "./no-candidates";
 import { InviteButton } from "./invite-button";
 
 type T = (key: TranslationKey, params?: Record<string, string | number>) => string;
@@ -17,15 +18,73 @@ const factorKey = (f: MatchFactor) => `match.factor.${f}` as TranslationKey;
  * existing `InviteButton`/`invite` action verbatim: re-inviting the next candidate is the same
  * operation as the very first invite, not a second code path.
  */
+/**
+ * A2 finding 9 — the empty state, with the reason it is empty.
+ *
+ * "Κανένας διαθέσιμος promoter" on its own is indistinguishable from "your roster does not fit",
+ * and on a date nobody has declared on — which is every date more than fourteen days out, because
+ * that is all a promoter's availability link ever offers — it is the wrong reading. Say which of
+ * the two it is, with the numbers behind it, and give the first case its next step.
+ */
+function NoCandidates({
+  diagnosis,
+  onDate,
+  t,
+}: {
+  diagnosis: NoCandidatesDiagnosis;
+  onDate: string;
+  t: T;
+}) {
+  const [y, m, d] = onDate.split("-");
+  const date = `${d}/${m}/${y}`;
+
+  if (diagnosis.reason === "no_promoters") {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-sm text-[color:var(--color-ink-soft)]">{t("match.none_no_promoters")}</p>
+        <LinkButton href="/promoters/new" variant="secondary" size="sm">
+          {t("match.none_no_promoters_cta")}
+        </LinkButton>
+      </div>
+    );
+  }
+
+  if (diagnosis.reason === "nobody_declared") {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-sm text-[color:var(--color-ink-soft)]">
+          {t("match.none_nobody_declared", { date, active: diagnosis.activeCount })}
+        </p>
+        <LinkButton href="/settings/messaging" variant="secondary" size="sm">
+          {t("match.none_nobody_declared_cta")}
+        </LinkButton>
+      </div>
+    );
+  }
+
+  return (
+    <p className="text-sm text-[color:var(--color-ink-soft)]">
+      {diagnosis.declaredCount === 1
+        ? t("match.none_all_excluded_one", { date })
+        : t("match.none_all_excluded_many", { declared: diagnosis.declaredCount, date })}
+    </p>
+  );
+}
+
 export function ReplacementPanel({
   shiftId,
   coverage,
   candidates,
+  noCandidates,
+  onDate,
   t,
 }: {
   shiftId: string;
   coverage: CoverageSummary;
   candidates: Candidate[];
+  /** Present only when `candidates` is empty — see `no-candidates.ts`. */
+  noCandidates?: NoCandidatesDiagnosis | null;
+  onDate: string;
   t: T;
 }) {
   const hasHistory = coverage.declines.length > 0 || coverage.cancellations.length > 0;
@@ -67,14 +126,22 @@ export function ReplacementPanel({
               </li>
             ))}
             {coverage.pendingCount > 0 ? (
-              <li>{t("shifts.replacements.pending_count", { count: coverage.pendingCount })}</li>
+              <li>
+                {coverage.pendingCount === 1
+                  ? t("shifts.replacements.pending_count_one")
+                  : t("shifts.replacements.pending_count_many", { count: coverage.pendingCount })}
+              </li>
             ) : null}
           </ul>
         </div>
       ) : null}
 
       {candidates.length === 0 ? (
-        <p className="text-sm text-[color:var(--color-muted)]">{t("match.none")}</p>
+        noCandidates ? (
+          <NoCandidates diagnosis={noCandidates} onDate={onDate} t={t} />
+        ) : (
+          <p className="text-sm text-[color:var(--color-muted)]">{t("match.none")}</p>
+        )
       ) : (
         <ul className="flex flex-col divide-y divide-[color:var(--color-line)]">
           {candidates.map((c, i) => (

@@ -30,6 +30,16 @@ export const el = {
   "match.brief_completed": "Ολοκληρωμένο brief",
   "match.brand_experience": "Εμπειρία στο brand",
   "match.why_ranked": "Γιατί προτάθηκε",
+  "match.none_no_promoters":
+    "Δεν υπάρχει κανένας ενεργός promoter στον κατάλογο, οπότε δεν υπάρχει τίποτα να καταταχθεί.",
+  "match.none_no_promoters_cta": "Πρόσθεσε promoter",
+  "match.none_nobody_declared":
+    "Κανένας από τους {active} ενεργούς promoters δεν έχει δηλώσει διαθεσιμότητα για τις {date}. Δεν είναι ότι δεν ταιριάζει κανείς — απλώς δεν ξέρουμε ακόμα ποιος μπορεί.",
+  "match.none_nobody_declared_cta": "Στείλε σύνδεσμο διαθεσιμότητας",
+  "match.none_all_excluded_one":
+    "Ένα άτομο δήλωσε ότι μπορεί στις {date}, αλλά δεν είναι διαθέσιμο για αυτή τη βάρδια: είναι πολύ μακριά, αποκλεισμένο, ήδη κλεισμένο, ή του έχει ήδη σταλεί πρόσκληση.",
+  "match.none_all_excluded_many":
+    "{declared} άτομα δήλωσαν ότι μπορούν στις {date}, αλλά κανένα δεν είναι διαθέσιμο για αυτή τη βάρδια: είναι πολύ μακριά, αποκλεισμένα, ήδη κλεισμένα, ή τους έχει ήδη σταλεί πρόσκληση.",
   "match.none": "Κανένας διαθέσιμος promoter για αυτή τη βάρδια.",
   "match.factor.distance": "Απόσταση",
   "match.factor.brand_experience": "Εμπειρία στο brand",
@@ -41,7 +51,10 @@ export const el = {
 
   "shifts.title": "Βάρδιες",
   "shifts.none": "Δεν υπάρχουν βάρδιες.",
-  "shifts.list.subtitle": "{count} βάρδιες, με τη χρονολογικά πρώτη στην κορυφή.",
+  "shifts.list.subtitle_shifts_one": "1 βάρδια",
+  "shifts.list.subtitle_shifts_many": "{count} βάρδιες",
+  "shifts.list.subtitle_sections_one": "σε 1 ενότητα",
+  "shifts.list.subtitle_sections_many": "σε {count} ενότητες",
   "shifts.empty.title": "Καμία βάρδια ακόμα",
   "shifts.empty.body":
     "Οι βάρδιες ζουν μέσα σε μια καμπάνια. Φτιάξε την πρώτη σου καμπάνια και πρόσθεσε τις βάρδιές της.",
@@ -140,6 +153,12 @@ export const el = {
   "auth.sending": "Αποστολή…",
   "auth.link_sent": "Αν η διεύθυνση έχει πρόσβαση, ο σύνδεσμος στάλθηκε. Άνοιξέ τον από την ίδια συσκευή.",
   "auth.link_failed": "Ο σύνδεσμος έληξε ή έχει ήδη χρησιμοποιηθεί. Ζήτησε καινούριο.",
+
+  // Η σελίδα που βλέπει κάποιος όταν χτυπήσει το όριο αιτήσεων στο middleware. Γραμμένη για
+  // promoter: δεν φταίει αυτός και ο σύνδεσμός του εξακολουθεί να ισχύει.
+  "rate_limit.title": "Πάρα πολλές αιτήσεις",
+  "rate_limit.body":
+    "Δοκίμασε ξανά σε λίγο. Αν άνοιξες τον σύνδεσμό σου πολλές φορές στη σειρά, περίμενε ένα λεπτό και ξαναπροσπάθησε — ο σύνδεσμος εξακολουθεί να ισχύει.",
   "auth.error_invalid_email": "Δώσε μια έγκυρη διεύθυνση email.",
   "auth.error_rate_limited": "Έγιναν πολλές προσπάθειες. Δοκίμασε ξανά σε λίγα λεπτά.",
   "auth.error_generic": "Δεν μπορέσαμε να στείλουμε τον σύνδεσμο τώρα. Δοκίμασε ξανά.",
@@ -155,6 +174,12 @@ export const el = {
   "auth.code_checking": "Έλεγχος…",
   "auth.code_invalid": "Ο κωδικός δεν είναι σωστός ή έληξε. Ζήτησε καινούριο.",
   "auth.create_agency_cta": "Δημιούργησε την εταιρεία σου",
+  "auth.invitation_waiting_title": "Σε περιμένει μια πρόσκληση",
+  "auth.invitation_waiting_body":
+    "Το «{agency}» σε κάλεσε στην ομάδα του ως {role}. Μέχρι να την αποδεχτείς, ο λογαριασμός σου δεν βλέπει δεδομένα.",
+  "auth.invitation_waiting_how":
+    "Άνοιξε τον σύνδεσμο της πρόσκλησης από το email που στάλθηκε στο {email}. Ο σύνδεσμος είναι μοναδικός και δεν μπορούμε να τον ξαναφτιάξουμε εδώ — αν δεν τον βρίσκεις, ζήτησε από τον ιδιοκτήτη να τον στείλει ξανά.",
+  "auth.invitation_waiting_other": "Ήθελες να φτιάξεις δικό σου πρακτορείο;",
 
   "promoters.add": "Προσθήκη promoter",
   "promoters.value_yes": "Ναι",
@@ -173,7 +198,8 @@ export const el = {
   "promoters.edit.archive_confirm_cancel": "Άκυρο",
   "promoters.edit.archived_notice": "Αυτός ο promoter είναι αρχειοθετημένος. Άλλαξε την κατάσταση παραπάνω σε \"Ενεργός\" για να τον επαναφέρεις.",
 
-  "promoters.list.subtitle": "{count} promoters",
+  "promoters.list.subtitle_one": "1 promoter",
+  "promoters.list.subtitle_many": "{count} promoters",
   "promoters.list.low_count_hint":
     "Η κατάταξη βγάζει νόημα μόνο με μια χούφτα promoters — πρόσθεσε τουλάχιστον 5-8 σε διαφορετικές περιοχές πριν δοκιμάσεις μια βάρδια.",
 
@@ -192,6 +218,11 @@ export const el = {
   "promoters.filter.apply": "Φίλτρο",
   "promoters.filter.clear": "Καθαρισμός φίλτρων",
   "promoters.filter.result_count": "{shown} από {total}",
+  "promoters.page.nav_label": "Σελίδες καταλόγου",
+  "promoters.page.range": "{from}–{to} από {total}",
+  "promoters.page.of": "Σελίδα {page} από {pages}",
+  "promoters.page.prev": "Προηγούμενη",
+  "promoters.page.next": "Επόμενη",
 
   "promoters.empty.title": "Δεν υπάρχουν promoters ακόμη",
   "promoters.empty.description":
@@ -366,6 +397,11 @@ export const el = {
   "campaigns.detail.mark_active": "Ενεργοποίηση",
   "campaigns.detail.mark_completed": "Ολοκλήρωση",
   "campaigns.detail.cancel": "Ακύρωση καμπάνιας",
+  "campaigns.detail.cancel_confirm_yes": "Ναι, ακύρωση καμπάνιας",
+  "campaigns.detail.cancel_confirm_no": "Άκυρο",
+  "campaigns.detail.status_error.transition":
+    "Η κατάσταση της καμπάνιας άλλαξε στο μεταξύ. Ανανέωσε τη σελίδα και δες πού βρίσκεται τώρα.",
+  "campaigns.detail.status_error.save_failed": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά.",
   "campaigns.detail.cancel_confirm":
     "Να ακυρωθεί η καμπάνια «{name}»; Οι βάρδιες θα παραμείνουν καταχωρημένες, αλλά η καμπάνια θα σημανθεί ακυρωμένη.",
 
@@ -412,6 +448,15 @@ export const el = {
   "campaigns.brief.default_title": "Brief — {campaign}",
   "campaigns.brief.save_draft": "Αποθήκευση πρόχειρου",
   "campaigns.brief.publish": "Δημοσίευση",
+  "campaigns.brief.republish": "Επαναδημοσίευση",
+  "campaigns.brief.state.published": "Δημοσιευμένο",
+  "campaigns.brief.state.published_at": "Δημοσιεύτηκε {when}",
+  "campaigns.brief.state.draft": "Πρόχειρο",
+  "campaigns.brief.state.none": "Δεν υπάρχει brief ακόμα",
+  "campaigns.brief.state.published_hint":
+    "Οι promoters το διαβάζουν ήδη από τον σύνδεσμο της πρόσκλησης. Ό,τι αποθηκεύσεις εδώ το βλέπουν αμέσως.",
+  "campaigns.brief.state.draft_hint":
+    "Κανένας promoter δεν το βλέπει ακόμα. Πάτα «Δημοσίευση» για να το δουν.",
   "campaigns.brief.saving": "Αποθήκευση…",
   "campaigns.brief.error.save_failed": "Δεν μπορέσαμε να αποθηκεύσουμε το brief. Δοκίμασε ξανά.",
 
@@ -510,10 +555,35 @@ export const el = {
   "shifts.board.started_no_checkin": "Η βάρδια έχει ξεκινήσει και δεν υπάρχει άφιξη ακόμα.",
   "shifts.board.cancel_action": "Ακύρωση ανάθεσης",
   "shifts.board.cancel_confirm": "Να ακυρωθεί η ανάθεση του/της {name};",
+  "shifts.board.cancel_confirm_yes": "Ναι, ακύρωση",
+  "shifts.board.invite_link.action": "Αντιγραφή συνδέσμου",
+  "shifts.board.invite_link.message.intro": "Νέα βάρδια",
+  "shifts.board.invite_link.message.cta": "Απάντησε εδώ:",
+  "shifts.board.invite_link.error.missing_ids": "Κάτι λείπει από το αίτημα. Ανανέωσε τη σελίδα.",
+  "shifts.board.invite_link.error.not_found": "Η πρόσκληση δεν βρέθηκε. Ανανέωσε τη σελίδα.",
+  "shifts.board.invite_link.error.not_pending":
+    "Η πρόσκληση δεν είναι πια ανοιχτή — απαντήθηκε ή ακυρώθηκε. Ανανέωσε τη σελίδα.",
+  "shifts.board.invite_link.error.invitation_expired":
+    "Η πρόσκληση έληξε. Ακύρωσέ την και στείλε καινούρια.",
+  "shifts.board.invite_link.error.link_unavailable":
+    "Ο σύνδεσμος αυτής της πρόσκλησης δεν μπορεί να ανακατασκευαστεί. Ακύρωσέ την και στείλε καινούρια.",
+  "shifts.board.invite_link.error.blocked_read_only":
+    "Ο λογαριασμός είναι σε κατάσταση μόνο για ανάγνωση, οπότε δεν στέλνονται προσκλήσεις. Τακτοποίησε τη Χρέωση.",
+  "shifts.board.cancel_invite.action": "Ακύρωση πρόσκλησης",
+  "shifts.board.cancel_invite.confirm":
+    "Να αποσυρθεί η πρόσκληση του/της {name}; Ο σύνδεσμος που έχει σταματάει να δουλεύει και η βάρδια μπορεί να προταθεί σε άλλον/άλλη.",
+  "shifts.board.cancel_invite.confirm_yes": "Ναι, απόσυρση",
+  "shifts.board.cancel_invite.error.missing_ids": "Κάτι λείπει από το αίτημα. Ανανέωσε τη σελίδα.",
+  "shifts.board.cancel_invite.error.not_found": "Η πρόσκληση δεν βρέθηκε. Ανανέωσε τη σελίδα.",
+  "shifts.board.cancel_invite.error.not_pending":
+    "Η πρόσκληση δεν είναι πια ανοιχτή. Ανανέωσε τη σελίδα.",
+  "shifts.board.cancel_invite.error.save_failed": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά.",
+  "shifts.board.confirm_no": "Άκυρο",
   "shifts.board.cancel_reason_label": "Λόγος ακύρωσης (προαιρετικό)",
   "shifts.board.cancel_reason_placeholder": "π.χ. αρρώστησε",
   "shifts.board.no_show_action": "Δεν εμφανίστηκε",
   "shifts.board.no_show_confirm": "Να καταγραφεί ότι ο/η {name} δεν εμφανίστηκε στη βάρδια;",
+  "shifts.board.no_show_confirm_yes": "Ναι, δεν εμφανίστηκε",
   "shifts.board.error.missing_ids": "Λείπουν στοιχεία στη φόρμα. Φόρτωσε ξανά τη σελίδα.",
   "shifts.board.error.not_found": "Δεν βρέθηκε αυτή η ανάθεση.",
   "shifts.board.error.not_confirmed": "Αυτή η ανάθεση δεν είναι πλέον επιβεβαιωμένη.",
@@ -523,7 +593,8 @@ export const el = {
   "shifts.replacements.why_title": "Γιατί χρειάζεται αναπλήρωση",
   "shifts.replacements.declined": "{name} αρνήθηκε — {when}",
   "shifts.replacements.cancelled": "Η ανάθεση του/της {name} ακυρώθηκε — {when}",
-  "shifts.replacements.pending_count": "{count} προσκλήσεις σε αναμονή απάντησης",
+  "shifts.replacements.pending_count_one": "1 πρόσκληση σε αναμονή απάντησης",
+  "shifts.replacements.pending_count_many": "{count} προσκλήσεις σε αναμονή απάντησης",
   "shifts.replacements.score_label": "Βαθμολογία αντιστοίχισης για {name}",
   "shifts.replacements.reinvite": "Πρόσκληση",
 
@@ -840,14 +911,16 @@ export const el = {
   "billing.plan.price_missing":
     "Η τιμή αυτού του πακέτου δεν έχει δημιουργηθεί ακόμα στο Stripe.",
 
-  "billing.interval.per_month": "/ μήνα",
-  "billing.interval.per_year": "/ έτος",
+  "billing.interval.per_month": "/μήνα",
+  "billing.interval.per_year": "/έτος",
   "billing.interval.annual_effective": "{price} τον μήνα, δύο μήνες δώρο",
   "billing.interval.switch_to_annual": "Ετήσια χρέωση — δύο μήνες δώρο",
   "billing.interval.switch_to_monthly": "Μηνιαία χρέωση",
 
   "billing.cta.subscribe": "Έναρξη συνδρομής",
   "billing.cta.change_plan": "Αλλαγή πακέτου",
+  "billing.cta.unavailable":
+    "Δεν μπορεί να πατηθεί ακόμα: η χρέωση δεν έχει ενεργοποιηθεί σε αυτόν τον λογαριασμό.",
   "billing.cta.current_plan": "Τρέχον πακέτο",
   "billing.cta.working": "Άνοιγμα Stripe…",
 
@@ -1038,6 +1111,8 @@ export const el = {
   // --- P24 — write guards on the remaining server actions (shifts, campaigns, team, invitations) ---
   "enforcement.invitations.blocked_read_only":
     "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να στείλεις νέες προσκλήσεις. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
+  "enforcement.campaigns.blocked_read_only_status":
+    "Ο λογαριασμός είναι σε κατάσταση μόνο για ανάγνωση, οπότε η κατάσταση της καμπάνιας δεν αλλάζει. Τακτοποίησε τη Χρέωση και ξαναδοκίμασε.",
   "enforcement.campaigns.blocked_read_only_create":
     "Ο λογαριασμός είναι μόνο για ανάγνωση αυτή τη στιγμή, οπότε δεν μπορείς να δημιουργήσεις νέα καμπάνια. Δες τη Χρέωση στις Ρυθμίσεις για να συνεχίσεις.",
   "enforcement.campaigns.blocked_read_only_brief":
@@ -1282,7 +1357,7 @@ export const el = {
     "Χωρίς επωνυμία και email επικοινωνίας, η σελίδα «Τα προσωπικά σου δεδομένα» δεν μπορεί να εμφανιστεί σε κανέναν promoter — θα δει σφάλμα αντί για την ενημέρωση που πρέπει να διαβάσει.",
   "agency_settings.not_set": "Δεν έχει οριστεί",
   "agency_settings.retention_value": "{months} μήνες",
-  "agency_settings.readonly_notice": "Μόνο ο owner του πρακτορείου μπορεί να αλλάξει αυτά τα στοιχεία.",
+  "agency_settings.readonly_notice": "Μόνο ο ιδιοκτήτης του πρακτορείου μπορεί να αλλάξει αυτά τα στοιχεία.",
 
   "agency_settings.form.legal_name.label": "Επωνυμία (νομικό πρόσωπο)",
   "agency_settings.form.legal_name.hint":
@@ -1301,7 +1376,7 @@ export const el = {
   "agency_settings.form.submitting": "Αποθήκευση...",
   "agency_settings.form.saved": "Αποθηκεύτηκε.",
 
-  "agency_settings.errors.not_owner": "Μόνο ο owner του πρακτορείου μπορεί να αλλάξει αυτά τα στοιχεία.",
+  "agency_settings.errors.not_owner": "Μόνο ο ιδιοκτήτης του πρακτορείου μπορεί να αλλάξει αυτά τα στοιχεία.",
   "agency_settings.errors.legal_name_required": "Γράψε την επωνυμία του πρακτορείου.",
   "agency_settings.errors.legal_name_too_long": "Η επωνυμία είναι πολύ μεγάλη — μέχρι 200 χαρακτήρες.",
   "agency_settings.errors.email_required": "Γράψε ένα email επικοινωνίας.",
@@ -1536,6 +1611,7 @@ export const el = {
   "shifts.sections.needs_people_one": "{count} βάρδια χρειάζεται ακόμα άτομα",
   "shifts.sections.needs_people_many": "{count} βάρδιες χρειάζονται ακόμα άτομα",
   "shifts.sections.needs_people_none": "Πλήρως στελεχωμένη",
+  "shifts.sections.needs_people_empty": "Καμία βάρδια ακόμα",
   "shifts.sections.add_shifts": "Προσθήκη βαρδιών",
   "shifts.sections.shifts_toggle_one": "Βάρδια ({count})",
   "shifts.sections.shifts_toggle_many": "Βάρδιες ({count})",
@@ -1707,6 +1783,11 @@ export const el = {
     "Χωρίς ρυθμισμένο email, κάθε promoter χρειάζεται τον σύνδεσμο από εσένα. Είναι έτοιμος για την καθεμία.",
   "messaging.unreachable.none": "Όλες οι ενεργές promoters μπορούν να λάβουν τον σύνδεσμο αυτόματα.",
   "messaging.unreachable.no_promoters": "Δεν υπάρχουν ακόμα ενεργές promoters.",
+  "messaging.unreachable.search_label": "Αναζήτηση στη λίστα",
+  "messaging.unreachable.search_placeholder": "Όνομα ή τηλέφωνο",
+  "messaging.unreachable.search_count": "{shown} από {total}",
+  "messaging.unreachable.search_empty_title": "Κανένα αποτέλεσμα",
+  "messaging.unreachable.search_empty_body": "Δοκίμασε άλλο όνομα ή τηλέφωνο.",
   "messaging.unreachable.link_label": "Σύνδεσμος διαθεσιμότητας για {name}",
   "messaging.unreachable.fix_email": "Διόρθωση email",
 
@@ -1749,6 +1830,8 @@ export const el = {
   "shifts.import.step.done": "Ολοκληρώθηκε",
   "shifts.import.close": "Κλείσιμο",
   "shifts.import.close_confirm": "Να κλείσει η εισαγωγή; Οι επιλογές σου θα χαθούν. Δεν έχει δημιουργηθεί τίποτα.",
+  "shifts.import.close_confirm_yes": "Ναι, κλείσιμο",
+  "shifts.import.close_confirm_no": "Συνέχισε την εισαγωγή",
   "shifts.import.back": "Πίσω",
   "shifts.import.next": "Επόμενο",
   "shifts.import.retry": "Δοκίμασε ξανά",
@@ -1838,6 +1921,7 @@ export const el = {
   "shifts.import.stores.badge.chosen": "Επιλέχθηκε",
   "shifts.import.stores.change": "Αλλαγή",
   "shifts.import.stores.choice_legend": "Τι να γίνει με το «{name}»",
+  "shifts.import.stores.likely_compare": "Στο αρχείο: {file} — Στη βάση: {existing}",
   "shifts.import.stores.likely_hint": "Μοιάζει με το «{store}». Βεβαιώσου ότι είναι το ίδιο κατάστημα.",
   "shifts.import.stores.use_existing": "Είναι υπάρχον κατάστημα",
   "shifts.import.stores.existing_label": "Κατάστημα",

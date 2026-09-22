@@ -36,10 +36,13 @@ export function BriefForm({
   campaignId,
   initialTitle,
   initialBody,
+  published = false,
 }: {
   campaignId: string;
   initialTitle: string;
   initialBody: string;
+  /** A2 finding 26 — an already-published brief re-publishes rather than publishes. */
+  published?: boolean;
 }) {
   const [state, formAction] = useActionState(saveBrief, INITIAL_STATE);
 
@@ -82,7 +85,7 @@ export function BriefForm({
 
       <Actions
         draftLabel={t("campaigns.brief.save_draft")}
-        publishLabel={t("campaigns.brief.publish")}
+        publishLabel={published ? t("campaigns.brief.republish") : t("campaigns.brief.publish")}
         savingLabel={t("campaigns.brief.saving")}
       />
     </form>

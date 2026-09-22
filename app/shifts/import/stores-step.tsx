@@ -15,8 +15,13 @@ export type StoreDecision =
   | { action: "skip" };
 
 export function defaultDecision(match: StoreMatch): StoreDecision {
-  // `exact` is accepted, `likely` pre-selected (and shown open); `none` is never guessed.
-  if (match.match && match.confidence !== "none") return { action: "existing", storeId: match.match.storeId };
+  // A2 finding 15 — only `exact` is accepted on the coordinator's behalf. A `likely` match used
+  // to be pre-selected *and* not block "Επόμενο", so clicking through a file quickly — which is
+  // what this feature is for — merged "Store Γλυφάδα" into "Store Κέντρο" silently, and nothing
+  // downstream ever contradicts a wrongly merged store. It is now a suggestion (the card stays
+  // open, names the candidate, and pre-fills the select the moment "υπάρχον" is chosen) rather
+  // than a decision, and it blocks the step exactly like an unknown store does.
+  if (match.match && match.confidence === "exact") return { action: "existing", storeId: match.match.storeId };
   return { action: "undecided" };
 }
 
@@ -44,6 +49,11 @@ export function decisionProblem(matches: StoreMatch[], decisionOf: (m: StoreMatc
 }
 
 const ORDER: Record<StoreMatch["confidence"], number> = { none: 0, likely: 1, exact: 2 };
+
+/** The stored address of a known store, for the side-by-side comparison on a likely match. */
+function storeAddressOf(storeId: string, stores: ImportStoreOption[]): string {
+  return stores.find((s) => s.id === storeId)?.address ?? "";
+}
 
 export function StoresStep({
   matches,
@@ -178,9 +188,20 @@ function StoreCard({
           <legend className="sr-only">{t("shifts.import.stores.choice_legend", { name: match.name })}</legend>
 
           {match.confidence === "likely" && match.match ? (
-            <p className="text-xs text-[color:var(--color-warn-ink)]">
-              {t("shifts.import.stores.likely_hint", { store: match.match.storeName })}
-            </p>
+            <div className="text-xs text-[color:var(--color-warn-ink)]">
+              <p>{t("shifts.import.stores.likely_hint", { store: match.match.storeName })}</p>
+              {/* A2 finding 15 — the file gives a name and a city, the database gives an
+                  address. Putting them next to each other is the only way to see that the two
+                  are different shops. */}
+              <p className="mt-1 text-[color:var(--color-muted)]">
+                {t("shifts.import.stores.likely_compare", {
+                  file: [match.name, match.city].filter(Boolean).join(" · "),
+                  existing: [match.match.storeName, storeAddressOf(match.match.storeId, stores)]
+                    .filter(Boolean)
+                    .join(" · "),
+                })}
+              </p>
+            </div>
           ) : null}
 
           <OptionChip className="flex-wrap">
@@ -189,7 +210,14 @@ function StoreCard({
               name={radioName}
               checked={decision.action === "existing"}
               disabled={stores.length === 0}
-              onChange={() => onDecide(() => ({ action: "existing", storeId: chosenStore?.id ?? ranked[0]?.id ?? "" }))}
+              onChange={() =>
+                onDecide(() => ({
+                  action: "existing",
+                  // The likely match first: it is the one the hint above names, so choosing
+                  // "υπάρχον κατάστημα" lands on it rather than on whatever sorts first.
+                  storeId: chosenStore?.id ?? match.match?.storeId ?? ranked[0]?.id ?? "",
+                }))
+              }
               className={RADIO_CLASS}
             />
             <span>{t("shifts.import.stores.use_existing")}</span>

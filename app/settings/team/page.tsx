@@ -24,7 +24,11 @@ function formatDate(value: string | null): string {
 
 function StatusBadge({ member }: { member: TeamMember }) {
   if (!member.active) return <Badge variant="neutral">{t("team.status.removed")}</Badge>;
-  if (!member.acceptedAt) return <Badge variant="warn">{t("team.status.invited")}</Badge>;
+  // A2 finding 20 — `accepted_at` is null on rows created by the operator helper
+  // `grant_agency_access()` (0011_accounts.sql), which is how the owner's own production row was
+  // made. The person reading this screen is signed in, so "Εκκρεμεί" on their own row is
+  // provably false whatever the column says: the session is the acceptance.
+  if (!member.acceptedAt && !member.isSelf) return <Badge variant="warn">{t("team.status.invited")}</Badge>;
   return <Badge variant="ok">{t("team.status.active")}</Badge>;
 }
 

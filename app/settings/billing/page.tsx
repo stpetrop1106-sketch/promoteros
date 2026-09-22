@@ -327,7 +327,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                   <p className="text-sm font-semibold text-[color:var(--color-ink)]">{t(PLAN_NAME[planId])}</p>
                   <p className="mt-1 text-lg font-semibold text-[color:var(--color-ink)]">
                     {formatEur(priceCents(plan, interval))}
-                    <span className="ml-1 text-xs font-normal text-[color:var(--color-muted)]">
+                    {/* A2 finding 29 — `ml-1` plus a leading space inside the key rendered
+                        "149 € / μήνα". The unit belongs against the amount. */}
+                    <span className="text-xs font-normal text-[color:var(--color-muted)]">
                       {interval === "year" ? t("billing.interval.per_year") : t("billing.interval.per_month")}
                     </span>
                   </p>
@@ -360,7 +362,12 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                     />
                   )}
 
-                  {configured && !priceReady ? (
+                  {/* A2 finding 23 — the button is disabled without a Stripe key, and a
+                      disabled button with no sentence beside it is indistinguishable from a
+                      broken one. Say which of the two reasons applies, per card. */}
+                  {!configured ? (
+                    <p className="mt-2 text-xs text-[color:var(--color-muted)]">{t("billing.cta.unavailable")}</p>
+                  ) : !priceReady ? (
                     <p className="mt-2 text-xs text-[color:var(--color-muted)]">{t("billing.plan.price_missing")}</p>
                   ) : null}
                 </div>
@@ -375,7 +382,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         <div className="mt-4">
           <PortalButton label={t("billing.portal.cta")} disabled={!configured || !entitlement.stripeCustomerId} />
         </div>
-        {!entitlement.stripeCustomerId ? (
+        {!configured ? (
+          <p className="mt-2 text-xs text-[color:var(--color-muted)]">{t("billing.cta.unavailable")}</p>
+        ) : !entitlement.stripeCustomerId ? (
           <p className="mt-2 text-xs text-[color:var(--color-muted)]">{t("billing.portal.unavailable")}</p>
         ) : null}
       </Card>

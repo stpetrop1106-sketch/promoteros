@@ -74,6 +74,14 @@ export default async function ShiftsPage({ searchParams }: { searchParams: Searc
   const filterCampaignOptions = campaignOptionsFrom(programmes);
   const filterClientOptions = clientOptionsFrom(programmes);
 
+  // A2 finding 16 — the subtitle used to pass `visibleSummaries.length` (a number of
+  // *sections*) into a string that said "βάρδιες", so four sections holding 25 shifts read
+  // "4 βάρδιες". Count both, each with its own singular, and say which is which. The old key
+  // also promised chronological order, which `sortProgrammeSummaries` does not produce (it
+  // ranks by upcoming-ness, then by descending end date) — that claim is gone with it.
+  const visibleShiftCount =
+    visibleSummaries.reduce((n, s) => n + s.shiftCount, 0) + unsectioned.shifts.length;
+
   const hasAnySection = programmes.length > 0;
   const hasVisibleContent = visibleSummaries.length > 0 || unsectioned.shifts.length > 0;
   const filtersActive = Boolean(clientName || campaignId || when !== "all" || showArchived);
@@ -84,8 +92,15 @@ export default async function ShiftsPage({ searchParams }: { searchParams: Searc
         <PageHeader
           title={t("shifts.title")}
           subtitle={
-            visibleSummaries.length > 0
-              ? t("shifts.list.subtitle", { count: visibleSummaries.length })
+            visibleShiftCount > 0
+              ? [
+                  visibleShiftCount === 1
+                    ? t("shifts.list.subtitle_shifts_one")
+                    : t("shifts.list.subtitle_shifts_many", { count: visibleShiftCount }),
+                  visibleSummaries.length === 1
+                    ? t("shifts.list.subtitle_sections_one")
+                    : t("shifts.list.subtitle_sections_many", { count: visibleSummaries.length }),
+                ].join(" ")
               : undefined
           }
           icon={<Icon name="calendar" size={20} />}

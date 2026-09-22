@@ -17,6 +17,7 @@ import type { BoardRow, BoardRowState } from "./board";
 import { CancelAssignmentButton } from "./cancel-assignment-button";
 import { MarkNoShowButton } from "./mark-no-show-button";
 import { CheckinLinkButton } from "./checkin-link-button";
+import { InvitationLinkButton } from "./invitation-link-button";
 
 type T = (key: TranslationKey, params?: Record<string, string | number>) => string;
 
@@ -119,6 +120,15 @@ export function StatusBoard({ shiftId, rows, t }: { shiftId: string; rows: Board
             </TableCell>
             <TableCell className="text-right">
               <div className="flex flex-col items-end gap-2">
+                {/* A2 finding 7 — an `awaiting_reply` row used to have nothing here at all. */}
+                {row.state === "awaiting_reply" && row.invitationId ? (
+                  <InvitationLinkButton
+                    shiftId={shiftId}
+                    invitationId={row.invitationId}
+                    fullName={row.fullName}
+                    phone={row.phone}
+                  />
+                ) : null}
                 {row.checkinLinkAvailable && row.assignmentId ? (
                   <CheckinLinkButton
                     shiftId={shiftId}
@@ -133,6 +143,8 @@ export function StatusBoard({ shiftId, rows, t }: { shiftId: string; rows: Board
                     assignmentId={row.assignmentId}
                     label={t("shifts.board.no_show_action")}
                     confirmText={t("shifts.board.no_show_confirm", { name: row.fullName })}
+                    confirmLabel={t("shifts.board.no_show_confirm_yes")}
+                    cancelLabel={t("shifts.board.confirm_no")}
                   />
                 ) : null}
                 {row.cancellable && row.assignmentId ? (
@@ -141,6 +153,8 @@ export function StatusBoard({ shiftId, rows, t }: { shiftId: string; rows: Board
                     assignmentId={row.assignmentId}
                     label={t("shifts.board.cancel_action")}
                     confirmText={t("shifts.board.cancel_confirm", { name: row.fullName })}
+                    confirmLabel={t("shifts.board.cancel_confirm_yes")}
+                    cancelLabel={t("shifts.board.confirm_no")}
                     reasonLabel={t("shifts.board.cancel_reason_label")}
                     reasonPlaceholder={t("shifts.board.cancel_reason_placeholder")}
                   />
