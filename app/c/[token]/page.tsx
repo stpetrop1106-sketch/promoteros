@@ -131,7 +131,7 @@ export default async function CheckinPage({
       <p className="mt-10 text-center text-xs">
         <Link
           className="text-[color:var(--color-muted)] underline underline-offset-2"
-          href="/privacy/promoters"
+          href={`/c/${token}/privacy`}
         >
           {t("promoter_privacy.link")}
         </Link>

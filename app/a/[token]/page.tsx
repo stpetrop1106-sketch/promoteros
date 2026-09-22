@@ -179,7 +179,7 @@ export default async function PromoterAvailabilityPage({
       <p className="mt-6 text-center text-xs">
         <Link
           className="text-[color:var(--color-muted)] underline underline-offset-2"
-          href="/privacy/promoters"
+          href={`/a/${token}/privacy`}
         >
           {t("promoter_privacy.link")}
         </Link>
