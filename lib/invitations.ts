@@ -11,6 +11,7 @@ import {
   linkFor,
 } from "@/lib/tokens";
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
+import { isActivePromoterStatus } from "@/lib/promoter-status";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { formatShiftWhen } from "@/lib/shift-format";
 
@@ -22,6 +23,17 @@ export type InvitationView = {
   promoterName: string;
   /** A3-12 — who the invitation is from. A promoter working for three agencies could not tell. */
   agencyName: string;
+  /**
+   * A3-06 — false once the coordinator has archived or blocklisted this promoter.
+   *
+   * Archiving is the product's stated way to cut someone off, and until now it stopped exactly one
+   * of their four links: `app/a/[token]/data.ts` gates on `promoters.status` and calls it "the
+   * closest thing we have to revocation", while this loader, `respondToInvitation` and every
+   * function in `lib/checkins.ts` never selected the column at all. So an archived promoter kept a
+   * working invitation page with a live Accept button. The page reads this to replace that button
+   * with a sentence; `respondToInvitation` is the gate that actually holds.
+   */
+  promoterActive: boolean;
   campaignName: string;
   storeName: string;
   /** A3-13 — "ΑΒ Βασιλόπουλος" is not an answer to "can you work this?"; how far away it is, is. */
@@ -163,7 +175,8 @@ export async function loadInvitation(token: string): Promise<
       // this promoter by other means (the agency is named in the privacy notice they can reach
       // from this page; the address is on the arrival page they get after accepting) — no new
       // class of data reaches the link, it is only shown at the moment the decision is made.
-      "id, status, token_hash, expires_at, agencies(name), promoters(full_name), shifts(on_date, start_time, end_time, rate_cents_override, campaigns(name, dress_code, rate_cents), stores(name, address))",
+      // A3-06 adds `promoters.status` — one more column on an embed that was already here.
+      "id, status, token_hash, expires_at, agencies(name), promoters(full_name, status), shifts(on_date, start_time, end_time, rate_cents_override, campaigns(name, dress_code, rate_cents), stores(name, address))",
     )
     .eq("id", verified.recordId)
     .single();
@@ -180,7 +193,7 @@ export async function loadInvitation(token: string): Promise<
     campaigns: { name: string; dress_code: string | null; rate_cents: number } | null;
     stores: { name: string; address: string | null } | null;
   } | null;
-  const promoter = data.promoters as unknown as { full_name: string } | null;
+  const promoter = data.promoters as unknown as { full_name: string; status: string } | null;
   const agency = data.agencies as unknown as { name: string } | null;
 
   if (!shift) return { ok: false, reason: "not_found" };
@@ -197,6 +210,7 @@ export async function loadInvitation(token: string): Promise<
       invitationId: data.id,
       promoterName: promoter?.full_name ?? "",
       agencyName: agency?.name ?? "",
+      promoterActive: isActivePromoterStatus(promoter?.status),
       campaignName: shift.campaigns?.name ?? "",
       storeName: shift.stores?.name ?? "",
       storeAddress: shift.stores?.address ?? null,
@@ -238,6 +252,18 @@ export async function respondToInvitation(
   if (error || !invitation) return { ok: false, reason: "not_found" };
   if (invitation.token_hash !== hashToken(token)) return { ok: false, reason: "bad_signature" };
   if (invitation.status !== "pending") return { ok: false, reason: "already_answered" };
+
+  // A3-06 — the gate that actually holds. `loadInvitation` hides the Accept button for an
+  // archived or blocklisted promoter, but a hidden button is not a rule: this URL is a plain
+  // POST and the page is the only thing between it and an `assignments` row. A promoter the
+  // agency has cut off, possibly after an incident, must not be able to put themselves back on
+  // a shift by reposting a form they still have open.
+  const { data: promoter } = await db
+    .from("promoters")
+    .select("status")
+    .eq("id", invitation.promoter_id)
+    .maybeSingle<{ status: string }>();
+  if (!isActivePromoterStatus(promoter?.status)) return { ok: false, reason: "inactive" };
 
   if (answer === "decline") {
     await db

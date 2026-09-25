@@ -70,6 +70,10 @@ export default async function CheckinPage({
     alreadyCheckedIn: t("checkin.already_checked_in_error"),
     saveFailedByReason: {
       already_checked_in: t("checkin.already_checked_in_error"),
+      // A3-06 — reachable only by a race (archived while the page was open); the page below
+      // already hides the form. Named anyway, because "try again" would be a lie.
+      inactive: t("checkin.error.inactive"),
+      cancelled: t("checkin.error.cancelled"),
       default: t("checkin.save_failed"),
     },
   };
@@ -128,6 +132,13 @@ export default async function CheckinPage({
       ) : notYetTime ? (
         <p className="mt-6 text-center text-sm text-[color:var(--color-muted)]">
           {t("checkin.not_yet_time")}
+        </p>
+      ) : !v.promoterActive ? (
+        /* A3-06 — archived or blocklisted. Note where this branch sits: BELOW `v.checkedIn`, so
+           someone who already arrived keeps their route to the field report. Only a new arrival
+           is refused. `submitCheckin` is the gate that holds. */
+        <p className="mt-6 rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 text-sm text-[color:var(--color-ink)]">
+          {t("checkin.error.inactive")}
         </p>
       ) : (
         <CheckinForm

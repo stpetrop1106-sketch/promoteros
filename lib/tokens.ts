@@ -1,3 +1,4 @@
+import "server-only";
 import { createHmac, timingSafeEqual, createHash } from "node:crypto";
 
 /**
@@ -7,6 +8,26 @@ import { createHmac, timingSafeEqual, createHash } from "node:crypto";
  * itself is the credential, so it is HMAC-signed, scoped to one purpose and one record, and
  * short-lived. Only the HASH is stored; the raw token exists in the message and nowhere else,
  * so a database leak does not hand anyone a working link.
+ *
+ * ---------------------------------------------------------------------------
+ * `server-only` — A1-09
+ * ---------------------------------------------------------------------------
+ * This module reads `TOKEN_SIGNING_SECRET`, the one value that makes every promoter link
+ * forgeable if it escapes. Nothing leaks today and nothing ever did: a bundle scan over the
+ * built client found no secret, Next inlines only `NEXT_PUBLIC_*`, and the `node:crypto` import
+ * above already fails a client build on its own. The directive is a guardrail rather than a fix —
+ * it turns an accidental client import into a build failure with a sentence that names the
+ * mistake, instead of a `node:crypto` resolution error that reads like a bundler problem, or a
+ * page that throws on a promoter's phone.
+ *
+ * The cost was one real refactor, which is why it had not been done: `lib/availability-links.ts`
+ * imports this file and was deliberately pure so both availability grids could reach its date
+ * helpers. Its pure half now lives in `lib/availability-dates.ts` and is re-exported, so the wall
+ * goes around the crypto and nothing else.
+ *
+ * The three test files that exercise signing neutralise this with `vi.mock("server-only")` — the
+ * alternative, aliasing the package away in `vitest.config.ts`, would have removed the guardrail
+ * from every module in the project to buy it for one.
  */
 
 export type TokenPurpose = "invitation" | "checkin";

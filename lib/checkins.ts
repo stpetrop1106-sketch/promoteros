@@ -9,6 +9,7 @@ import {
   hashToken,
 } from "@/lib/tokens";
 import { distanceMetres, type Coordinates } from "@/lib/geo";
+import { isActivePromoterStatus } from "@/lib/promoter-status";
 
 /**
  * Check-in and field report for the day of the shift.
@@ -44,6 +45,8 @@ export type CheckinView = {
   startTime: string;
   endTime: string;
   briefSummary: string | null;
+  /** A3-06 — false once the coordinator has archived or blocklisted this promoter. */
+  promoterActive: boolean;
   checkedIn: boolean;
   checkinMethod: "geolocation" | "manual_override" | "coordinator" | null;
   withinGeofence: boolean | null;
@@ -64,7 +67,7 @@ type AssignmentRow = {
   agency_id: string;
   shift_id: string;
   status: string;
-  promoters: { full_name: string } | null;
+  promoters: { full_name: string; status: string } | null;
   shifts: ShiftRow | null;
 };
 
@@ -212,7 +215,8 @@ export async function loadCheckin(
   const { data, error } = await db
     .from("assignments")
     .select(
-      "id, agency_id, shift_id, status, promoters(full_name), shifts(campaign_id, on_date, start_time, end_time, campaigns(name), stores(name, address, lat, lng))",
+      // A3-06 adds `promoters.status` to an embed that was already here.
+      "id, agency_id, shift_id, status, promoters(full_name, status), shifts(campaign_id, on_date, start_time, end_time, campaigns(name), stores(name, address, lat, lng))",
     )
     .eq("id", verified.recordId)
     .single();
@@ -254,6 +258,7 @@ export async function loadCheckin(
       startTime: String(shift.start_time).slice(0, 5),
       endTime: String(shift.end_time).slice(0, 5),
       briefSummary,
+      promoterActive: isActivePromoterStatus(row.promoters?.status),
       checkedIn: !!checkin,
       checkinMethod: (checkin?.method as CheckinView["checkinMethod"]) ?? null,
       withinGeofence: checkin?.within_geofence ?? null,
@@ -295,7 +300,8 @@ export async function submitCheckin(
   const db = createAdminClient();
   const { data, error } = await db
     .from("assignments")
-    .select("id, agency_id, status, shifts(stores(lat, lng))")
+    // A3-06 — `promoters(status)` is the only addition.
+    .select("id, agency_id, status, promoters(status), shifts(stores(lat, lng))")
     .eq("id", verified.recordId)
     .single();
   if (error || !data) return { ok: false, reason: "not_found" };
@@ -304,9 +310,15 @@ export async function submitCheckin(
     id: string;
     agency_id: string;
     status: string;
+    promoters: { status: string } | null;
     shifts: { stores: { lat: number; lng: number } | null } | null;
   };
   if (assignment.status === "cancelled") return { ok: false, reason: "cancelled" };
+  // A3-06 — recording an arrival is a write, and an arrival is what a shift is paid against. A
+  // promoter the agency has blocklisted must not be able to put one on the record.
+  if (!isActivePromoterStatus(assignment.promoters?.status)) {
+    return { ok: false, reason: "inactive" };
+  }
 
   const { data: existing } = await db
     .from("check_ins")
@@ -354,7 +366,16 @@ export type FieldReportInput = {
   notes: string | null;
 };
 
-/** Submit the post-shift field report. Requires a check-in to already exist. */
+/**
+ * Submit the post-shift field report. Requires a check-in to already exist.
+ *
+ * A3-06 — deliberately NOT gated on `promoters.status`, unlike `submitCheckin` above and
+ * `respondToInvitation`. A report can only exist behind a check-in, so by definition this person
+ * already stood in the store and did the work; refusing their report after the coordinator
+ * archives them throws away the CLIENT's data to punish the promoter, and the client's report is
+ * the thing the agency is paid for. The audit's own suggested fix says the same. See
+ * `lib/promoter-status.ts`.
+ */
 export async function submitFieldReport(
   token: string,
   input: FieldReportInput,
@@ -410,6 +431,8 @@ export async function submitFieldReport(
  *
  * Deliberately separate from `submitFieldReport`: the report text must be saved first so a
  * failed photo upload never loses the rest of the report (quality bar in the P9 brief).
+ * Ungated on `promoters.status` for the same reason as `submitFieldReport` — and it cannot run
+ * without a `field_reports` row, which cannot exist without a check-in.
  * Storage policies cannot evaluate our HMAC token scheme (see migration 0009's comment), so
  * this — like every write in this file — verifies the token in application code and only then
  * reaches the service-role client.

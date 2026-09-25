@@ -1,4 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// A1-09 — `lib/tokens.ts` now carries `import "server-only"`, whose Node build throws on
+// import. Neutralised here rather than aliased away in vitest.config.ts: the guardrail should
+// stay real for every other module, and these three files are the ones that must reach the
+// signing code itself.
+vi.mock("server-only", () => ({}));
 import { createHmac } from "node:crypto";
 import { acceptedInvitationStillReadable, mintToken, verifyToken, verifyTokenSignature } from "@/lib/tokens";
 

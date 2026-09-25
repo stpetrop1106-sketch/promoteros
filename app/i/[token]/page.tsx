@@ -181,7 +181,16 @@ export default async function InvitationPage({
         </div>
       ) : null}
 
-      {!answered ? (
+      {/* A3-06 — an archived or blocklisted promoter keeps a readable page (they may need to see
+          which shift this was, and who to ask) but loses the Accept button. The rule itself is
+          enforced in `respondToInvitation`; this is only what it looks like. */}
+      {!answered && !v.promoterActive ? (
+        <p className="mt-6 rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 text-sm text-[color:var(--color-ink)]">
+          {t("invitation.error.inactive")}
+        </p>
+      ) : null}
+
+      {!answered && v.promoterActive ? (
         <>
           <p className="mt-6 text-center text-sm">{t("invitation.question")}</p>
           <RespondForm
@@ -194,6 +203,7 @@ export default async function InvitationPage({
             acceptedLabel={t("invitation.accepted")}
             declinedLabel={t("invitation.declined")}
             alreadyAnsweredLabel={t("invitation.error.already_answered")}
+            inactiveLabel={t("invitation.error.inactive")}
             errorLabel={t("invitation.error.generic")}
             offlineLabel={t("promoter.offline")}
           />

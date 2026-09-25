@@ -1,4 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
+
+// A1-09 — reaches `lib/tokens.ts` through `lib/dispatch/messages.ts`, which mints a real
+// availability link. `lib/tokens.ts` now carries `import "server-only"`, whose Node build throws
+// on import. Neutralised here rather than aliased away in vitest.config.ts: the guardrail should
+// stay real for every module that does not genuinely need to cross it.
+vi.mock("server-only", () => ({}));
+
 import {
   isRunPeriodKey,
   manualPeriodKey,

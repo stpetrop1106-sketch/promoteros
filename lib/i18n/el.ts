@@ -2057,12 +2057,18 @@ export const el = {
     "Ο σύνδεσμος δεν είναι έγκυρος — μπορεί να κόπηκε όταν αντιγράφηκε.",
   "invitation.error.not_found": "Δεν βρήκαμε αυτή την πρόσκληση.",
   "invitation.error.wrong_purpose": "Αυτός ο σύνδεσμος δεν είναι πρόσκληση σε βάρδια.",
+  // A3-06 · archived or blocklisted. Says what changed and who to talk to, without a verdict.
+  "invitation.error.inactive":
+    "Η συνεργασία σου με το πρακτορείο δεν είναι ενεργή αυτή τη στιγμή, οπότε δεν μπορείς να αναλάβεις αυτή τη βάρδια. Μίλα με τον συντονιστή σου.",
   "checkin.error.expired": "Αυτός ο σύνδεσμος έληξε.",
   "checkin.error.bad_token":
     "Ο σύνδεσμος δεν είναι έγκυρος — μπορεί να κόπηκε όταν αντιγράφηκε.",
   "checkin.error.not_found": "Δεν βρήκαμε αυτή τη βάρδια.",
   "checkin.error.wrong_purpose": "Αυτός ο σύνδεσμος δεν είναι σελίδα άφιξης.",
   "checkin.error.cancelled": "Αυτή η βάρδια ακυρώθηκε. Δεν χρειάζεται να πας στο κατάστημα.",
+  // A3-06 · the arrival is a write and is what the shift is paid against.
+  "checkin.error.inactive":
+    "Η συνεργασία σου με το πρακτορείο δεν είναι ενεργή αυτή τη στιγμή, οπότε δεν μπορείς να δηλώσεις άφιξη. Μίλα με τον συντονιστή σου.",
 
   // A3-02 · a cancelled assignment must replace the confirmation, never sit underneath it.
   "invitation.cancelled.title": "Η βάρδια ακυρώθηκε",

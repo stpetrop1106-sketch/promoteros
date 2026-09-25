@@ -2014,11 +2014,17 @@ export const en: Record<TranslationKey, string> = {
   "invitation.error.bad_token": "The link is not valid — it may have been cut when it was copied.",
   "invitation.error.not_found": "We could not find this invitation.",
   "invitation.error.wrong_purpose": "This link is not a shift invitation.",
+  // A3-06
+  "invitation.error.inactive":
+    "Your work with the agency is not active at the moment, so you cannot take this shift. Talk to your coordinator.",
   "checkin.error.expired": "This link has expired.",
   "checkin.error.bad_token": "The link is not valid — it may have been cut when it was copied.",
   "checkin.error.not_found": "We could not find this shift.",
   "checkin.error.wrong_purpose": "This link is not an arrival page.",
   "checkin.error.cancelled": "This shift was cancelled. You do not need to go to the store.",
+  // A3-06
+  "checkin.error.inactive":
+    "Your work with the agency is not active at the moment, so you cannot record an arrival. Talk to your coordinator.",
 
   // A3-02
   "invitation.cancelled.title": "The shift was cancelled",

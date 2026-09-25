@@ -56,6 +56,7 @@ export function RespondForm({
   acceptedLabel,
   declinedLabel,
   alreadyAnsweredLabel,
+  inactiveLabel,
   errorLabel,
   offlineLabel,
 }: {
@@ -66,6 +67,7 @@ export function RespondForm({
   acceptedLabel: string;
   declinedLabel: string;
   alreadyAnsweredLabel: string;
+  inactiveLabel: string;
   errorLabel: string;
   offlineLabel: string;
 }) {
@@ -105,7 +107,9 @@ export function RespondForm({
         ? offlineLabel
         : state.reason === "already_answered"
           ? alreadyAnsweredLabel
-          : errorLabel
+          : state.reason === "inactive"
+            ? inactiveLabel
+            : errorLabel
       : null;
 
   return (
