@@ -141,6 +141,23 @@ and the "send to everyone" button would attempt a real third-party address that 
 promoter list. A verified domain resolves both, and nothing in the code changes when it arrives —
 only `EMAIL_FROM`.
 
+### D23 — Availability stops at 23:00; a shift that crosses midnight is out of scope · 2026-09-25
+
+The promoter audit (A3-19) found that availability cannot express a window crossing midnight:
+`START_TIMES` offers 06:00–22:00, `END_TIMES` 08:00–23:00, and `planRow` rejects an end at or
+before the start. Promotion work does sometimes run past midnight, so the audit raised it as a
+design question rather than a defect and declined to invent an answer.
+
+**Answered by the owner: promoters declare up to 23:00, and that is the cap.** No change was
+needed — 23:00 is already the last option in `END_TIMES` — so this entry exists to stop the next
+person rediscovering the limitation and "fixing" it.
+
+The matching filter has the same shape (`from_time <= shift.start_time and to_time >=
+shift.end_time`, `0007_match_radius.sql`), so the engine and the promoter's grid agree. A shift
+running 22:00–02:00 therefore cannot be matched automatically at all; it is staffed by hand. If
+that becomes common, the change is a model change — an availability window that carries a date
+boundary — not a wider dropdown, and it touches the matching SQL as much as the UI.
+
 ---
 
 ## Open questions
