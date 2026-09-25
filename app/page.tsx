@@ -1,23 +1,12 @@
-import { Landing } from "@/app/landing";
+import { Home } from "@/app/home";
 
-type HomeProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
-
-export default async function Home({ searchParams }: HomeProps) {
-  const params = await searchParams;
-  const value = (key: string) => {
-    const parameter = params[key];
-    return typeof parameter === "string" ? parameter.slice(0, 120) : "";
-  };
-
-  return (
-    <Landing
-      attribution={{
-        source: value("utm_source"),
-        medium: value("utm_medium"),
-        campaign: value("utm_campaign"),
-      }}
-    />
-  );
+/**
+ * The front door of PromoterOS.
+ *
+ * This used to render the waitlist, which made a page we intend to delete the first thing anyone
+ * saw of the product. The waitlist now lives at `/waitlist` and this is the product page:
+ * what PromoterOS does, for whom, and a way in. See `app/home.tsx`.
+ */
+export default function Page() {
+  return <Home />;
 }

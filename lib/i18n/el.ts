@@ -2121,4 +2121,82 @@ export const el = {
   // The value is deliberately the OTHER language's own name in each dictionary.
   "promoter.language.other": "English",
   "promoter.language.label": "Γλώσσα",
+
+  // --- The PromoterOS product page (`/`) ------------------------------------------------------
+  // Separate from `landing.*`, which belongs to the waitlist and now lives at `/waitlist`. The
+  // waitlist is a temporary lead collector the owner intends to switch off; the product page has
+  // to outlive it, so the two share no keys on purpose.
+  "home.nav.login": "Σύνδεση",
+  "home.nav.waitlist": "Λίστα αναμονής",
+
+  "home.hero.eyebrow": "Λειτουργικό σύστημα για πρακτορεία προώθησης",
+  "home.hero.title": "Σταμάτα να κυνηγάς promoters στο τηλέφωνο.",
+  "home.hero.lede":
+    "Το PromoterOS προτείνει ποια ταιριάζει σε κάθε βάρδια, στέλνει την πρόσκληση, καταγράφει την απάντηση και βρίσκει αντικαταστάτρια όταν κάποια ακυρώσει. Εσύ βλέπεις μόνο ό,τι θέλει απόφαση.",
+  "home.hero.cta": "Σύνδεση",
+  "home.hero.secondary": "Δες πώς δουλεύει",
+  "home.hero.proof_1": "Κάθε πρόταση με εξήγηση",
+  "home.hero.proof_2": "Ο promoter δεν φτιάχνει λογαριασμό",
+  "home.hero.proof_3": "Ελληνικά από την πρώτη οθόνη",
+
+  "home.day.label": "Μια μέρα συντονισμού",
+  "home.day.title": "Δεκατέσσερα τηλεφωνήματα, ή μία οθόνη.",
+  "home.day.before_title": "Χωρίς PromoterOS",
+  "home.day.before_1": "Ψάχνεις στο Excel ποια είναι ελεύθερη Σάββατο στη Γλυφάδα.",
+  "home.day.before_2": "Στέλνεις δεκατέσσερα μηνύματα και περιμένεις.",
+  "home.day.before_3": "Μία ακυρώνει στις έντεκα το βράδυ. Ξαναρχίζεις.",
+  "home.day.before_4": "Το πρωί δεν ξέρεις ποια έφτασε, μέχρι να τηλεφωνήσεις.",
+  "home.day.before_5": "Η αναφορά για τον πελάτη γράφεται Κυριακή βράδυ.",
+  "home.day.after_title": "Με PromoterOS",
+  "home.day.after_1": "Η λίστα έρχεται κατατεταγμένη, με τον λόγο δίπλα σε κάθε όνομα.",
+  "home.day.after_2": "Η πρόσκληση φεύγει με ένα πάτημα.",
+  "home.day.after_3": "Η ακύρωση φέρνει μόνη της τις επόμενες υποψήφιες.",
+  "home.day.after_4": "Οι αφίξεις φαίνονται στην οθόνη, όσο συμβαίνουν.",
+  "home.day.after_5": "Τα στοιχεία του πεδίου είναι ήδη συγκεντρωμένα.",
+
+  "home.match.label": "Η καρδιά του συστήματος",
+  "home.match.title": "Σου λέει ποια ταιριάζει — και γιατί.",
+  "home.match.body":
+    "Η κατάταξη δεν είναι μαύρο κουτί και δεν τη βγάζει κάποιο μοντέλο που δεν μπορείς να ελέγξεις. Κάθε πρόταση έρχεται αναλυμένη σε παράγοντες που καταλαβαίνεις, με τα βάρη ρυθμισμένα όπως δουλεύει το δικό σου πρακτορείο. Και την τελική επιλογή την κάνεις πάντα εσύ.",
+  "home.match.example_name": "Μαρία Κ.",
+  "home.match.example_score": "Βαθμολογία",
+  "home.match.factor_distance": "Απόσταση",
+  "home.match.factor_brand": "Εμπειρία στη μάρκα",
+  "home.match.factor_category": "Κατηγορία",
+  "home.match.factor_skills": "Δεξιότητες",
+  "home.match.factor_reliability": "Αξιοπιστία",
+
+  "home.flow.label": "Ο κύκλος μιας βάρδιας",
+  "home.flow.title": "Από το κενό στο στελεχωμένο, χωρίς να το κυνηγήσεις.",
+  "home.flow.step_1_title": "Προτείνει",
+  "home.flow.step_1_body": "Κατατάσσει το μητρώο σου για τη συγκεκριμένη βάρδια, το συγκεκριμένο κατάστημα, τη συγκεκριμένη ώρα.",
+  "home.flow.step_2_title": "Στέλνει",
+  "home.flow.step_2_body": "Μία πρόσκληση με σύνδεσμο. Ανοίγει στο κινητό, χωρίς εγκατάσταση και χωρίς κωδικό.",
+  "home.flow.step_3_title": "Απαντά",
+  "home.flow.step_3_body": "Δέχομαι ή Δεν μπορώ, με ένα πάτημα. Η απάντηση είναι ήδη στον πίνακά σου.",
+  "home.flow.step_4_title": "Αναπληρώνει",
+  "home.flow.step_4_body": "Ακύρωση δύο μέρες πριν; Οι επόμενες υποψήφιες είναι ήδη κατατεταγμένες.",
+  "home.flow.step_5_title": "Δηλώνει άφιξη",
+  "home.flow.step_5_body": "Τοποθεσία τη στιγμή της άφιξης, μία φορά. Βλέπεις ποια έφτασε χωρίς να πάρεις τηλέφωνο.",
+  "home.flow.step_6_title": "Αναφέρει",
+  "home.flow.step_6_body": "Φωτογραφίες, πωλήσεις, θέματα stock. Η αναφορά για τον πελάτη γράφεται μόνη της.",
+
+  "home.trust.label": "Όρια που δεν περνάμε",
+  "home.trust.title": "Τα δεδομένα των promoters δεν είναι εμπόρευμα.",
+  "home.trust.item_1_title": "Καμία παρακολούθηση",
+  "home.trust.item_1_body": "Η θέση καταγράφεται μία φορά, τη στιγμή που κάποια δηλώνει άφιξη. Κρατάμε την απόσταση από το κατάστημα — όχι το πού βρίσκεται, ούτε πριν ούτε μετά.",
+  "home.trust.item_2_title": "Κανένα κοινό μητρώο",
+  "home.trust.item_2_body": "Το μητρώο σου είναι δικό σου. Κανένα άλλο πρακτορείο δεν το βλέπει, δεν συγκρίνεται μαζί σου και δεν αντλεί από αυτό. Ποτέ.",
+  "home.trust.item_3_title": "Η τοποθεσία δεν πληρώνει κανέναν",
+  "home.trust.item_3_body": "Υπάρχει πάντα χειροκίνητη επιβεβαίωση. Κανείς δεν μένει απλήρωτος επειδή το GPS ενός κινητού έδειξε ογδόντα μέτρα πιο πέρα.",
+
+  "home.cta.title": "Έτοιμο για το πρακτορείο σου.",
+  "home.cta.body": "Μπες με το email σου. Χωρίς εγκατάσταση, χωρίς κάρτα.",
+  "home.cta.button": "Σύνδεση",
+  "home.cta.waitlist": "Δεν έχεις πρόσβαση ακόμη;",
+  "home.cta.waitlist_link": "Γράψου στη λίστα αναμονής",
+
+  "home.footer.tagline": "PromoterOS — λειτουργία προωθητικών ενεργειών, σε τάξη.",
+  "home.footer.privacy": "Πολιτική απορρήτου",
+
 } as const;
