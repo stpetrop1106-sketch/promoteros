@@ -73,10 +73,16 @@ export function InviteButton({
 
   // Never the raw error message — the action used to hand back `Error#message` ("Shift not found",
   // a Postgres error), which is not a sentence a coordinator should have to read.
+  //
+  // A1-10: one exception. A read-only subscription is the only failure here the coordinator can
+  // actually do something about, so it says so instead of "try again in a moment" — which was
+  // advice that would never once have worked.
   if (state.status === "error") {
     return (
       <p role="alert" className="text-xs text-[color:var(--color-bad-ink)]">
-        {t("shifts.invite.failed")}
+        {state.reason === "blocked_read_only"
+          ? t("invite_panel.send.error.blocked_read_only")
+          : t("shifts.invite.failed")}
       </p>
     );
   }

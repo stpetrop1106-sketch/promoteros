@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createInvitation, refreshShiftStatus } from "@/lib/invitations";
+import { createInvitation, refreshShiftStatus, InvitationBlockedError } from "@/lib/invitations";
 import { createCheckinLink, checkinLinkTtlHours } from "@/lib/checkins";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
@@ -61,7 +61,13 @@ export async function invite(
       ? { status: "sent", url: result.url }
       : { status: "manual", manualBody: result.manualBody ?? "", url: result.url };
   } catch (err) {
-    return { status: "error", reason: err instanceof Error ? err.message : "unknown" };
+    // A billing refusal is the one failure the coordinator can act on, so it keeps its own code.
+    if (err instanceof InvitationBlockedError) return { status: "error", reason: err.code };
+
+    // Everything else: the real text goes to the server log, never into the action's response.
+    // It names columns, constraints and policies, and it is not a sentence anyone should read.
+    console.error("invite failed", { message: err instanceof Error ? err.message : String(err) });
+    return { status: "error", reason: "unknown" };
   }
 }
 

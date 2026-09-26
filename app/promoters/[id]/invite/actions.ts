@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
-import { createInvitation } from "@/lib/invitations";
+import { createInvitation, InvitationBlockedError } from "@/lib/invitations";
 import { loadEligibilityForShift } from "./data";
 import type { SendInviteState } from "./state";
 
@@ -49,10 +49,15 @@ export async function sendInviteFromProfile(
     return result.delivered
       ? { status: "sent", url: result.url }
       : { status: "manual", manualBody: result.manualBody ?? "", url: result.url };
-  } catch {
-    // Never surface `Error#message` to the promoter-facing… no, this is coordinator-facing, but
-    // still: an internal message ("Shift not found", a Postgres error) is not a sentence a
-    // coordinator should have to read. A short, known code maps to one Greek sentence below.
+  } catch (err) {
+    // A1-10 — `blocked_read_only` was already in this screen's KNOWN_ERROR_REASONS and already had
+    // its own Greek sentence. Nothing ever produced it, because the refusal arrived as an
+    // untyped Error and was flattened into "unknown" here.
+    if (err instanceof InvitationBlockedError) return { status: "error", reason: err.code };
+
+    // Everything else: an internal message ("Shift not found", a Postgres error) is not a
+    // sentence a coordinator should have to read. It goes to the log; a known code goes back.
+    console.error("invite failed", { message: err instanceof Error ? err.message : String(err) });
     return { status: "error", reason: "unknown" };
   }
 }

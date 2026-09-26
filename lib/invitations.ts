@@ -18,6 +18,24 @@ import { formatShiftWhen } from "@/lib/shift-format";
 const DEFAULT_TTL_HOURS = 24;
 const t = translatorFor(DEFAULT_LOCALE);
 
+/**
+ * A1-10 — why this is a class and not just an Error with a message.
+ *
+ * `createInvitation` refused a read-only agency by throwing the translated sentence, and both
+ * callers caught it, could not tell it apart from "Shift not found" or a Postgres error, and
+ * rendered one generic "the invitation was not sent". So a coordinator whose subscription had
+ * lapsed was told the feature was broken, and never told to go and pay — the enforcement worked
+ * and the only person who needed to understand it was the one person kept in the dark.
+ *
+ * The message stays human for the server log; `code` is what the callers switch on.
+ */
+export class InvitationBlockedError extends Error {
+  constructor(readonly code: "blocked_read_only", message: string) {
+    super(message);
+    this.name = "InvitationBlockedError";
+  }
+}
+
 export type InvitationView = {
   invitationId: string;
   promoterName: string;
@@ -76,7 +94,10 @@ export async function createInvitation(
   // meant to be the single source of truth rather than copied into every call site.
   const entitlement = await getEntitlement(shift.agency_id);
   if (entitlement && !checkBilling(entitlement, "write").allowed) {
-    throw new Error(t("enforcement.invitations.blocked_read_only"));
+    throw new InvitationBlockedError(
+      "blocked_read_only",
+      t("enforcement.invitations.blocked_read_only"),
+    );
   }
 
   const { data: promoter, error: promoterErr } = await db
