@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { checkPromoterRateLimit } from "@/lib/promoter-rate-limit";
+import { RateLimited } from "@/app/rate-limited";
 import {
   ATHENS_TZ,
   END_TIMES,
@@ -109,6 +111,11 @@ export default async function PromoterAvailabilityPage({
   params: Promise<{ token: string }>;
   searchParams?: PromoterSearchParams;
 }) {
+  // A1-07 — counted before anything else runs, so a flood costs one upsert instead of three
+  // reads and a full render. lib/promoter-rate-limit.ts says why this is not in middleware.
+  const limit = await checkPromoterRateLimit("availability");
+  if (!limit.allowed) return <RateLimited />;
+
   const { token } = await params;
   const locale = localeFromSearchParams(await searchParams);
   const t = translatorFor(locale);

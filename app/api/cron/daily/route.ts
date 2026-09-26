@@ -6,6 +6,7 @@ import { automaticDeliveryConfigured } from "@/lib/messaging";
 import { athensToday } from "@/lib/availability-links";
 import { sweepOrphanedPhotos, type SweepResult } from "@/lib/photo-sweep";
 import { sweepWaitlistRateLimit } from "@/lib/waitlist/rate-limit";
+import { sweepEndpointRateLimit } from "@/lib/promoter-rate-limit";
 
 /**
  * P39 — the one daily job.
@@ -69,6 +70,10 @@ export async function GET(request: NextRequest) {
   // inflate. Null means the delete failed and said so in the log.
   const waitlistRowsSwept = await sweepWaitlistRateLimit(startedAt);
 
+  // The promoter endpoints' own counter (0019). One-minute windows, so this table turns over fast
+  // and would otherwise keep every closed window forever.
+  const endpointRowsSwept = await sweepEndpointRateLimit(startedAt);
+
   if (!automaticDeliveryConfigured()) {
     // Today's behaviour, unchanged: no channel can send unattended, so nothing is attempted and
     // nothing is recorded. Said plainly so a manager reading the cron log knows why.
@@ -80,6 +85,7 @@ export async function GET(request: NextRequest) {
       availabilityLinks: { ran: false, periodKey },
       photoSweep,
       waitlistRowsSwept,
+      endpointRowsSwept,
     });
   }
 
@@ -117,6 +123,7 @@ export async function GET(request: NextRequest) {
       availabilityLinks,
       photoSweep,
       waitlistRowsSwept,
+      endpointRowsSwept,
     },
     { status: ok ? 200 : 500 },
   );

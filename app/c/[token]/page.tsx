@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { checkPromoterRateLimit } from "@/lib/promoter-rate-limit";
+import { RateLimited } from "@/app/rate-limited";
 import { loadCheckin } from "@/lib/checkins";
 import { translatorFor } from "@/lib/i18n";
 import { Markdown, PromoterLanguageToggle } from "@/components/ui";
@@ -30,6 +32,11 @@ export default async function CheckinPage({
   params: Promise<{ token: string }>;
   searchParams?: PromoterSearchParams;
 }) {
+  // A1-07 — counted before anything else runs, so a flood costs one upsert instead of three
+  // reads and a full render. lib/promoter-rate-limit.ts says why this is not in middleware.
+  const limit = await checkPromoterRateLimit("checkin");
+  if (!limit.allowed) return <RateLimited />;
+
   const { token } = await params;
   const locale = localeFromSearchParams(await searchParams);
   const t = translatorFor(locale);
