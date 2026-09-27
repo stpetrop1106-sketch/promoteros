@@ -56,7 +56,13 @@ export async function GET(request: NextRequest) {
   // difference is invisible until you compare two real emails side by side.
   if (tokenHash?.startsWith("pkce_")) {
     const { error } = await db.auth.exchangeCodeForSession(tokenHash);
-    if (error) return NextResponse.redirect(`${origin}/login?reason=link_failed`);
+    if (error) {
+      // This route used to discard the reason and redirect, which made a failing sign-in
+      // impossible to diagnose from the outside — the user sees "the link expired" whatever
+      // actually happened. The reason belongs in the server log.
+      console.error("login callback: pkce exchange failed", { message: error.message, code: error.code });
+      return NextResponse.redirect(`${origin}/login?reason=link_failed`);
+    }
     return NextResponse.redirect(`${origin}${next}`);
   }
 
@@ -65,7 +71,10 @@ export async function GET(request: NextRequest) {
       type: type as "magiclink" | "email" | "recovery" | "invite",
       token_hash: tokenHash,
     });
-    if (error) return NextResponse.redirect(`${origin}/login?reason=link_failed`);
+    if (error) {
+      console.error("login callback: verifyOtp failed", { message: error.message, code: error.code });
+      return NextResponse.redirect(`${origin}/login?reason=link_failed`);
+    }
     return NextResponse.redirect(`${origin}${next}`);
   }
 

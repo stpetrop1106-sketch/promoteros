@@ -2,6 +2,7 @@
 
 import type { Route } from "next";
 import { redirect } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase } from "@/lib/supabase/server";
 
 export type LoginState = {
@@ -44,9 +45,29 @@ export async function requestMagicLink(
   if (!EMAIL.test(email)) return { status: "invalid_email" };
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const db = await createServerSupabase();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return { status: "error" };
 
-  const { error } = await db.auth.signInWithOtp({
+  // A PLAIN anon client, not the cookie-backed SSR one, and this is the whole fix for "the link
+  // does not work".
+  //
+  // `@supabase/ssr` runs the PKCE flow and ignores `flowType`, so the link it emails carries
+  // `token_hash=pkce_…`. Redeeming that needs a code-verifier cookie written when the link was
+  // requested, and Supabase's own error says the rest: "PKCE code verifier not found in storage".
+  // It never reached the callback, so EVERY link from this form failed — and even if it had
+  // worked, the link would only open in the browser that asked for it, which is not what a link
+  // in an email is for.
+  //
+  // This client only SENDS the email. It stores nothing, so Supabase issues a plain token_hash,
+  // which `app/login/callback/route.ts` verifies server-side with `verifyOtp` — no cookie, no
+  // device binding, opens from the phone when it was requested on the laptop. The session is
+  // created there, by the SSR client, which is the only thing that should be writing cookies.
+  const mailer = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+
+  const { error } = await mailer.auth.signInWithOtp({
     email,
     options: {
       emailRedirectTo: `${appUrl}/login/callback?next=${encodeURIComponent(next)}`,
