@@ -1,12 +1,29 @@
 import { Home } from "@/app/home";
 
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
 /**
  * The front door of PromoterOS.
  *
- * This used to render the waitlist, which made a page we intend to delete the first thing anyone
- * saw of the product. The waitlist now lives at `/waitlist` and this is the product page:
- * what PromoterOS does, for whom, and a way in. See `app/home.tsx`.
+ * A server component only so the campaign attribution can be read before the page renders and
+ * handed to the client tree as plain strings. Everything visible is in `app/home.tsx`.
  */
-export default function Page() {
-  return <Home />;
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const value = (key: string) => {
+    const parameter = params[key];
+    return typeof parameter === "string" ? parameter.slice(0, 120) : "";
+  };
+
+  return (
+    <Home
+      attribution={{
+        source: value("utm_source"),
+        medium: value("utm_medium"),
+        campaign: value("utm_campaign"),
+      }}
+    />
+  );
 }

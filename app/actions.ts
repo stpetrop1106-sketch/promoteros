@@ -13,8 +13,14 @@ const waitlistSchema = z.object({
   workEmail: z.string().trim().email().max(254),
   companyName: z.string().trim().min(2).max(160),
   jobTitle: z.string().trim().max(120),
-  promoterCount: z.enum(["1-30", "31-100", "101-300", "300+"]),
-  primaryChallenge: z.string().trim().max(1000),
+  // The ranges the form offers. An enum rather than free text because this is the one field the
+  // signups are actually segmented by, and "about 40" is not a segment.
+  promoterCount: z.enum(["1-25", "26-50", "51-100", "101-250", "250+"]),
+  // Both of these are optional: a half-answered form from a real agency is worth more than a
+  // perfect one that was abandoned at the fourth question.
+  primaryChallenge: z.string().trim().max(120),
+  currentTooling: z.string().trim().max(120),
+  wantsDemo: z.enum(["yes", "no", ""]),
   utmSource: z.string().trim().max(120),
   utmMedium: z.string().trim().max(120),
   utmCampaign: z.string().trim().max(120),
@@ -36,6 +42,8 @@ export async function joinWaitlist(
     jobTitle: formData.get("jobTitle") ?? "",
     promoterCount: formData.get("promoterCount") ?? "",
     primaryChallenge: formData.get("primaryChallenge") ?? "",
+    currentTooling: formData.get("currentTooling") ?? "",
+    wantsDemo: formData.get("wantsDemo") ?? "",
     utmSource: formData.get("utmSource") ?? "",
     utmMedium: formData.get("utmMedium") ?? "",
     utmCampaign: formData.get("utmCampaign") ?? "",
@@ -70,6 +78,9 @@ export async function joinWaitlist(
       job_title: data.jobTitle || null,
       promoter_count: data.promoterCount,
       primary_challenge: data.primaryChallenge || null,
+      current_tooling: data.currentTooling || null,
+      // Null means "not asked", which is a different fact from "said no" — see migration 0020.
+      wants_demo: data.wantsDemo === "" ? null : data.wantsDemo === "yes",
       utm_source: data.utmSource || null,
       utm_medium: data.utmMedium || null,
       utm_campaign: data.utmCampaign || null,
