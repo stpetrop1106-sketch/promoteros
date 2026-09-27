@@ -49,6 +49,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}${next}`);
   }
 
+  // A `pkce_` prefix means the link was requested from the SITE, where the Supabase client runs
+  // the PKCE flow and wrote a verifier cookie. That token is a code, not an OTP hash, and
+  // `verifyOtp` rejects it — which is why signing in from the login form landed on "the link did
+  // not work", while a link minted straight from the API (no PKCE, plain hash) worked fine. The
+  // difference is invisible until you compare two real emails side by side.
+  if (tokenHash?.startsWith("pkce_")) {
+    const { error } = await db.auth.exchangeCodeForSession(tokenHash);
+    if (error) return NextResponse.redirect(`${origin}/login?reason=link_failed`);
+    return NextResponse.redirect(`${origin}${next}`);
+  }
+
   if (tokenHash && type) {
     const { error } = await db.auth.verifyOtp({
       type: type as "magiclink" | "email" | "recovery" | "invite",

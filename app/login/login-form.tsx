@@ -79,7 +79,7 @@ function CodeForm({ next, email, labels }: { next: string; email: string; labels
         inputMode="numeric"
         autoComplete="one-time-code"
         pattern="[0-9]*"
-        maxLength={6}
+        maxLength={8}
         required
         className="mt-2 w-full rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-2.5 text-center text-lg tracking-[0.4em] outline-none transition focus:border-[color:var(--color-accent)]"
       />

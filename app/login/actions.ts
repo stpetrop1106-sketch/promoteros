@@ -87,7 +87,13 @@ export async function signInWithCode(
   const code = String(formData.get("code") ?? "").replace(/\D/g, "");
   const next = safeNext(String(formData.get("next") ?? "") || null);
 
-  if (!EMAIL.test(email) || code.length !== 6) return { status: "invalid_code" };
+  // Supabase decides the length (`mailer_otp_length`), this file used to hard-code 6, and the
+  // project was configured for 8 — so the code box rejected every code it was ever sent, for
+  // everyone, before the request left the browser. Accept the range Supabase can emit rather than
+  // one end of it, so a setting change cannot silently close the door again.
+  if (!EMAIL.test(email) || code.length < 6 || code.length > 8) {
+    return { status: "invalid_code" };
+  }
 
   const db = await createServerSupabase();
   const { error } = await db.auth.verifyOtp({ email, token: code, type: "email" });
