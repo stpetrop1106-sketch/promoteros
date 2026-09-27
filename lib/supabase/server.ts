@@ -42,5 +42,21 @@ export async function createServerSupabase() {
     },
   };
 
-  return createServerClient(url, key, { cookies: cookieMethods });
+  // `flowType: "implicit"` rather than @supabase/ssr's PKCE default, and this is a product
+  // decision, not a preference.
+  //
+  // Under PKCE the emailed link carries `token_hash=pkce_…`, which can only be redeemed by the
+  // browser that asked for it, because redeeming it needs a verifier cookie written at request
+  // time. A magic link that only opens in the requesting browser is broken for the way people
+  // actually use email: ask on the laptop, open on the phone. It was also broken here for a
+  // simpler reason — every link from the login form failed, which is what Stella hit.
+  //
+  // Implicit issues a plain `token_hash`, which `app/login/callback/route.ts` verifies with
+  // `verifyOtp` server-side, with no browser state involved. The link then works from any device.
+  // Nothing else in this app uses PKCE: there are no OAuth providers, only email links and the
+  // numeric code.
+  return createServerClient(url, key, {
+    cookies: cookieMethods,
+    auth: { flowType: "implicit" },
+  });
 }
