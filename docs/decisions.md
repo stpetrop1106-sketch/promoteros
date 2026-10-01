@@ -158,6 +158,52 @@ running 22:00–02:00 therefore cannot be matched automatically at all; it is st
 that becomes common, the change is a model change — an availability window that carries a date
 boundary — not a wider dropdown, and it touches the matching SQL as much as the UI.
 
+### D24 — A shift counts as worked when the promoter declared arrival · 2026-09-28
+
+`assignment_status` has had a `completed` value since the schema was written, `board.ts` reads it,
+and **nothing in the application has ever written it**. The live database holds 6 confirmed and 1
+cancelled assignment and zero completed ones. So "payable = completed" would have produced €0 for
+everybody, for ever, while looking like a working feature.
+
+**Answered by the owner: a shift is payable when a check-in exists for it and its date has passed.**
+Cancelled and no-show are never payable. The evidence already exists — the promoter taps "δήλωσα
+άφιξη" and `check_ins` records it — so nothing new has to be remembered by a coordinator at the end
+of a long day. The rejected alternative was a "mark completed" button, which is more precise and
+which somebody would forget every Friday, leaving a real person unpaid.
+
+Consequence for whoever implements earnings: ask `check_ins`, not `assignments.status`. If the
+`completed` status is ever wired up, this decision should be revisited rather than both being read.
+
+### D25 — One free month, and it is one constant · 2026-09-28
+
+New agencies get **one month free**. The trial is enforced server-side through `trial_ends_at` and
+`lib/billing/access.ts`, which already computes access, grace and notices from it — no frontend-only
+trial, and no second mechanism.
+
+The length must live in exactly one place so that changing 1 → 2 months is one edit, which is what
+the owner asked for explicitly.
+
+### D26 — No passwords; email link and one-time code stay the whole of sign-in · 2026-09-28
+
+Sign-up was specified with a password and a confirmation field. The product has never had
+passwords: `app/login` sends a single-use link and a six-digit code, and there is no credential to
+leak, forget, reset or store.
+
+**Answered by the owner: it stays as it is.** What gets built instead is a clear "Create your
+PromoterOS account" path that is visibly NOT the waitlist — the real account flow is
+sign-in link → `/onboarding` → `create_agency_for_user`, and the confusion to fix is that nothing
+on the site said so.
+
+### D27 — Plans and trial ship without charging anything · 2026-09-28
+
+There is a real billing architecture (`lib/billing/`, plans with Stripe price ids read from the
+environment, a webhook, a sync path) and **no Stripe keys in production at all**.
+
+**Answered by the owner: build the plans page and the server-side trial now, connect payment
+later.** Nothing may pretend a payment happened. A tier whose price id is absent must say it cannot
+be subscribed to yet rather than showing a dead button — `lib/billing/plans.ts` already treats a
+missing price id that way, and that behaviour is the contract.
+
 ---
 
 ## Open questions

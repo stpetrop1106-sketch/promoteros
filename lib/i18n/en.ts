@@ -435,10 +435,20 @@ export const en: Record<TranslationKey, string> = {
   "campaigns.shifts_new.no_stores_hint": "No stores yet for this client — add the first one below.",
   "campaigns.shifts_new.new_store_name_label": "Store name",
   "campaigns.shifts_new.new_store_address_label": "Address",
+  "campaigns.shifts_new.new_store_address_hint":
+    "Street, number and city — e.g. “100 Vouliagmenis Avenue, Glyfada”.",
+  "campaigns.shifts_new.geocode_button": "Find on the map",
+  "campaigns.shifts_new.geocode_found": "We found the address",
+  "campaigns.shifts_new.geocode_found_low":
+    "Found, but with low confidence — check the location before you continue",
+  "campaigns.shifts_new.geocode_not_found":
+    "We could not find that address. Write it in more detail (street, number, city) or fill the coordinates in by hand.",
+  "campaigns.shifts_new.error.geocode_failed":
+    "We could not locate the store's address, so nothing was created. Try a more detailed address, or fill the coordinates in by hand.",
   "campaigns.shifts_new.new_store_lat_label": "Latitude",
   "campaigns.shifts_new.new_store_lng_label": "Longitude",
   "campaigns.shifts_new.new_store_coords_hint":
-    "Manual coordinates for now — find them on Google Maps. Automatic geocoding comes later.",
+    "Filled in automatically from the address. Change them only if you need to.",
   "campaigns.shifts_new.section_schedule": "Schedule",
   "campaigns.shifts_new.from_date_label": "From date",
   "campaigns.shifts_new.to_date_label": "To date",
@@ -494,6 +504,8 @@ export const en: Record<TranslationKey, string> = {
   "campaigns.validation.weekdays_none": "Choose at least one day.",
   "campaigns.validation.no_dates": "No shift dates came out of that — check the range and the days.",
   "campaigns.validation.campaign_not_found": "Campaign not found.",
+  "campaigns.validation.address_required":
+    "Write the store's address so we can find it on the map.",
 
   "checkin.expired": "This link has expired or is invalid.",
   "checkin.locating": "Finding your location…",
@@ -2019,7 +2031,11 @@ export const en: Record<TranslationKey, string> = {
 
   "invitation.dress_code": "Dress code",
   // A3-04 — this is the campaign's HOURLY rate; see el.ts.
-  "invitation.rate": "Pay (per hour)",
+  "invitation.pay_total": "Pay for this shift",
+  "invitation.pay_breakdown": "{rate} per hour · {hours} hours",
+  "invitation.pay_hours_one": "{rate} per hour · 1 hour",
+  "invitation.message.pay": "Pay: {total}",
+  "invitation.rate": "Pay per hour",
 
   "report.photos_preparing": "Preparing the photos…",
 
@@ -2221,5 +2237,128 @@ export const en: Record<TranslationKey, string> = {
   "ui.att_time_1": "09:58",
   "ui.att_time_2": "10:02",
   "ui.att_alert": "Shift started 12 minutes ago",
+
+  // -------------------------------------------------------------------------------------------
+  // S1 — bulk promoter import from Excel. Greek is the reference locale; see el.ts.
+  // -------------------------------------------------------------------------------------------
+
+  "promoters.import.button": "Import from Excel",
+  "promoters.import.button_hint": "Upload the file with the promoter list (.xlsx, .xls, .csv)",
+  "promoters.import.close": "Close",
+  "promoters.import.drop.title": "Drop the file here",
+  "promoters.import.drop.body": "An Excel or CSV file with the promoter list. You will see what gets imported before anything is saved.",
+
+  "promoters.import.file.wrong_type": "Excel and CSV files only (.xlsx, .xls, .ods, .csv).",
+  "promoters.import.file.too_large": "The file is larger than {max} MB.",
+  "promoters.import.file.empty": "The file is empty.",
+  "promoters.import.file.unreadable": "We could not read this file. Open it in Excel and save it again as .xlsx.",
+  "promoters.import.file.too_many_rows": "The file has too many rows. Split it and upload it in two parts.",
+  "promoters.import.file.load_failed": "Something went wrong opening the file. Try again.",
+
+  "promoters.import.title": "Import promoters",
+  "promoters.import.step_of": "Step {step} of {total}",
+  "promoters.import.step.columns": "Columns",
+  "promoters.import.step.preview": "Review",
+  "promoters.import.step.done": "Done",
+  "promoters.import.next": "Continue",
+  "promoters.import.back": "Back",
+  "promoters.import.retry": "Try again",
+  "promoters.import.context_failed": "We could not load your agency's details.",
+  "promoters.import.close_confirm": "Close the import? Everything you have set up will be lost.",
+  "promoters.import.close_confirm_yes": "Yes, close",
+  "promoters.import.close_confirm_no": "No, carry on",
+
+  "promoters.import.reading": "Reading the file…",
+  "promoters.import.validating_one": "Checking 1 row…",
+  "promoters.import.validating_other": "Checking {count} rows…",
+
+  "promoters.import.columns.title": "What each column means",
+  "promoters.import.columns.description":
+    "We guessed from the headers. Correct anything that does not fit — nothing is saved yet.",
+  "promoters.import.columns.sheet_label": "Sheet",
+  "promoters.import.columns.header_row_label": "Header row",
+  "promoters.import.columns.header_row_hint": "The row holding the column titles.",
+  "promoters.import.columns.header_row_option": "Row {row}: {preview}",
+  "promoters.import.columns.meaning_label": "Column {column}",
+  "promoters.import.columns.samples": "Sample",
+  "promoters.import.columns.no_samples": "— empty —",
+  "promoters.import.columns.untitled": "(untitled)",
+  "promoters.import.columns.review_badge": "Check this",
+  "promoters.import.columns.review_one": "1 column needs your eye.",
+  "promoters.import.columns.review_other": "{count} columns need your eye.",
+  "promoters.import.columns.missing": "Missing: {fields}. Choose the right column to continue.",
+  "promoters.import.columns.required.name": "full name",
+  "promoters.import.columns.required.phone": "phone",
+  "promoters.import.columns.rows_found_one": "Found 1 row with data.",
+  "promoters.import.columns.rows_found_other": "Found {count} rows with data.",
+  "promoters.import.columns.blocked": "Choose a column for full name and for phone.",
+  "promoters.import.columns.no_rows": "No rows with data were found under the headers.",
+  "promoters.import.columns.too_many": "The file has more than {max} rows.",
+
+  "promoters.import.field.full_name": "Full name",
+  "promoters.import.field.first_name": "First name",
+  "promoters.import.field.last_name": "Surname",
+  "promoters.import.field.phone": "Phone",
+  "promoters.import.field.email": "Email",
+  "promoters.import.field.area": "Area",
+  "promoters.import.field.birth_year": "Birth year",
+  "promoters.import.field.has_car": "Car",
+  "promoters.import.field.has_licence": "Licence",
+  "promoters.import.field.notes": "Notes",
+  "promoters.import.field.ignore": "— not used —",
+
+  "promoters.import.reason.missing_name": "no full name",
+  "promoters.import.reason.name_too_short": "name too short",
+  "promoters.import.reason.missing_phone": "no phone",
+  "promoters.import.reason.phone_invalid": "phone not valid",
+  "promoters.import.reason.duplicate_in_file": "appears twice in the file",
+  "promoters.import.reason.email_invalid": "email not valid — not saved",
+  "promoters.import.reason.birth_year_invalid": "birth year not valid — not saved",
+  "promoters.import.reason.unknown_area": "area not recognised — not linked",
+  "promoters.import.reason.duplicate_existing": "already on the roster",
+
+  "promoters.import.preview.title": "What will be imported",
+  "promoters.import.preview.summary": "{valid} valid · {duplicates} already exist · {errors} with errors",
+  "promoters.import.preview.warnings_one": "1 row will be imported with a value missing.",
+  "promoters.import.preview.warnings_other": "{count} rows will be imported with a value missing.",
+  "promoters.import.preview.duplicates_hint":
+    "Promoters who already exist are skipped — we do not change their details. Edit them from their own page if you need to.",
+  "promoters.import.preview.only_problems": "Only rows needing attention ({count})",
+  "promoters.import.preview.table_label": "File rows",
+  "promoters.import.preview.col.row": "Row",
+  "promoters.import.preview.col.name": "Full name",
+  "promoters.import.preview.col.phone": "Phone",
+  "promoters.import.preview.col.areas": "Areas",
+  "promoters.import.preview.col.status": "Status",
+  "promoters.import.preview.status.ready": "Ready",
+  "promoters.import.preview.status.warning": "With a caveat",
+  "promoters.import.preview.status.error": "Error",
+  "promoters.import.preview.status.duplicate": "Already exists",
+  "promoters.import.preview.duplicate_of": "same phone as \"{name}\"",
+  "promoters.import.preview.read_only": "This account is read-only, so the import will not go through.",
+  "promoters.import.preview.capacity": "Your plan has room for {count} more promoters.",
+  "promoters.import.preview.capacity_exceeded":
+    "Your plan has room for {count} more promoters, so the first {count} of the {valid} will be imported.",
+  "promoters.import.preview.submit_none": "No rows to import",
+  "promoters.import.preview.submit_one": "Import 1 promoter",
+  "promoters.import.preview.submit_other": "Import {count} promoters",
+  "promoters.import.preview.submitting": "Importing…",
+
+  "promoters.import.done.title": "Import finished",
+  "promoters.import.done.created_one": "1 promoter added.",
+  "promoters.import.done.created_other": "{count} promoters added.",
+  "promoters.import.done.created_none": "No promoters were added.",
+  "promoters.import.done.duplicates": "{count} already existed and were skipped.",
+  "promoters.import.done.errors": "{count} rows had errors and were skipped.",
+  "promoters.import.done.over_limit": "{count} did not fit within your plan.",
+  "promoters.import.done.not_created": "{count} could not be saved because of an error. Try the same file again — the ones that got in will show as \"already exists\".",
+  "promoters.import.done.close": "Done",
+
+  "promoters.import.error.read_only": "This account is read-only.",
+  "promoters.import.error.invalid_payload": "Something went wrong with the data. Start the import again.",
+  "promoters.import.error.too_many_rows": "The file has too many rows.",
+  "promoters.import.error.nothing_to_import": "There is no valid row to import.",
+  "promoters.import.error.over_promoter_limit": "Your plan is full. Upgrade to add more promoters.",
+  "promoters.import.error.load_failed": "We could not finish the import. Try again.",
 
 };

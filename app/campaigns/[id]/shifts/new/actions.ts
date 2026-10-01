@@ -7,6 +7,8 @@ import { requireUser } from "@/lib/auth";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import { createProgramme } from "@/lib/programmes";
+import { getGeocoder, type GeocodeResult } from "@/lib/geocoding";
+import { isSaneCoordinate, readCoordinates } from "./coordinates";
 import {
   expandSeriesDates,
   fieldErrorsFromZodError,
@@ -37,11 +39,18 @@ export type ShiftFormState = FormState<ShiftField>;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
 
-/** Coordinates copy-pasted from Google Maps use a dot, but tolerate a Greek comma decimal too. */
-function parseCoordinate(value: string | undefined): number | null {
-  if (!value) return null;
-  const n = Number(value.trim().replace(",", "."));
-  return Number.isFinite(n) ? n : null;
+/**
+ * Turn a typed address into coordinates, for the "Εύρεση στον χάρτη" button on the form.
+ *
+ * Same shape and same provider as `app/promoters/actions.ts`'s `geocodeAddress` — one adapter
+ * (`lib/geocoding/`), never a provider SDK, and `null` for every failure because the provider
+ * contract says it never throws. `requireUser()` first: this is a signed-in coordinator's tool,
+ * not an open geocoding proxy paid for by our LocationIQ quota.
+ */
+export async function geocodeStoreAddress(address: string): Promise<GeocodeResult | null> {
+  await requireUser();
+  if (!address.trim()) return null;
+  return getGeocoder().geocode(address, { country: "gr" });
 }
 
 const schema = z
@@ -76,13 +85,17 @@ const schema = z
     message: "campaigns.validation.new_store_name",
     path: ["newStoreName"],
   })
-  .refine((v) => v.storeMode !== "new" || parseCoordinate(v.newStoreLat) !== null, {
+  // The address is what the store is created from now — it is geocoded below, and lat/lng are the
+  // override, not the input. So the address is required where the coordinates used to be.
+  .refine((v) => v.storeMode !== "new" || (v.newStoreAddress?.trim().length ?? 0) >= 4, {
+    message: "campaigns.validation.address_required",
+    path: ["newStoreAddress"],
+  })
+  // Blank coordinates are fine and normal: the server geocodes the address. What is not fine is a
+  // pair that is half-filled, unparseable, or not a point on Earth — see `isSaneCoordinate`.
+  .refine((v) => v.storeMode !== "new" || readCoordinates(v.newStoreLat, v.newStoreLng).kind !== "invalid", {
     message: "campaigns.validation.coords_invalid",
     path: ["newStoreLat"],
-  })
-  .refine((v) => v.storeMode !== "new" || parseCoordinate(v.newStoreLng) !== null, {
-    message: "campaigns.validation.coords_invalid",
-    path: ["newStoreLng"],
   })
   .refine((v) => v.programmeMode !== "existing" || Boolean(v.programmeId), {
     message: "campaigns.validation.programme_required",
@@ -166,15 +179,54 @@ export async function createShifts(_prev: ShiftFormState, formData: FormData): P
   let storeId: string;
 
   if (data.storeMode === "new") {
+    const address = data.newStoreAddress!.trim();
+
+    /**
+     * G1 — the coordinator used to be asked for `newStoreLat` / `newStoreLng` by hand, i.e. to go
+     * to Google Maps, right-click the store and copy two numbers back into this form. Nobody does
+     * that under pressure, so stores arrived with wrong or transposed coordinates, and because
+     * distance decay is the first term of the matching score (CLAUDE.md § Matching) every ranking
+     * for that store was quietly wrong from then on. Nothing ever flagged it.
+     *
+     * So the address is geocoded here, through the same `lib/geocoding/` adapter the promoter form
+     * and the Excel importer already use. Typed coordinates still win when they are there — that
+     * is the manual override, matching `app/promoters/promoter-form.tsx` exactly — but the normal
+     * path is now: type the address, get a located store.
+     *
+     * Geocoded BEFORE anything is written, like `app/shifts/import/commit.ts` does, so a failure
+     * leaves no half-made store behind. There is no fallback coordinate: `stores.lat/lng` are
+     * `not null`, and a placeholder would be indistinguishable from a real location for the rest
+     * of the store's life.
+     */
+    const typed = readCoordinates(data.newStoreLat, data.newStoreLng);
+    let point: { lat: number; lng: number };
+
+    if (typed.kind === "ok") {
+      point = { lat: typed.lat, lng: typed.lng };
+    } else {
+      const located = await getGeocoder().geocode(address, { country: "gr" });
+      // The provider contract is "null on every failure, never throws", and the sanity check is
+      // repeated here rather than trusted: this is the last point before a row is written.
+      if (!located || !isSaneCoordinate(located.coordinates.lat, located.coordinates.lng)) {
+        return { status: "error", formError: "campaigns.shifts_new.error.geocode_failed" };
+      }
+      point = { lat: located.coordinates.lat, lng: located.coordinates.lng };
+    }
+
     const { data: store, error: storeErr } = await db
       .from("stores")
       .insert({
         agency_id: user.agencyId,
         client_id: campaign.client_id,
         name: data.newStoreName!.trim(),
-        address: data.newStoreAddress ?? null,
-        lat: parseCoordinate(data.newStoreLat),
-        lng: parseCoordinate(data.newStoreLng),
+        // The address the coordinator typed, not the provider's formatted one. `stores` has a
+        // single free-text `address` column and no place to keep both (see docs/status/G1.md);
+        // this column is what the promoter is shown on `/i/[token]`, and "Λ. Βουλιαγμένης 100,
+        // Γλυφάδα" is more use to someone finding the door than Nominatim's full administrative
+        // chain. The formatted address is shown on the form so it can be confirmed.
+        address,
+        lat: point.lat,
+        lng: point.lng,
       })
       .select("id")
       .single();

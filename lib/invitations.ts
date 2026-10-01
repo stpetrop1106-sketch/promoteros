@@ -13,7 +13,8 @@ import {
 import { getEntitlement, checkBilling } from "@/lib/billing/subscription";
 import { isActivePromoterStatus } from "@/lib/promoter-status";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
-import { formatShiftWhen } from "@/lib/shift-format";
+import { formatEuroCents, formatShiftWhen } from "@/lib/shift-format";
+import { shiftPayCents } from "@/lib/shift-pay";
 
 const DEFAULT_TTL_HOURS = 24;
 const t = translatorFor(DEFAULT_LOCALE);
@@ -79,7 +80,13 @@ export async function createInvitation(
 
   const { data: shift, error: shiftErr } = await db
     .from("shifts")
-    .select("id, agency_id, on_date, start_time, end_time, campaigns(name, rate_cents), stores(name)")
+    // `rate_cents_override` is new here: the message body now quotes what the shift pays, and the
+    // shift's own rate is what it pays when one is set — the same resolution `loadInvitation`
+    // already did for the page. Quoting the campaign rate in the message and the override on the
+    // page would have been two different numbers for the same shift.
+    .select(
+      "id, agency_id, on_date, start_time, end_time, rate_cents_override, campaigns(name, rate_cents), stores(name)",
+    )
     .eq("id", shiftId)
     .single();
   if (shiftErr || !shift) throw new Error("Shift not found");
@@ -139,11 +146,22 @@ export async function createInvitation(
   // the product not behind a key, in a module that already holds a `t`. They also addressed
   // everyone in the feminine ("Είσαι διαθέσιμη;"), which the roster makes wrong for a good share
   // of the people receiving it. Both are keys now, and the question is phrased without a gender.
+  // What the shift pays, not what an hour of it pays. A promoter reading a message on their phone
+  // should not have to work out 7,00 € × 7½ h before they can answer. `shiftPayCents` returns null
+  // when the campaign carries no rate or the hours do not parse, and a null line is dropped by the
+  // `.filter(Boolean)` below — silence is right there, an invented "0,00 €" is not.
+  const payCents = shiftPayCents(
+    shift.rate_cents_override ?? campaign?.rate_cents ?? null,
+    String(shift.start_time),
+    String(shift.end_time),
+  );
+
   const body = [
     t("invitation.message.title"),
     campaign?.name ?? "",
     store?.name ?? "",
     formatShiftWhen(shift.on_date, String(shift.start_time), String(shift.end_time)),
+    payCents === null ? "" : t("invitation.message.pay", { total: formatEuroCents(payCents) }),
     "",
     t("invitation.message.question"),
   ]

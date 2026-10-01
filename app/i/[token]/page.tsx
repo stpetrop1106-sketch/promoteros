@@ -10,6 +10,7 @@ import { RespondForm } from "./respond-form";
 import { AcknowledgeBriefForm } from "./acknowledge-brief-form";
 import { InvitationErrorScreen } from "./error-screen";
 import { formatEuroCents, formatShiftWhen } from "@/lib/shift-format";
+import { formatShiftHours, shiftDurationMinutes, shiftPayCents } from "@/lib/shift-pay";
 import {
   langQuery,
   localeFromSearchParams,
@@ -74,6 +75,20 @@ export default async function InvitationPage({
    */
   const cancelled = checkinResult !== null && !checkinResult.ok && checkinResult.reason === "cancelled";
 
+  // `v.rateCents` is already the effective rate (`shifts.rate_cents_override ?? campaigns.rate_cents`,
+  // resolved in `loadInvitation`). Everything below is pure arithmetic on it — see `lib/shift-pay.ts`
+  // for why there are no breaks in it and why an end at or before the start yields null.
+  const payCents = shiftPayCents(v.rateCents, v.startTime, v.endTime);
+  const payMinutes = shiftDurationMinutes(v.startTime, v.endTime);
+  const payHours = formatShiftHours(payMinutes);
+  const payBreakdown =
+    payHours === null
+      ? null
+      : t(payMinutes === 60 ? "invitation.pay_hours_one" : "invitation.pay_breakdown", {
+          rate: formatEuroCents(v.rateCents),
+          hours: payHours,
+        });
+
   return (
     <main className="mx-auto max-w-md px-6 py-12">
       <h1 className="text-lg font-semibold">{t("invitation.title")}</h1>
@@ -118,14 +133,29 @@ export default async function InvitationPage({
             <dd className="font-medium">{v.dressCode}</dd>
           </div>
         )}
-        {v.rateCents > 0 && (
+        {/* G1 — the promoter is told what the SHIFT pays.
+            A3-04 had relabelled this row "Αμοιβή (ανά ώρα)" so the hourly number stopped reading as
+            the day's total. Honest, but it left the person deciding whether to give up a Saturday
+            doing 7,00 € × 7½ h in their head on a phone. The total is the primary number now, with
+            the rate and the hours kept underneath it so it can be checked rather than trusted.
+            `payCents` is null only when there is no rate or the hours do not parse; then the old
+            hourly row is what is shown, because a wrong total is worse than no total. */}
+        {payCents !== null ? (
           <div>
-            {/* A3-04 — the label now says "per hour". The number is the campaign's hourly rate
-                (or the shift's own override); shown bare it read as the pay for the whole shift. */}
+            <dt className="text-[color:var(--color-muted)]">{t("invitation.pay_total")}</dt>
+            <dd className="text-xl font-semibold text-[color:var(--color-ink)]">
+              {formatEuroCents(payCents)}
+            </dd>
+            {payBreakdown && (
+              <p className="mt-0.5 text-xs text-[color:var(--color-muted)]">{payBreakdown}</p>
+            )}
+          </div>
+        ) : v.rateCents > 0 ? (
+          <div>
             <dt className="text-[color:var(--color-muted)]">{t("invitation.rate")}</dt>
             <dd className="font-medium">{formatEuroCents(v.rateCents)}</dd>
           </div>
-        )}
+        ) : null}
       </dl>
 
       {cancelled ? (

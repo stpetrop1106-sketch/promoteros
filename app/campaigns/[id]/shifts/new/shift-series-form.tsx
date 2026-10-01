@@ -1,12 +1,14 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useState, useTransition } from "react";
 import type { ReactNode } from "react";
-import { SelectField, TextField, Section, Icon, type SelectOption } from "@/components/ui";
+import { SelectField, TextField, Section, Icon, Button, type SelectOption } from "@/components/ui";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
 import { SubmitButton } from "@/app/campaigns/submit-button";
 import { WEEKDAYS, WEEKDAY_KEY, expandSeriesDates } from "@/app/campaigns/_shared";
-import { createShifts, type ShiftFormState } from "./actions";
+import { createShifts, geocodeStoreAddress, type ShiftFormState } from "./actions";
+// Type-only, so nothing of `lib/geocoding` reaches the browser bundle — the import is erased.
+import type { GeocodeResult } from "@/lib/geocoding";
 
 const INITIAL_STATE: ShiftFormState = { status: "idle" };
 
@@ -20,15 +22,55 @@ const t = translatorFor(DEFAULT_LOCALE);
 
 /** Same shape as `app/promoters/promoter-form.tsx`'s `Banner` and `app/campaigns/new/campaign-form.tsx`'s
  * `ErrorBanner` — kept local because `components/ui/**` is frozen. */
-function ErrorBanner({ children }: { children: ReactNode }) {
+const BANNER_TONE = {
+  bad: "border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] text-[color:var(--color-bad-ink)]",
+  warn: "border-[color:var(--color-warn-line)] bg-[color:var(--color-warn-subtle)] text-[color:var(--color-warn-ink)]",
+  ok: "border-[color:var(--color-ok-line)] bg-[color:var(--color-ok-subtle)] text-[color:var(--color-ok-ink)]",
+} as const;
+
+function Banner({
+  tone,
+  icon,
+  children,
+}: {
+  tone: keyof typeof BANNER_TONE;
+  icon: "alert" | "check";
+  children: ReactNode;
+}) {
   return (
     <div
-      role="alert"
-      className="flex items-start gap-2.5 rounded-xl border border-[color:var(--color-bad-line)] bg-[color:var(--color-bad-subtle)] px-4 py-3 text-sm font-medium leading-5 text-[color:var(--color-bad-ink)]"
+      role={tone === "bad" ? "alert" : "status"}
+      className={`flex items-start gap-2.5 rounded-xl border px-4 py-3 text-sm leading-5 ${BANNER_TONE[tone]}`}
     >
-      <Icon name="alert" size={18} className="mt-0.5 shrink-0" />
-      <div>{children}</div>
+      <Icon name={icon} size={18} className="mt-0.5 shrink-0" />
+      <div className="min-w-0">{children}</div>
     </div>
+  );
+}
+
+function ErrorBanner({ children }: { children: ReactNode }) {
+  return (
+    <Banner tone="bad" icon="alert">
+      <span className="font-medium">{children}</span>
+    </Banner>
+  );
+}
+
+/** Byte-for-byte the shape `app/promoters/promoter-form.tsx` shows after a geocode, including the
+ * low-confidence variant — the coordinator meets the same box on both screens, so a warning means
+ * the same thing in both places. */
+function GeocodeResultBox({ result }: { result: GeocodeResult }) {
+  const low = result.confidence === "low";
+  return (
+    <Banner tone={low ? "warn" : "ok"} icon={low ? "alert" : "check"}>
+      <p className="font-medium">
+        {low ? t("campaigns.shifts_new.geocode_found_low") : t("campaigns.shifts_new.geocode_found")}
+      </p>
+      <p className="mt-0.5 opacity-90">{result.formattedAddress}</p>
+      <p className="mt-0.5 text-xs opacity-75">
+        {result.coordinates.lat.toFixed(5)}, {result.coordinates.lng.toFixed(5)}
+      </p>
+    </Banner>
   );
 }
 
@@ -69,9 +111,40 @@ export function ShiftSeriesForm({
   );
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+
+  // G1 — the new-store block. The address is now the input and the two coordinate boxes are the
+  // override, the other way round from how this form used to work.
+  const [address, setAddress] = useState("");
+  const [lat, setLat] = useState("");
+  const [lng, setLng] = useState("");
+  const [geocodeState, setGeocodeState] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "found"; result: GeocodeResult }
+    | { status: "not_found" }
+  >({ status: "idle" });
+  const [isGeocoding, startGeocode] = useTransition();
+
   // Every day checked by default — the common case is "these three specific dates", not "every
   // Tuesday", so nothing should have to be unchecked to get a handful of shifts in one pass.
   const [weekdays, setWeekdays] = useState<Set<number>>(() => new Set(WEEKDAYS));
+
+  function handleGeocode() {
+    if (!address.trim()) return;
+    setGeocodeState({ status: "loading" });
+    startGeocode(async () => {
+      const result = await geocodeStoreAddress(address);
+      if (result) {
+        setLat(String(result.coordinates.lat));
+        setLng(String(result.coordinates.lng));
+        setGeocodeState({ status: "found", result });
+      } else {
+        // Leave whatever is in the boxes alone — a failed lookup must never blank a coordinate the
+        // coordinator typed, and must never invent one.
+        setGeocodeState({ status: "not_found" });
+      }
+    });
+  }
 
   const previewCount = useMemo(() => {
     if (!fromDate || !toDate || toDate < fromDate || weekdays.size === 0) return 0;
@@ -140,38 +213,70 @@ export function ShiftSeriesForm({
               required
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-4">
               <TextField
                 id="newStoreName"
                 name="newStoreName"
                 label={t("campaigns.shifts_new.new_store_name_label")}
                 error={errorFor("newStoreName")}
                 required
-                containerClassName="sm:col-span-2"
               />
-              <TextField
-                id="newStoreAddress"
-                name="newStoreAddress"
-                label={t("campaigns.shifts_new.new_store_address_label")}
-                containerClassName="sm:col-span-2"
-              />
-              <TextField
-                id="newStoreLat"
-                name="newStoreLat"
-                inputMode="decimal"
-                label={t("campaigns.shifts_new.new_store_lat_label")}
-                hint={t("campaigns.shifts_new.new_store_coords_hint")}
-                error={errorFor("newStoreLat")}
-                required
-              />
-              <TextField
-                id="newStoreLng"
-                name="newStoreLng"
-                inputMode="decimal"
-                label={t("campaigns.shifts_new.new_store_lng_label")}
-                error={errorFor("newStoreLng")}
-                required
-              />
+
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                <TextField
+                  id="newStoreAddress"
+                  name="newStoreAddress"
+                  label={t("campaigns.shifts_new.new_store_address_label")}
+                  hint={t("campaigns.shifts_new.new_store_address_hint")}
+                  containerClassName="flex-1"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  error={errorFor("newStoreAddress")}
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  loading={isGeocoding}
+                  disabled={!address.trim()}
+                  onClick={handleGeocode}
+                >
+                  {t("campaigns.shifts_new.geocode_button")}
+                </Button>
+              </div>
+
+              {geocodeState.status === "found" ? <GeocodeResultBox result={geocodeState.result} /> : null}
+
+              {geocodeState.status === "not_found" ? (
+                <p className="text-sm text-[color:var(--color-muted)]">
+                  {t("campaigns.shifts_new.geocode_not_found")}
+                </p>
+              ) : null}
+
+              {/* Still here, still editable: the same manual override `app/promoters/promoter-form.tsx`
+                  offers. Left blank — which is now the normal case — the server geocodes the address
+                  itself, so the coordinator never has to press the button at all. */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextField
+                  id="newStoreLat"
+                  name="newStoreLat"
+                  inputMode="decimal"
+                  label={t("campaigns.shifts_new.new_store_lat_label")}
+                  hint={t("campaigns.shifts_new.new_store_coords_hint")}
+                  value={lat}
+                  onChange={(e) => setLat(e.target.value)}
+                  error={errorFor("newStoreLat")}
+                />
+                <TextField
+                  id="newStoreLng"
+                  name="newStoreLng"
+                  inputMode="decimal"
+                  label={t("campaigns.shifts_new.new_store_lng_label")}
+                  value={lng}
+                  onChange={(e) => setLng(e.target.value)}
+                  error={errorFor("newStoreLng")}
+                />
+              </div>
             </div>
           )}
         </div>

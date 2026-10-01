@@ -438,10 +438,20 @@ export const el = {
     "Δεν υπάρχουν ακόμη καταστήματα για αυτόν τον πελάτη — πρόσθεσε το πρώτο παρακάτω.",
   "campaigns.shifts_new.new_store_name_label": "Όνομα καταστήματος",
   "campaigns.shifts_new.new_store_address_label": "Διεύθυνση",
+  "campaigns.shifts_new.new_store_address_hint":
+    "Οδός, αριθμός και πόλη — π.χ. «Λεωφόρος Βουλιαγμένης 100, Γλυφάδα».",
+  "campaigns.shifts_new.geocode_button": "Εύρεση στον χάρτη",
+  "campaigns.shifts_new.geocode_found": "Βρήκαμε τη διεύθυνση",
+  "campaigns.shifts_new.geocode_found_low":
+    "Τη βρήκαμε, αλλά με χαμηλή ακρίβεια — έλεγξε το σημείο πριν συνεχίσεις",
+  "campaigns.shifts_new.geocode_not_found":
+    "Δεν βρέθηκε αυτή η διεύθυνση. Γράψε την πιο αναλυτικά (οδός, αριθμός, πόλη) ή συμπλήρωσε τις συντεταγμένες χειροκίνητα.",
+  "campaigns.shifts_new.error.geocode_failed":
+    "Δεν μπορέσαμε να εντοπίσουμε τη διεύθυνση του καταστήματος, οπότε δεν δημιουργήθηκε τίποτα. Δοκίμασε πιο αναλυτική διεύθυνση ή συμπλήρωσε συντεταγμένες χειροκίνητα.",
   "campaigns.shifts_new.new_store_lat_label": "Γεωγραφικό πλάτος",
   "campaigns.shifts_new.new_store_lng_label": "Γεωγραφικό μήκος",
   "campaigns.shifts_new.new_store_coords_hint":
-    "Μη αυτόματες συντεταγμένες προς το παρόν — βρες τις στο Google Maps. Ο αυτόματος εντοπισμός έρχεται αργότερα.",
+    "Συμπληρώνονται αυτόματα από τη διεύθυνση. Άλλαξέ τες μόνο αν χρειάζεται.",
   "campaigns.shifts_new.section_schedule": "Πρόγραμμα",
   "campaigns.shifts_new.from_date_label": "Από ημερομηνία",
   "campaigns.shifts_new.to_date_label": "Έως ημερομηνία",
@@ -498,6 +508,8 @@ export const el = {
   "campaigns.validation.weekdays_none": "Επίλεξε τουλάχιστον μία ημέρα.",
   "campaigns.validation.no_dates": "Δεν προέκυψε καμία ημερομηνία βάρδιας — έλεγξε το εύρος και τις ημέρες.",
   "campaigns.validation.campaign_not_found": "Η καμπάνια δεν βρέθηκε.",
+  "campaigns.validation.address_required":
+    "Γράψε τη διεύθυνση του καταστήματος για να τη βρούμε στον χάρτη.",
 
   "checkin.expired": "Ο σύνδεσμος έχει λήξει ή δεν είναι έγκυρος.",
   "checkin.locating": "Εντοπισμός τοποθεσίας…",
@@ -2058,7 +2070,14 @@ export const el = {
   "invitation.dress_code": "Ενδυμασία",
   // A3-04 — this is the campaign's HOURLY rate. Shown bare, it read as the pay for the whole
   // shift, which on an eight-hour day is an alarming number and a false one.
-  "invitation.rate": "Αμοιβή (ανά ώρα)",
+  // What the promoter is paid for THIS shift, which is the number they actually care about.
+  // `invitation.rate` stays as the small hourly line underneath, and as the fallback label when
+  // the hours cannot be worked out.
+  "invitation.pay_total": "Αμοιβή για τη βάρδια",
+  "invitation.pay_breakdown": "{rate} ανά ώρα · {hours} ώρες",
+  "invitation.pay_hours_one": "{rate} ανά ώρα · 1 ώρα",
+  "invitation.message.pay": "Αμοιβή: {total}",
+  "invitation.rate": "Αμοιβή ανά ώρα",
 
   "report.photos_preparing": "Ετοιμάζουμε τις φωτογραφίες…",
 
@@ -2270,5 +2289,129 @@ export const el = {
   "ui.att_time_1": "09:58",
   "ui.att_time_2": "10:02",
   "ui.att_alert": "Η βάρδια ξεκίνησε πριν 12 λεπτά",
+
+  // -------------------------------------------------------------------------------------------
+  // S1 — μαζική εισαγωγή promoters από Excel. Γραμμένο για συντονίστρια που μόλις έλαβε το αρχείο
+  // του πελάτη και δεν πρόκειται να πληκτρολογήσει 500 άτομα ένα-ένα.
+  // -------------------------------------------------------------------------------------------
+
+  "promoters.import.button": "Εισαγωγή από Excel",
+  "promoters.import.button_hint": "Ανέβασε το αρχείο με τη λίστα promoters (.xlsx, .xls, .csv)",
+  "promoters.import.close": "Κλείσιμο",
+  "promoters.import.drop.title": "Άφησε το αρχείο εδώ",
+  "promoters.import.drop.body": "Excel ή CSV με τη λίστα promoters. Θα δεις τι θα εισαχθεί πριν αποθηκευτεί οτιδήποτε.",
+
+  "promoters.import.file.wrong_type": "Δεκτά είναι αρχεία Excel ή CSV (.xlsx, .xls, .ods, .csv).",
+  "promoters.import.file.too_large": "Το αρχείο ξεπερνά τα {max} MB.",
+  "promoters.import.file.empty": "Το αρχείο είναι κενό.",
+  "promoters.import.file.unreadable": "Δεν μπορέσαμε να διαβάσουμε αυτό το αρχείο. Άνοιξέ το στο Excel και αποθήκευσέ το ξανά ως .xlsx.",
+  "promoters.import.file.too_many_rows": "Το αρχείο έχει πάρα πολλές γραμμές. Χώρισέ το και ανέβασέ το σε δύο κομμάτια.",
+  "promoters.import.file.load_failed": "Κάτι πήγε στραβά κατά το άνοιγμα του αρχείου. Δοκίμασε ξανά.",
+
+  "promoters.import.title": "Εισαγωγή promoters",
+  "promoters.import.step_of": "Βήμα {step} από {total}",
+  "promoters.import.step.columns": "Στήλες",
+  "promoters.import.step.preview": "Έλεγχος",
+  "promoters.import.step.done": "Ολοκληρώθηκε",
+  "promoters.import.next": "Συνέχεια",
+  "promoters.import.back": "Πίσω",
+  "promoters.import.retry": "Δοκίμασε ξανά",
+  "promoters.import.context_failed": "Δεν μπορέσαμε να φορτώσουμε τα στοιχεία του γραφείου.",
+  "promoters.import.close_confirm": "Να κλείσει η εισαγωγή; Ό,τι έχεις ρυθμίσει θα χαθεί.",
+  "promoters.import.close_confirm_yes": "Ναι, κλείσιμο",
+  "promoters.import.close_confirm_no": "Όχι, συνέχεια",
+
+  "promoters.import.reading": "Διαβάζουμε το αρχείο…",
+  "promoters.import.validating_one": "Ελέγχουμε 1 γραμμή…",
+  "promoters.import.validating_other": "Ελέγχουμε {count} γραμμές…",
+
+  "promoters.import.columns.title": "Τι σημαίνει κάθε στήλη",
+  "promoters.import.columns.description":
+    "Μαντέψαμε από τις επικεφαλίδες. Διόρθωσε ό,τι δεν ταιριάζει — τίποτα δεν αποθηκεύεται ακόμη.",
+  "promoters.import.columns.sheet_label": "Φύλλο",
+  "promoters.import.columns.header_row_label": "Γραμμή επικεφαλίδων",
+  "promoters.import.columns.header_row_hint": "Η γραμμή με τους τίτλους των στηλών.",
+  "promoters.import.columns.header_row_option": "Γραμμή {row}: {preview}",
+  "promoters.import.columns.meaning_label": "Στήλη {column}",
+  "promoters.import.columns.samples": "Δείγμα",
+  "promoters.import.columns.no_samples": "— κενή —",
+  "promoters.import.columns.untitled": "(χωρίς τίτλο)",
+  "promoters.import.columns.review_badge": "Έλεγξέ το",
+  "promoters.import.columns.review_one": "1 στήλη χρειάζεται τον έλεγχό σου.",
+  "promoters.import.columns.review_other": "{count} στήλες χρειάζονται τον έλεγχό σου.",
+  "promoters.import.columns.missing": "Λείπει: {fields}. Διάλεξε τη σωστή στήλη για να συνεχίσεις.",
+  "promoters.import.columns.required.name": "ονοματεπώνυμο",
+  "promoters.import.columns.required.phone": "τηλέφωνο",
+  "promoters.import.columns.rows_found_one": "Βρέθηκε 1 γραμμή με στοιχεία.",
+  "promoters.import.columns.rows_found_other": "Βρέθηκαν {count} γραμμές με στοιχεία.",
+  "promoters.import.columns.blocked": "Διάλεξε στήλη για ονοματεπώνυμο και τηλέφωνο.",
+  "promoters.import.columns.no_rows": "Δεν βρέθηκε καμία γραμμή με στοιχεία κάτω από τις επικεφαλίδες.",
+  "promoters.import.columns.too_many": "Το αρχείο έχει πάνω από {max} γραμμές.",
+
+  "promoters.import.field.full_name": "Ονοματεπώνυμο",
+  "promoters.import.field.first_name": "Όνομα",
+  "promoters.import.field.last_name": "Επώνυμο",
+  "promoters.import.field.phone": "Τηλέφωνο",
+  "promoters.import.field.email": "Email",
+  "promoters.import.field.area": "Περιοχή",
+  "promoters.import.field.birth_year": "Έτος γέννησης",
+  "promoters.import.field.has_car": "Αυτοκίνητο",
+  "promoters.import.field.has_licence": "Δίπλωμα",
+  "promoters.import.field.notes": "Σχόλια",
+  "promoters.import.field.ignore": "— δεν χρησιμοποιείται —",
+
+  "promoters.import.reason.missing_name": "λείπει το ονοματεπώνυμο",
+  "promoters.import.reason.name_too_short": "πολύ σύντομο όνομα",
+  "promoters.import.reason.missing_phone": "λείπει το τηλέφωνο",
+  "promoters.import.reason.phone_invalid": "μη έγκυρο τηλέφωνο",
+  "promoters.import.reason.duplicate_in_file": "διπλή εγγραφή μέσα στο αρχείο",
+  "promoters.import.reason.email_invalid": "μη έγκυρο email — δεν αποθηκεύτηκε",
+  "promoters.import.reason.birth_year_invalid": "μη έγκυρο έτος γέννησης — δεν αποθηκεύτηκε",
+  "promoters.import.reason.unknown_area": "άγνωστη περιοχή — δεν συνδέθηκε",
+  "promoters.import.reason.duplicate_existing": "υπάρχει ήδη στο μητρώο",
+
+  "promoters.import.preview.title": "Τι θα εισαχθεί",
+  "promoters.import.preview.summary": "{valid} έγκυρες · {duplicates} υπάρχουν ήδη · {errors} με σφάλμα",
+  "promoters.import.preview.warnings_one": "1 γραμμή θα εισαχθεί με κάποια τιμή να λείπει.",
+  "promoters.import.preview.warnings_other": "{count} γραμμές θα εισαχθούν με κάποια τιμή να λείπει.",
+  "promoters.import.preview.duplicates_hint":
+    "Όσες υπάρχουν ήδη παραλείπονται — δεν αλλάζουμε τα στοιχεία τους. Διόρθωσέ τες από την καρτέλα τους αν χρειάζεται.",
+  "promoters.import.preview.only_problems": "Μόνο όσες χρειάζονται προσοχή ({count})",
+  "promoters.import.preview.table_label": "Γραμμές αρχείου",
+  "promoters.import.preview.col.row": "Γρ.",
+  "promoters.import.preview.col.name": "Ονοματεπώνυμο",
+  "promoters.import.preview.col.phone": "Τηλέφωνο",
+  "promoters.import.preview.col.areas": "Περιοχές",
+  "promoters.import.preview.col.status": "Κατάσταση",
+  "promoters.import.preview.status.ready": "Έτοιμη",
+  "promoters.import.preview.status.warning": "Με επιφύλαξη",
+  "promoters.import.preview.status.error": "Σφάλμα",
+  "promoters.import.preview.status.duplicate": "Υπάρχει ήδη",
+  "promoters.import.preview.duplicate_of": "ίδιο τηλέφωνο με «{name}»",
+  "promoters.import.preview.read_only": "Ο λογαριασμός είναι σε κατάσταση μόνο για ανάγνωση, οπότε η εισαγωγή δεν θα γίνει.",
+  "promoters.import.preview.capacity": "Το πακέτο σου χωράει άλλους {count} promoters.",
+  "promoters.import.preview.capacity_exceeded":
+    "Το πακέτο σου χωράει άλλους {count} promoters, οπότε θα εισαχθούν οι πρώτοι {count} από τους {valid}.",
+  "promoters.import.preview.submit_none": "Καμία γραμμή για εισαγωγή",
+  "promoters.import.preview.submit_one": "Εισαγωγή 1 promoter",
+  "promoters.import.preview.submit_other": "Εισαγωγή {count} promoters",
+  "promoters.import.preview.submitting": "Γίνεται εισαγωγή…",
+
+  "promoters.import.done.title": "Η εισαγωγή ολοκληρώθηκε",
+  "promoters.import.done.created_one": "Προστέθηκε 1 promoter.",
+  "promoters.import.done.created_other": "Προστέθηκαν {count} promoters.",
+  "promoters.import.done.created_none": "Δεν προστέθηκε κανένας promoter.",
+  "promoters.import.done.duplicates": "{count} υπήρχαν ήδη και παραλείφθηκαν.",
+  "promoters.import.done.errors": "{count} γραμμές είχαν σφάλμα και παραλείφθηκαν.",
+  "promoters.import.done.over_limit": "{count} δεν χώρεσαν στο πακέτο σου.",
+  "promoters.import.done.not_created": "{count} δεν αποθηκεύτηκαν λόγω σφάλματος. Ξαναδοκίμασε με το ίδιο αρχείο — όσες μπήκαν θα εμφανιστούν ως «υπάρχουν ήδη».",
+  "promoters.import.done.close": "Τέλος",
+
+  "promoters.import.error.read_only": "Ο λογαριασμός είναι σε κατάσταση μόνο για ανάγνωση.",
+  "promoters.import.error.invalid_payload": "Κάτι πήγε στραβά με τα δεδομένα. Ξεκίνα την εισαγωγή από την αρχή.",
+  "promoters.import.error.too_many_rows": "Το αρχείο έχει πάρα πολλές γραμμές.",
+  "promoters.import.error.nothing_to_import": "Δεν υπάρχει καμία έγκυρη γραμμή για εισαγωγή.",
+  "promoters.import.error.over_promoter_limit": "Το πακέτο σου έχει συμπληρωθεί. Αναβάθμισε για να προσθέσεις κι άλλους promoters.",
+  "promoters.import.error.load_failed": "Δεν μπορέσαμε να ολοκληρώσουμε την εισαγωγή. Δοκίμασε ξανά.",
 
 } as const;
