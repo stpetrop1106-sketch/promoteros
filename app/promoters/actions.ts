@@ -10,6 +10,9 @@ import { requireUser } from "@/lib/auth";
 import { getGeocoder, type GeocodeResult } from "@/lib/geocoding";
 import { translatorFor, DEFAULT_LOCALE, type TranslationKey } from "@/lib/i18n";
 import { checkBillingFor, lookupEntitlement } from "@/lib/billing/subscription";
+// S1 — moved out of this file so the bulk importer can apply the identical rule. A `"use server"`
+// module may export only async functions, so it could not be exported from here.
+import { normalizePhone } from "@/lib/promoters/phone";
 import type { PlanId } from "@/lib/billing/plans";
 import type { FieldErrors, PromoterFormState } from "./state";
 
@@ -29,22 +32,6 @@ const PLAN_LABEL_KEY: Record<PlanId, TranslationKey> = {
   agency: "billing.plan.agency",
   multi_brand: "billing.plan.multi_brand",
 };
-
-/**
- * Normalises a promoter's phone number to a consistent shape before it ever reaches the
- * `unique (agency_id, phone)` constraint. Two coordinators typing "6971234567" and
- * "+30 697 123 4567" must collide, not create two rows for the same person.
- */
-function normalizePhone(raw: string): string {
-  const trimmed = raw.trim();
-  const hasPlus = trimmed.startsWith("+");
-  const digits = trimmed.replace(/\D/g, "");
-
-  if (hasPlus) return `+${digits}`;
-  // A 10-digit Greek mobile typed without a country code — the overwhelming common case.
-  if (digits.length === 10 && digits.startsWith("6")) return `+30${digits}`;
-  return digits;
-}
 
 function parseOptionalInt(raw: FormDataEntryValue | null): number | undefined | "invalid" {
   if (typeof raw !== "string") return undefined;

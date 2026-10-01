@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { translatorFor, DEFAULT_LOCALE } from "@/lib/i18n";
+import { promoterSearchFilter } from "@/lib/promoters/search";
 import {
   Avatar,
   PageHeader,
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui";
 import type { BadgeVariant } from "@/components/ui";
 import { LinkButton } from "./link-button";
+import { ImportPromoters } from "./import/import-promoters";
 
 export const dynamic = "force-dynamic";
 
@@ -68,15 +70,6 @@ function readStatus(value: string): PromoterStatus | null {
   return (PROMOTER_STATUSES as readonly string[]).includes(value) ? (value as PromoterStatus) : null;
 }
 
-/**
- * PostgREST's `or=` takes a comma-separated list inside parentheses, so a comma, a bracket or a
- * quote in the search box would change the shape of the filter rather than be searched for.
- * Strip those, and `%`/`_`, which are `ilike` wildcards.
- */
-function searchPattern(raw: string): string {
-  return "%" + raw.replace(/[,()"'%_*\\]/g, " ").trim() + "%";
-}
-
 /** The current query string with `page` replaced — used by the two pager links. */
 function pageHref(sp: Record<string, string | string[] | undefined>, page: number): string {
   const params = new URLSearchParams();
@@ -99,7 +92,10 @@ export default async function PromotersPage({
   await requireUser();
   const db = await createServerSupabase();
 
-  const q = first(sp.q).trim().toLowerCase();
+  // Kept exactly as typed. It is echoed back into the search box below, and lowercasing it there
+  // rewrote the coordinator's "Μαρία" to "μαρία" in front of them on every submit. Normalisation
+  // for the *query* happens in `promoterSearchFilter`, where it belongs.
+  const q = first(sp.q).trim();
   const statusFilter = first(sp.status);
   const areaFilter = first(sp.area);
   const skillFilter = first(sp.skill);
@@ -141,12 +137,19 @@ export default async function PromotersPage({
          promoter_skills ( level, skill:skills ( id, name ) )`,
       { count: "exact" },
     )
-    .order("full_name");
+    // `full_name` is NOT unique — the real roster holds "Στέλιος Καραγιάννη" three times and
+    // "Άννα Γεωργίου" twice. A LIMIT/OFFSET pager over a non-unique sort key has no defined order
+    // between ties, so the same promoter could be served on page 1 and again on page 2 while
+    // another was served on neither: rows genuinely go missing without any error. `id` is the
+    // tiebreaker that makes the ordering total and the paging stable.
+    .order("full_name")
+    .order("id");
 
-  if (q) {
-    const pattern = searchPattern(q);
-    query = query.or(`full_name.ilike.${pattern},phone.ilike.${pattern}`);
-  }
+  // S1 — the search runs against 0021's normalised columns, not against `full_name`. `ilike` is
+  // case-insensitive but NOT accent-insensitive, so '%Στέλλα%' found nobody on a roster holding
+  // "ΣΤΕΛΛΑ" and '%μαρια%' found one of the four Marias. See lib/promoters/search.ts.
+  const searchFilter = promoterSearchFilter(q);
+  if (searchFilter) query = query.or(searchFilter);
   const status = readStatus(statusFilter);
   if (status) query = query.eq("status", status);
   if (carFilter === "yes") query = query.eq("has_car", true);
@@ -178,9 +181,14 @@ export default async function PromotersPage({
           }
           icon={<Icon name="users" size={20} />}
           actions={
-            <LinkButton href="/promoters/new" iconLeft={<Icon name="plus" size={16} />}>
-              {t("promoters.add")}
-            </LinkButton>
+            <div className="flex flex-wrap items-center gap-2">
+              {/* An agency arriving with 500 promoters in a spreadsheet must not type them in one
+                  at a time. The whole page is also a drop target — see import-promoters.tsx. */}
+              <ImportPromoters />
+              <LinkButton href="/promoters/new" iconLeft={<Icon name="plus" size={16} />}>
+                {t("promoters.add")}
+              </LinkButton>
+            </div>
           }
         />
 
