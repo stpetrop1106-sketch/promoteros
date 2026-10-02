@@ -22,6 +22,8 @@ import {
 import type { BadgeVariant } from "@/components/ui";
 import { LinkButton } from "../link-button";
 import { AvailabilityLink } from "./availability-link";
+import { EarningsSection } from "./earnings-section";
+import type { PromoterShiftRow } from "@/lib/promoters/earnings";
 
 export const dynamic = "force-dynamic";
 
@@ -87,8 +89,16 @@ const ASSIGNMENT_STATUS_KEY: Record<string, TranslationKey> = {
   no_show: "promoters.profile.assignment_status.no_show",
 };
 
-export default async function PromoterProfilePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PromoterProfilePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { id } = await params;
+  const sp = await searchParams;
+  const requestedMonth = typeof sp.month === "string" ? sp.month : null;
   const t = translatorFor(DEFAULT_LOCALE);
   await requireUser();
   const db = await createServerSupabase();
@@ -111,7 +121,13 @@ export default async function PromoterProfilePage({ params }: { params: Promise<
     db
       .from("assignments")
       .select(
-        `id, status, shift:shifts ( id, on_date, start_time, end_time, store:stores(name), campaign:campaigns(name) )`,
+        // The rate-bearing columns and the check-in are here for the earnings section. Both rates
+        // are selected because the effective one is `rate_cents_override ?? campaigns.rate_cents`,
+        // and `check_ins` is what decides whether a shift counts as worked at all (D24).
+        `id, status, shift:shifts ( id, on_date, start_time, end_time, rate_cents_override,
+           store:stores(name, address),
+           campaign:campaigns(name, rate_cents, client:clients(name)) ),
+         check_ins ( checked_in_at )`,
       )
       .eq("promoter_id", id),
   ]);
@@ -131,6 +147,48 @@ export default async function PromoterProfilePage({ params }: { params: Promise<
     .sort((a, b) => (a.shift!.on_date > b.shift!.on_date ? -1 : 1));
 
   const missingCoords = p.home_lat == null || p.home_lng == null;
+
+  // Shaped for `lib/promoters/earnings.ts`, which owns every rule and every sum. The query is the
+  // RLS-scoped client, so these rows are already this agency's and nobody else's.
+  const earningsRows: PromoterShiftRow[] = allAssignments
+    .filter((a) => a.shift)
+    .map((a) => {
+      const shift = a.shift as unknown as {
+        id: string;
+        on_date: string;
+        start_time: string;
+        end_time: string;
+        rate_cents_override: number | null;
+        store: { name: string | null; address: string | null } | null;
+        campaign: { name: string | null; rate_cents: number | null; client: { name: string | null } | null } | null;
+      };
+      // PostgREST returns a to-ONE embed as an object and a to-many as an array, and the
+      // check-in is one-to-one (unique on assignment_id). Treating it as an array made
+      // `hasCheckIn` always false, so every promoter looked as though they had never worked and
+      // the earnings screen was empty even for the people who qualified. Accept either shape.
+      const rawCheckIn = (a as unknown as {
+        check_ins?: { checked_in_at: string | null } | { checked_in_at: string | null }[] | null;
+      }).check_ins;
+      const checkIn = Array.isArray(rawCheckIn) ? (rawCheckIn[0] ?? null) : (rawCheckIn ?? null);
+
+      return {
+        assignmentId: a.id,
+        shiftId: shift.id,
+        // The row type narrows this; the query returns the column as a plain string.
+        status: a.status as PromoterShiftRow["status"],
+        onDate: shift.on_date,
+        startTime: String(shift.start_time),
+        endTime: String(shift.end_time),
+        clientName: shift.campaign?.client?.name ?? null,
+        campaignName: shift.campaign?.name ?? null,
+        storeName: shift.store?.name ?? null,
+        storeAddress: shift.store?.address ?? null,
+        campaignRateCents: shift.campaign?.rate_cents ?? null,
+        shiftRateOverrideCents: shift.rate_cents_override ?? null,
+        hasCheckIn: checkIn !== null,
+        checkedInAt: checkIn?.checked_in_at ?? null,
+      };
+    });
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-10 sm:py-12">
@@ -259,6 +317,13 @@ export default async function PromoterProfilePage({ params }: { params: Promise<
         {/* P30 mounted: the coordinator sends the promoter their own availability link.
             Minting writes nothing — it is an HMAC over the promoter id — so this is safe to reopen. */}
         <AvailabilityLink promoterId={p.id} promoterName={p.full_name} promoterPhone={p.phone} />
+
+        <EarningsSection
+          promoterId={p.id}
+          rows={earningsRows}
+          today={today}
+          requestedMonth={requestedMonth}
+        />
 
         <Card
           flush

@@ -653,7 +653,7 @@ export const el = {
   "onboarding.create.full_name_hint": "Προαιρετικό. Έτσι θα σε βλέπει η ομάδα σου.",
   "onboarding.create.submit": "Δημιουργία πρακτορείου",
   "onboarding.create.submitting": "Δημιουργία…",
-  "onboarding.create.trial_note": "14 ημέρες δοκιμή. Δεν χρειάζεται κάρτα.",
+  "onboarding.create.trial_note": "Ο πρώτος μήνας δωρεάν. Δεν χρειάζεται κάρτα.",
   "onboarding.create.invited_instead":
     "Σε προσκάλεσε συνάδελφος; Άνοιξε τον σύνδεσμο που έλαβες με email αντί να δημιουργήσεις νέο πρακτορείο.",
 
@@ -2413,5 +2413,84 @@ export const el = {
   "promoters.import.error.nothing_to_import": "Δεν υπάρχει καμία έγκυρη γραμμή για εισαγωγή.",
   "promoters.import.error.over_promoter_limit": "Το πακέτο σου έχει συμπληρωθεί. Αναβάθμισε για να προσθέσεις κι άλλους promoters.",
   "promoters.import.error.load_failed": "Δεν μπορέσαμε να ολοκληρώσουμε την εισαγωγή. Δοκίμασε ξανά.",
+
+  // --- Creating a real account, and what it costs ---------------------------------------------
+  // Distinct from `landing.*` (the waitlist) on purpose: the waitlist collects addresses and will
+  // be switched off; this is the account path and has to outlive it.
+  "signup.title": "Δημιούργησε τον λογαριασμό σου στο PromoterOS",
+  "signup.subtitle": "Ο πρώτος μήνας είναι δωρεάν, δεν ζητάμε κάρτα και δεν υπάρχει κωδικός πρόσβασης.",
+  "signup.not_waitlist": "Δεν είναι η λίστα πρώιμης πρόσβασης: εδώ φτιάχνεις λογαριασμό που δουλεύει αμέσως.",
+  "signup.cta": "Δημιουργία λογαριασμού",
+  "signup.how_title": "Πώς γίνεται",
+  "signup.how_1": "Γράφεις το email σου.",
+  "signup.how_2":
+    "Σου στέλνουμε σύνδεσμο μιας χρήσης και έναν κωδικό έξι ψηφίων — χρησιμοποίησε όποιο από τα δύο σου βολεύει.",
+  "signup.how_3": "Δίνεις το όνομα του πρακτορείου και ο λογαριασμός είναι έτοιμος.",
+  "signup.no_password_note":
+    "Δεν υπάρχουν κωδικοί πρόσβασης στο PromoterOS, άρα δεν υπάρχει κωδικός να ξεχαστεί ή να διαρρεύσει. Αν ζητήσεις σύνδεσμο δύο φορές δεν είναι λάθος — απλώς στέλνουμε καινούριο.",
+  "signup.already_have_account":
+    "Έχεις ήδη λογαριασμό; Βάλε το ίδιο email — ο σύνδεσμος σε συνδέει στο πρακτορείο σου.",
+  "signup.pricing_link": "Δες τα πακέτα και τις τιμές",
+  "auth.no_account": "Δεν έχεις ακόμη λογαριασμό;",
+
+  "page_title.pricing": "Τιμές",
+  "pricing.title": "Τιμές",
+  "pricing.subtitle":
+    "Σταθερή τιμή ανά πρακτορείο — η ίδια τον Δεκέμβριο και τον Αύγουστο. Καμία χρέωση ανά promoter.",
+  "pricing.trial_note": "Κάθε νέο πρακτορείο ξεκινά με έναν μήνα δωρεάν, χωρίς κάρτα.",
+  "pricing.start_cta": "Ξεκίνα τον δωρεάν μήνα",
+  "pricing.recommended": "Προτεινόμενο",
+  "pricing.limits_title": "Όρια",
+  "pricing.payment_pending_title": "Η online πληρωμή δεν είναι ακόμη ενεργή",
+  "pricing.payment_pending_body":
+    "Μπορείς να ξεκινήσεις τον δωρεάν μήνα σήμερα. Δεν χρεώνεται τίποτα και δεν γίνεται να πληρώσεις από εδώ ακόμη· θα επικοινωνήσουμε μαζί σου πριν λήξει η δοκιμή.",
+  "pricing.included_title": "Σε κάθε πακέτο",
+  "pricing.included_note":
+    "Τα πακέτα δεν κρύβουν λειτουργίες. Και τα τρία περιλαμβάνουν ολόκληρο το προϊόν και διαφέρουν μόνο στα όρια.",
+  "pricing.included_1": "Κατάταξη promoters για κάθε βάρδια, με αναλυτική βαθμολογία ανά παράγοντα",
+  "pricing.included_2": "Προσκλήσεις με σύνδεσμο μιας χρήσης — ο promoter απαντά χωρίς λογαριασμό",
+  "pricing.included_3": "Δήλωση άφιξης με απόσταση από το σημείο, με χειροκίνητη παράκαμψη",
+  "pricing.included_4": "Αναφορές πεδίου με φωτογραφίες, για τον πελάτη",
+  "pricing.included_5": "Εισαγωγή promoters από Excel",
+  "pricing.included_6": "Λογαριασμοί ομάδας με ρόλους· τα δεδομένα κάθε πρακτορείου μένουν χωριστά",
+  "pricing.change_plan_note": "Δεν είσαι σίγουρος/η; Ξεκίνα με το Starter — το πακέτο αλλάζει όποτε θέλεις.",
+  "pricing.your_trial": "Το {agency} είναι σε δοκιμή και λήγει {date}.",
+  "pricing.signed_in_plan": "Τρέχον πακέτο: {plan}.",
+  "pricing.your_subscription_cta": "Η συνδρομή σου",
+
+  "onboarding.trial.title": "Είσαι σε δωρεάν δοκιμή",
+  "onboarding.trial.body":
+    "Η δοκιμή λήγει {date} — {days} ημέρες ακόμα. Δεν έχει καταχωρηθεί κάρτα και δεν έχει χρεωθεί τίποτα.",
+  "onboarding.trial.cta": "Πακέτα και τιμές",
+
+  // --- Monthly earnings on the promoter profile ------------------------------------------------
+  // "Worked" is defined by decision D24: the shift's date has passed AND a check-in exists.
+  // `promoters.earnings.basis` says that on screen, because an unexplained number about somebody's
+  // pay is a number nobody trusts.
+  "promoters.earnings.title": "Αποδοχές μήνα",
+  "promoters.earnings.month_label": "Μήνας",
+  "promoters.earnings.shifts_one": "βάρδια",
+  "promoters.earnings.shifts_many": "βάρδιες",
+  "promoters.earnings.hours": "πληρωτέες ώρες",
+  "promoters.earnings.total": "σύνολο",
+  "promoters.earnings.basis":
+    "Μετρούν οι βάρδιες που έχουν περάσει και στις οποίες ο promoter δήλωσε άφιξη.",
+  "promoters.earnings.empty": "Καμία βάρδια αυτόν τον μήνα.",
+  "promoters.earnings.none_ever":
+    "Δεν υπάρχει ακόμη καμία βάρδια με δηλωμένη άφιξη για αυτόν τον promoter.",
+  "promoters.earnings.partial":
+    "Σε {count} βάρδια δεν έχει οριστεί αμοιβή, οπότε το σύνολο είναι μικρότερο από το πραγματικό.",
+  "promoters.earnings.partial_many":
+    "Σε {count} βάρδιες δεν έχει οριστεί αμοιβή, οπότε το σύνολο είναι μικρότερο από το πραγματικό.",
+  "promoters.earnings.history_title": "Ιστορικό βαρδιών",
+  "promoters.earnings.col.date": "Ημερομηνία",
+  "promoters.earnings.col.campaign": "Πελάτης / Καμπάνια",
+  "promoters.earnings.col.location": "Σημείο",
+  "promoters.earnings.col.hours": "Ώρες",
+  "promoters.earnings.col.pay": "Αμοιβή",
+  "promoters.earnings.no_pay": "—",
+  "promoters.earnings.no_pay_hint": "Δεν έχει οριστεί αμοιβή",
+  "promoters.earnings.mutable_warning":
+    "Οι αμοιβές υπολογίζονται από την τρέχουσα τιμή της καμπάνιας. Αν αλλάξει η τιμή, αλλάζουν και τα περασμένα ποσά.",
 
 } as const;

@@ -647,7 +647,7 @@ export const en: Record<TranslationKey, string> = {
   "onboarding.create.full_name_hint": "Optional. This is how your team will see you.",
   "onboarding.create.submit": "Create agency",
   "onboarding.create.submitting": "Creating…",
-  "onboarding.create.trial_note": "14-day trial. No card required.",
+  "onboarding.create.trial_note": "One free month. No card required.",
   "onboarding.create.invited_instead":
     "Invited by a colleague? Open the link from your email instead of creating a new agency.",
 
@@ -2360,5 +2360,77 @@ export const en: Record<TranslationKey, string> = {
   "promoters.import.error.nothing_to_import": "There is no valid row to import.",
   "promoters.import.error.over_promoter_limit": "Your plan is full. Upgrade to add more promoters.",
   "promoters.import.error.load_failed": "We could not finish the import. Try again.",
+
+  // --- Creating a real account, and what it costs ---------------------------------------------
+  "signup.title": "Create your PromoterOS account",
+  "signup.subtitle": "The first month is free, we ask for no card, and there is no password.",
+  "signup.not_waitlist":
+    "This is not the early-access waitlist: here you create an account that works straight away.",
+  "signup.cta": "Create an account",
+  "signup.how_title": "How it works",
+  "signup.how_1": "You type your email address.",
+  "signup.how_2": "We send you a single-use link and a six-digit code — use whichever suits you.",
+  "signup.how_3": "You give your agency's name and the account is ready.",
+  "signup.no_password_note":
+    "PromoterOS has no passwords, so there is no password to forget or to leak. Asking for a link twice is not an error — we simply send a new one.",
+  "signup.already_have_account":
+    "Already have an account? Use the same address — the link signs you in to your agency.",
+  "signup.pricing_link": "See the plans and prices",
+  "auth.no_account": "Don't have an account yet?",
+
+  "page_title.pricing": "Pricing",
+  "pricing.title": "Pricing",
+  "pricing.subtitle":
+    "A flat price per agency — the same in December as in August. Nothing is charged per promoter.",
+  "pricing.trial_note": "Every new agency starts with one free month, with no card.",
+  "pricing.start_cta": "Start the free month",
+  "pricing.recommended": "Recommended",
+  "pricing.limits_title": "Limits",
+  "pricing.payment_pending_title": "Online payment is not switched on yet",
+  "pricing.payment_pending_body":
+    "You can start the free month today. Nothing is charged and there is no way to pay from here yet; we will be in touch before the trial ends.",
+  "pricing.included_title": "In every plan",
+  "pricing.included_note":
+    "Plans do not hide features. All three include the whole product and differ only in the limits.",
+  "pricing.included_1": "Promoter ranking for every shift, with the score broken down per factor",
+  "pricing.included_2": "Invitations by single-use link — the promoter answers without an account",
+  "pricing.included_3": "Arrival check-in with distance from the venue, and a manual override",
+  "pricing.included_4": "Field reports with photos, for the client",
+  "pricing.included_5": "Promoter import from Excel",
+  "pricing.included_6": "Team accounts with roles; each agency's data stays separate",
+  "pricing.change_plan_note": "Not sure? Start on Starter — the plan can change whenever you like.",
+  "pricing.your_trial": "{agency} is on trial until {date}.",
+  "pricing.signed_in_plan": "Current plan: {plan}.",
+  "pricing.your_subscription_cta": "Your subscription",
+
+  "onboarding.trial.title": "You are on a free trial",
+  "onboarding.trial.body":
+    "The trial ends {date} — {days} days left. No card has been stored and nothing has been charged.",
+  "onboarding.trial.cta": "Plans and prices",
+
+  // --- Monthly earnings on the promoter profile ------------------------------------------------
+  "promoters.earnings.title": "Earnings this month",
+  "promoters.earnings.month_label": "Month",
+  "promoters.earnings.shifts_one": "shift",
+  "promoters.earnings.shifts_many": "shifts",
+  "promoters.earnings.hours": "paid hours",
+  "promoters.earnings.total": "total",
+  "promoters.earnings.basis": "Counts shifts whose date has passed and where the promoter checked in.",
+  "promoters.earnings.empty": "No shifts in this month.",
+  "promoters.earnings.none_ever": "This promoter has no checked-in shifts yet.",
+  "promoters.earnings.partial":
+    "{count} shift has no rate set, so the total is lower than the real one.",
+  "promoters.earnings.partial_many":
+    "{count} shifts have no rate set, so the total is lower than the real one.",
+  "promoters.earnings.history_title": "Shift history",
+  "promoters.earnings.col.date": "Date",
+  "promoters.earnings.col.campaign": "Client / Campaign",
+  "promoters.earnings.col.location": "Venue",
+  "promoters.earnings.col.hours": "Hours",
+  "promoters.earnings.col.pay": "Pay",
+  "promoters.earnings.no_pay": "—",
+  "promoters.earnings.no_pay_hint": "No rate set",
+  "promoters.earnings.mutable_warning":
+    "Pay is calculated from the campaign's current rate. If the rate changes, past amounts change with it.",
 
 };
