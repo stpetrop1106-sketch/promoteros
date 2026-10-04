@@ -201,6 +201,12 @@ export function Home({ attribution }: { attribution: Attribution }) {
             {/* The full sentence wraps to two lines on a 375px phone and squashes the logo, which
                 is the "desktop layout, stacked" look this page is meant to avoid. The short label
                 says the same thing in the space a phone actually has. */}
+            <Link
+              href="/pricing"
+              className="hidden whitespace-nowrap text-[0.85rem] text-[color:var(--color-muted)] transition hover:text-[color:var(--color-ink)] sm:inline"
+            >
+              {t("pricing.title")}
+            </Link>
             <a
               href="#early-access"
               className="whitespace-nowrap rounded-[var(--radius-sm)] bg-[color:var(--color-accent)] px-3.5 py-2 text-[0.85rem] font-medium text-white transition hover:bg-[color:var(--color-accent-hover)]"
@@ -444,6 +450,12 @@ export function Home({ attribution }: { attribution: Attribution }) {
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-9 text-[0.85rem] text-[color:var(--color-muted)] sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <p>{t("home.footer.tagline")}</p>
           <div className="flex items-center gap-6">
+            <Link className="transition hover:text-[color:var(--color-ink)]" href="/pricing">
+              {t("pricing.title")}
+            </Link>
+            <Link className="transition hover:text-[color:var(--color-ink)]" href="/signup">
+              {t("signup.cta")}
+            </Link>
             <Link className="transition hover:text-[color:var(--color-ink)]" href="/login">
               {t("auth.login_title")}
             </Link>
